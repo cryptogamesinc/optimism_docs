@@ -1,3 +1,9 @@
+# Optimism Docs日本語
+2024.04.14時点でのドキュメントを日本語化
+
+- チェックしやすいように原文併記
+
+
 #  Optimism Docs
 
 This repo houses the Optimism Docs located at [docs.optimism.io](https://docs.optimism.io/). All documentation-related updates and new content will be tracked and maintained in this repo. 
