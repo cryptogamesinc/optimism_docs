@@ -1,73 +1,73 @@
 ---
-title: App Developer Overview
-lang: en-US
-description: Learn about deploying contracts, cross-chain messaging, and tutorials to help you build applications on OP Mainnet.
+title: アプリ開発者概要
+lang: ja-JP
+description: OP Mainnetでのコントラクトのデプロイ、クロスチェーンメッセージング、アプリケーション構築のためのチュートリアルについて学びましょう。
 ---
 
 import { Cards, Card } from 'nextra/components'
 
-# App Developer Overview
+# アプリ開発者概要
 
-If you're a developer looking to build on OP Mainnet, you've come to the right place.
-In this area of the Optimism Docs you'll find everything you need to know about building OP Mainnet applications.
+OP Mainnetでの開発を検討している開発者の方へ、ここが正しい場所です。
+Optimism Docsのこのエリアでは、OP Mainnetアプリケーションの構築に必要なすべての情報を見つけることができます。
 
-## Getting Started
+## はじめに
 
-If you're brand new to OP Mainnet, try starting with the guide on [deploying a basic contract](/chain/getting-started).
-It'll get you familiar with the basic steps required to get a contract deployed to the network.
-OP Mainnet is [EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306) so you can feel confident that your existing Ethereum smart contract skills will carry over to OP Mainnet.
-Just make sure to be aware of the few small [differences between Ethereum and OP Mainnet](/chain/differences).
+OP Mainnetが初めての方は、[基本的なコントラクトのデプロイ](/chain/getting-started)に関するガイドから始めてみてください。
+これにより、ネットワークへのコントラクトデプロイに必要な基本的なステップに慣れることができます。
+OP Mainnetは[EVMと等価](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306)ですので、既存のEthereumスマートコントラクトスキルがOP Mainnetにも活用できることを安心してください。
+ただし、EthereumとOP Mainnetの[いくつかの小さな違い](/chain/differences)に注意してください。
 
-You might also want to check out the [testing on OP Networks guide](/chain/testing/testing-apps) and the tutorial on [running a local development environment](/chain/testing/dev-node) to help you feel totally confident in your OP Mainnet deployment.
-
-<Cards>
-  <Card title="Deploying Your First Contract to OP Mainnet" href="/builders/app-developers/tutorials/first-contract" icon={<img src="/img/icons/shapes.svg" />} />
-
-  <Card title="Solidity Compatibility on OP Mainnet" href="/builders/app-developers/contracts/compatibility" icon={<img src="/img/icons/shapes.svg" />} />
-
-  <Card title="Testing Apps on OP Mainnet" href="/chain/testing/testing-apps" icon={<img src="/img/icons/shapes.svg" />} />
-</Cards>
-
-## Bridging and Messaging
-
-Looking to build an application that sends ETH, tokens, or data between OP Mainnet and Ethereum?
-You'll find some useful guides and tutorials in this area of the docs.
-For instance, if you want to learn how to bridge a token from Ethereum to OP Mainnet (or vice versa!), you should check out the [Standard Token Bridge](bridging/standard-bridge).
-
-If you're looking for something more advanced, take a look at the guide on [sending data between L1 and L2](bridging/messaging).
-Contracts on one chain can trigger contract functions on the other chain, it's pretty cool!
-The Standard Token Bridge for OP Mainnet even uses this same message-passing infrastructure under the hood.
+また、[OPネットワークでのテストガイド](/chain/testing/testing-apps)や[ローカル開発環境の実行](/chain/testing/dev-node)についてのチュートリアルも確認して、OP Mainnetデプロイメントに完全な自信を持てるようにしましょう。
 
 <Cards>
-  <Card title="Basics of Bridging on OP Mainnet" href="/builders/app-developers/bridging/basics" icon={<img src="/img/icons/shapes.svg" />} />
+  <Card title="OP Mainnetへの最初のコントラクトのデプロイ" href="/builders/app-developers/tutorials/first-contract" icon={<img src="/img/icons/shapes.svg" />} />
 
-  <Card title="Sending Data Between L1 and L2" href="/builders/app-developers/bridging/messaging" icon={<img src="/img/icons/shapes.svg" />} />
+  <Card title="OP MainnetでのSolidity互換性" href="/builders/app-developers/contracts/compatibility" icon={<img src="/img/icons/shapes.svg" />} />
 
-  <Card title="The Standard Bridge" href="/builders/app-developers/bridging/standard-bridge" icon={<img src="/img/icons/shapes.svg" />} />
+  <Card title="OP Mainnetでのアプリのテスト" href="/chain/testing/testing-apps" icon={<img src="/img/icons/shapes.svg" />} />
 </Cards>
 
-## Tutorials
+## ブリッジとメッセージング
 
-If you're a bit more familiar with OP Mainnet and Ethereum, you can try walking through one of the tutorials put together by the Optimism community.
-They'll help you get a head start when building your first Optimistic project.
+OP MainnetとEthereum間でETH、トークン、またはデータを送信するアプリケーションを構築しますか？
+このドキュメントのエリアには、役立つガイドやチュートリアルがあります。
+例えば、EthereumからOP Mainnet（またはその逆）へトークンをブリッジする方法を学びたい場合は、[標準トークンブリッジ](/builders/app-developers/bridging/standard-bridge)をチェックしてください。
 
-| Tutorial Name                                                                                             | Description                                                                                                                               | Difficulty Level |
-| --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| [Deploying Your First Contract on OP Mainnet](tutorials/first-contract)                                   | Learn how to deploy your first contract to OP Mainnet with Remix and MetaMask.                                                            | 🟢 Easy          |
-| [Bridging ETH With the Optimism SDK](tutorials/cross-dom-bridge-eth)                                      | Learn how to use the Optimism SDK to transfer ETH between Layer 1 (Ethereum or Sepolia) and Layer 2 (OP Mainnet or OP Sepolia).           | 🟢 Easy          |
-| [Bridging ERC-20 Tokens With the Optimism SDK](tutorials/cross-dom-bridge-erc20)                          | Learn how to use the Optimism SDK to transfer ERC-20 tokens between Layer 1 (Ethereum or Sepolia) and Layer 2 (OP Mainnet or OP Sepolia). | 🟢 Easy          |
-| [Bridging your Standard ERC-20 token using the Standard Bridge](tutorials/standard-bridge-standard-token) | Learn how to bridge your standard ERC-20 token to layer 2 using the standard bridge.                                                      | 🟡 Medium        |
-| [Bridging your Custom ERC-20 token using the Standard Bridge](tutorials/standard-bridge-custom-token)     | Learn how to bridge your custom ERC-20 token to layer 2 using the standard bridge.                                                        | 🟡 Medium        |
-| [Tracing Deposits and Withdrawals With the Optimism SDK](tutorials/sdk-trace-txns)                        | Learn how to use the Optimism SDK to trace deposits and withdrawals.                                                                      | 🟢 Easy          |
-| [Viewing Deposits and Withdrawals by Address With the Optimism SDK](tutorials/sdk-view-txns)              | Learn how to use the Optimism SDK to view deposits and withdrawals by address.                                                            | 🟢 Easy          |
-| [Estimating Transaction Costs With the Optimism SDK](tutorials/sdk-view-txns)                             | Learn how to use the Optimism SDK to estimate the cost of a transaction on OP Mainnet.                                                    | 🟢 Easy          |
-| [Sending OP Mainnet Transactions from Ethereum](tutorials/send-tx-from-eth)                               | Learn how to send transactions to OP Mainnet from Ethereum.                                                                               | 🟢 Easy          |
+もっと高度なものを探している場合は、[L1とL2間でデータを送信](/builders/app-developers/bridging/messaging)するガイドを見てみましょう。
+あるチェーンのコントラクトが他のチェーンのコントラクト機能をトリガーすることができます。とてもクールです！
+OP Mainnetの標準トークンブリッジも、この同じメッセージパッシングインフラストラクチャを内部で使用しています。
 
-You can also [suggest a new tutorial](https://github.com/ethereum-optimism/docs/issues/new?assignees=\&labels=tutorial%2Cdocumentation%2Ccommunity-request\&projects=\&template=suggest_tutorial.yaml\&title=%5BTUTORIAL%5D+Add+PR+title) if you have something specific in mind. We'd love to grow this list!
+<Cards>
+  <Card title="OP Mainnetでのブリッジの基本" href="/builders/app-developers/bridging/basics" icon={<img src="/img/icons/shapes.svg" />} />
 
-## Next Steps
+  <Card title="L1とL2間でのデータ送信" href="/builders/app-developers/bridging/messaging" icon={<img src="/img/icons/shapes.svg" />} />
 
-If you still can't find the content you're looking for, there's a few options to get extra help.
+  <Card title="標準ブリッジ" href="/builders/app-developers/bridging/standard-bridge" icon={<img src="/img/icons/shapes.svg" />} />
+</Cards>
 
-*   You can [ask a question in the Optimism developer support forum](https://github.com/ethereum-optimism/developers/discussions).
-*   If you run into any problems during deployment, visit the [Transactions Troubleshooting Guide](./transactions/troubleshooting) for help.
+## チュートリアル
+
+OP MainnetやEthereumに少し慣れている場合は、Optimismコミュニティによってまとめられたチュートリアルのいずれかを試してみることができます。
+これらは、最初のOptimisticプロジェクトを構築するときのスタートアップを助けてくれます。
+
+| チュートリアル名                                                                                                   | 説明                                                                                                                       | 難易度             |
+| -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| [OP Mainnetでの最初のコントラクトのデプロイ](/tutorials/first-contract)                                         | RemixとMetaMaskを使用してOP Mainnetに初めてのコントラクトをデプロイする方法を学びます。                                      | 🟢 簡単          |
+| [Optimism SDKを使用したETHのブリッジ](/tutorials/cross-dom-bridge-eth)                                           | Layer 1 (EthereumまたはSepolia)とLayer 2 (OP MainnetまたはOP Sepolia)間でETHを転送する方法を学びます。                    | 🟢 簡単          |
+| [Optimism SDKを使用したERC-20トークンのブリッジ](/tutorials/cross-dom-bridge-erc20)                               | Layer 1 (EthereumまたはSepolia)とLayer 2 (OP MainnetまたはOP Sepolia)間でERC-20トークンを転送する方法を学びます。          | 🟢 簡単          |
+| [標準ブリッジを使用した標準ERC-20トークンのブリッジ](/tutorials/standard-bridge-standard-token)                  | 標準ブリッジを使用して標準ERC-20トークンをLayer 2にブリッジする方法を学びます。                                             | 🟡 中程度        |
+| [標準ブリッジを使用したカスタムERC-20トークンのブリッジ](/tutorials/standard-bridge-custom-token)                | 標準ブリッジを使用してカスタムERC-20トークンをLayer 2にブリッジする方法を学びます。                                         | 🟡 中程度        |
+| [Optimism SDKを使用した入出金の追跡](/tutorials/sdk-trace-txns)                                                  | Optimism SDKを使用して入出金を追跡する方法を学びます。                                                                   | 🟢 簡単          |
+| [Optimism SDKを使用したアドレス別の入出金の表示](/tutorials/sdk-view-txns)                                       | Optimism SDKを使用して特定のアドレスの入出金を表示する方法を学びます。                                                   | 🟢 簡単          |
+| [Optimism SDKを使用したトランザクションコストの見積もり](/tutorials/sdk-view-txns)                               | Optimism SDKを使用してOP Mainnetでのトランザクションのコストを見積もる方法を学びます。                                     | 🟢 簡単          |
+| [EthereumからOP Mainnetへのトランザクションの送信](/tutorials/send-tx-from-eth)                                  | EthereumからOP Mainnetへトランザクションを送信する方法を学びます。                                                      | 🟢 簡単          |
+
+特定のチュートリアルがある場合は、[新しいチュートリアルを提案する](https://github.com/ethereum-optimism/docs/issues/new?assignees=&labels=tutorial,documentation,community-request&projects=&template=suggest_tutorial.yaml&title=[TUTORIAL] Add PR title)こともできます。このリストを拡大したいと考えています！
+
+## 次のステップ
+
+まだ必要なコンテンツが見つからない場合は、さらなる支援を得るためのいくつかのオプションがあります。
+
+*   [Optimism開発者サポートフォーラムで質問を投稿する](https://github.com/ethereum-optimism/developers/discussions)。
+*   デプロイメント中に問題が発生した場合は、[トランザクションのトラブルシューティングガイド](./transactions/troubleshooting)を参照してください。
