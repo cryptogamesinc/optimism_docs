@@ -1,143 +1,138 @@
 ---
-title: Preparing for Ecotone Breaking Changes
-lang: en-US
-description: Learn how to prepare for Ecotone upgrade breaking changes.
+title: Ecotoneアップグレードの破壊的変更に備える
+lang: ja
+description: Ecotoneアップグレードの破壊的変更に備える方法を学びます。
 ---
 
 import { Steps, Callout } from 'nextra/components'
 import { Tabs } from 'nextra/components'
 
-# Preparing for Ecotone Breaking Changes
+# Ecotoneアップグレードの破壊的変更に備える
 
-This page outlines breaking changes related to Ecotone network upgrade for wallets and front-end developers, chain operators, and node operators.
-If you experience difficulty at any stage of this process, please reach out to [developer support](https://github.com/ethereum-optimism/developers/discussions).
-
-<Callout type="warning">
-  *   The Ecotone upgrade for OP Sepolia activated at **1708534800 Wed Feb 21 17:00:00 UTC 2024**.
-  *   The Ecotone OP Mainnet upgrade will be at **1710374401 Thu Mar 14 00:00:01 UTC 2024**, pending [governance approval](https://gov.optimism.io/t/upgrade-proposal-5-ecotone-network-upgrade/7669).
-</Callout>
-
-## For Wallets and Front-End Developers
-
-The proposed Ecotone upgrade to the OP Stack and OP Mainnet changes the formula for estimating the [L1 Data Fee](/stack/transactions/fees#l1-data-fee) component of the [OP Stack Transaction Fee](/stack/transactions/fees) in preparation for the introduction of [EIP-4844](https://eip4844.com) support.
-
-*   This new formula is designed to account for the option to post transaction data within [data blobs](/builders/chain-operators/management/blobs) instead of as Ethereum calldata, a feature enabled by [EIP-4844](https://eip4844.com).
-*   Read the [Ecotone Formula](/stack/transactions/fees#ecotone) section of the [Transaction Fees](/stack/transactions/fees) page for more information about the new formula.
-
-Your application may need to be updated to account for this change.
-Read on to learn more about how you can prepare for Ecotone.
-
-### Preparing Your Wallet or Front-End
+このページでは、ウォレットおよびフロントエンド開発者、チェーンオペレーター、ノードオペレーターに関連するEcotoneネットワークアップグレードの破壊的変更について説明します。
+このプロセスのどの段階で困難を感じた場合は、[開発者サポート](https://github.com/ethereum-optimism/developers/discussions)にご連絡ください。
 
 <Callout type="warning">
-  Changes to the L1 Data Fee formula may affect your application if you are computing this fee component on your own.
+  *   OP SepoliaのためのEcotoneアップグレードは **1708534800 Wed Feb 21 17:00:00 UTC 2024** に有効化されました。
+  *   OP MainnetのEcotoneアップグレードは **1710374401 Thu Mar 14 00:00:01 UTC 2024** に行われる予定で、[ガバナンスの承認](https://gov.optimism.io/t/upgrade-proposal-5-ecotone-network-upgrade/7669)を待っています。
 </Callout>
 
-It's strongly recommended that you use [existing tooling](/builders/app-developers/transactions/estimates#tooling) to estimate transaction fees instead of computing them yourself.
-Refer to the [tooling](/builders/app-developers/transactions/estimates#tooling) section of the [Estimating Fees](/builders/app-developers/transactions/estimates) page for recommendations on which tooling might be best suited for your application.
+## ウォレットおよびフロントエンド開発者のために
 
-If you cannot use existing tooling, use the `getL1Fee` function on the `GasPriceOracle` smart contract to compute the L1 Data Fee component of the transaction fee.
-This function would be automatically updated during the proposed upgrade.
-Avoid implementing the formula yourself, as it may change in the future.
+提案されたEcotoneアップグレードでは、OP StackとOP Mainnetの[L1 Data Fee](/stack/transactions/fees#l1-data-fee) コンポーネントの計算式が変更され、[EIP-4844](https://eip4844.com)のサポート導入に備えます。
 
-## For Chain Operators
+*   この新しい式は、Ethereumのcalldataとしてではなく、[data blobs](/builders/chain-operators/management/blobs)内にトランザクションデータを投稿するオプションを考慮に入れて設計されています。
+*   新しい式についての詳細は、[Transaction Fees](/stack/transactions/fees)ページの[Ecotone Formula](/stack/transactions/fees#ecotone)セクションを参照してください。
 
-The proposed Ecotone upgrade impacts OP chains and requires chain operators to upgrade their chain and configure the sequencer for Ecotone.
-Chain operators will also want to review the guide on [Using Blobs](/builders/chain-operators/management/blobs) for next steps after Ecotone activation.
+あなたのアプリケーションはこの変更を考慮に入れて更新する必要があるかもしれません。
+Ecotoneへの対応方法についてさらに読み進めてください。
 
-### Preparing Your Chain
+### あなたのウォレットやフロントエンドの準備
+
+<Callout type="warning">
+  L1 Data Feeの式の変更は、この料金コンポーネントを自分で計算している場合、あなたのアプリケーションに影響を与える可能性があります。
+</Callout>
+
+トランザクション料金を自分で計算する代わりに、[既存のツール](/builders/app-developers/transactions/estimates#tooling)を使用して料金を見積もることを強く推奨します。
+料金を見積もるためのツールに関しては、[Estimating Fees](/builders/app-developers/transactions/estimates)ページの[tooling](/builders/app-developers/transactions/estimates#tooling)セクションを参照してください。
+
+既存のツールを使用できない場合は、`GasPriceOracle`スマートコントラクトの`getL1Fee`関数を使用して、トランザクション料金のL1 Data Feeコンポーネントを計算してください。
+この関数は提案されたアップグレード中に自動的に更新されます。
+将来的に変更される可能性があるため、自分で式を実装することは避けてください。
+
+## チェーンオペレーターのために
+
+提案されたEcotoneアップグレードはOPチェーンに影響を与え、チェーンオペレーターはチェーンをアップグレードし、Ecotoneのためにシーケンサーを設定する必要があります。
+チェーンオペレーターは、Ecotoneの有効化後の次のステップとして[Using Blobs](/builders/chain-operators/management/blobs)のガイドを確認することも望まれます。
+
+### チェーンの準備
 
 <Steps>
-  ### Prepare Sequencer Node
+  ### Sequencer Nodeの準備
 
-  Ensure your sequencer node is prepared by following the [three node operator steps](#preparing-your-node): update to latest release, configure the Ecotone activation date, and preparing for activation.
+  Sequencerノードが準備できていることを確認するために、[three node operator steps](#preparing-your-node)に従ってください: 最新リリースに更新、Ecotoneの有効化日を設定、有効化の準備。
 
-  ### Prepare `SystemConfig` Transaction
+  ### `SystemConfig`トランザクションの準備
 
-  Encode and prepare to send an L1 transaction from your `SystemConfigProxy` owner shortly after Ecotone activation. See the guide on [Using Blobs](/builders/chain-operators/management/blobs#determine-scalar-values-for-using-blobs) for more details.
+  Ecotoneの有効化直後にあなたの`SystemConfigProxy`オーナーからL1トランザクションをエンコードして送信する準備をしてください。詳細については、[Using Blobs](/builders/chain-operators/management/blobs#determine-scalar-values-for-using-blobs)のガイドを参照してください。
 
   <Callout type="info">
-    At the point of activation of the Ecotone fork, your current scalar setting will by default become the `BaseFeeScalar` value, and the `BlobBaseFeeScalar` will be set to `0`.
+    Ecotoneフォークの有効化時点で、現在のスカラー設定はデフォルトで`BaseFeeScalar`値になり、`BlobBaseFeeScalar`は`0`に設定されます。
   </Callout>
 
-  ### Prepare Batcher
+  ### Batcherの準備
 
-  Prepare your batcher to be restarted with the updated configuration in advance of the Ecotone activation to submit blobs. See the guide on [Using Blobs](/builders/chain-operators/management/blobs#update-your-batcher-to-post-blobs) for more details.
+  Ecotoneの有効化に先立って、更新された設定でバッチャーを再起動する準備をしてください。詳細については、[Using Blobs](/builders/chain-operators/management/blobs#update-your-batcher-to-post-blobs)のガイドを参照してください。
 
-  ### Take Full Advantage of Blobs
+  ### Blobsのフル活用
 
-  You will want to do the above steps very shortly after the activation of Ecotone to take full advantage of cheaper fees with 4844.
-  Also, due to the removal of the `overhead` in the calculation of L1 data fees, after Ecotone activates, chain operators are expected to experience an up to 10% decrease in L1 fee margin.
-  This could result in operating at a loss until the above steps are completed.
+  4844でより安価な料金をフルに活用するために、上記のステップをEcotoneの有効化直後に実行することを望みます。
+  また、Ecotoneが有効化された後は、L1データ料金の計算から`overhead`が削除されるため、チェーンオペレーターはL1料金のマージンが最大10％減少すると予想されます。
+  これにより、上記のステップが完了するまで損失で運営する可能性があります。
 </Steps>
 
-## For Node Operators
+## ノードオペレーターのために
 
-The proposed Ecotone upgrade impacts node operators because of the new Beacon endpoint for \`op-node. Soon after the Ecotone activation, batch
-transactions will be sent as 4844 blobs, and blobs can only be retrieved from Beacon nodes.
-This means node operators will need access to a [beacon node/consensus client](https://ethereum.org/developers/docs/nodes-and-clients#consensus-clients) (i.e. Lighthouse, Lodestar, Nimbus, Prysm, Teku, etc.).
+提案されたEcotoneアップグレードはノードオペレーターに影響を与えるため、新しいBeaconエンドポイントが`op-node`に必要です。Ecotoneの有効化後すぐに、トランザクションは4844 blobsとして送信され、blobsはBeaconノードからのみ取得可能です。
+これは、ノードオペレーターが[beacon node/consensus client](https://ethereum.org/developers/docs/nodes-and-clients#consensus-clients) (例: Lighthouse, Lodestar, Nimbus, Prysm, Teku等)へのアクセスが必要であることを意味します。
 
-### Preparing Your Node
+### ノードの準備
 
-These steps are necessary for EVERY node operator:
+これらのステップはすべてのノードオペレーターに必要です：
 
 <Steps>
-  ### Update to the latest release
+  ### 最新リリースへの更新
 
   *   [`op-geth`](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101308.2)
   *   [`op-node`](https://github.com/ethereum-optimism/optimism/releases/tag/v1.7.0)
 
-  ### Configure the Ecotone Activation Date
+  ### Ecotone有効化日の設定
 
-  *   If you are operating a node for an OP Chain that has an entry in the [`superchain-registry`](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/configs/chainids.json), the Ecotone activation date is part of the `op-node` and `op-geth` nodes. So, no action is needed for the sequencer after upgrading to the latest release.
-  *   For node operators of custom chains not included in the [`superchain-registry`](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/configs/chainids.json), the activation dates can be set in the `rollup.json` (set `ecotone_time`) or set the activation time via overrides (CLI) in both `op-node` and `op-geth`. These will need to be set on `op-node` and `op-geth` for the sequencer and all other nodes.
+  *   OPチェーンを運用している場合、そのチェーンが[`superchain-registry`](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/configs/chainids.json)に記載されている場合、Ecotone有効化日は`op-node`と`op-geth`ノードに組み込まれています。そのため、最新リリースにアップグレードした後、シーケンサーに対して何も行う必要はありません。
+  *   [`superchain-registry`](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/configs/chainids.json)に記載されていないカスタムチェーンのノードオペレーターの場合、有効化日は`rollup.json`で設定(`ecotone_time`を設定)するか、`op-node`と`op-geth`の両方でCLIを介してオーバーライドで有効化時刻を設定する必要があります。
 
   <Callout type="warning">
-    Even if the ecotone activation is configured via the `rollup.json`, it still needs to be configured separately on `op-geth` via command line flag.
+    `rollup.json`を介してecotone有効化が設定されていても、それは`op-geth`でコマンドラインフラグを介して別途設定する必要があります。
   </Callout>
 
   <Tabs items={['op-node', 'op-geth']}>
     <Tabs.Tab>
       ```shell
       --override.ecotone value            (default: 0)                       ($OP_NODE_OVERRIDE_ECOTONE)
-                Manually specify the Ecotone fork timestamp, overriding the bundled setting
+                Ecotoneフォークのタイムスタンプを手動で指定し、バンドル設定を上書き
       ```
     </Tabs.Tab>
 
     <Tabs.Tab>
       ```shell
       --override.ecotone value            (default: 0)                       ($GETH_OVERRIDE_ECOTONE)
-                Manually specify the Optimism Ecotone fork timestamp, overriding the bundled
-                setting
+                Optimism Ecotoneフォークのタイムスタンプを手動で指定し、バンドル設定を上書き
       ```
     </Tabs.Tab>
   </Tabs>
 
-  ### Prepare for Activation
+  ### 有効化の準備
 
-  *   All node operators must set an L1 beacon value in your `op-node` as soon as you update to the latest release.
+  *   すべてのノードオペレーターは、最新リリースにアップデートしたときに、あなたの`op-node`にL1 beacon値を設定する必要があります。
 
   <Callout type="warning">
-    If Ecotone activates and you have not set an l1 beacon value on your `op-node`, your node will crash.
+    Ecotoneが有効化され、あなたが`op-node`にl1 beacon値を設定していない場合、あなたのノードはクラッシュするでしょう。
   </Callout>
 
   ```shell
   --l1.beacon value                                                      ($OP_NODE_L1_BEACON)
-            HTTP endpoint Address of L1 Beacon-node.
+            L1 Beacon-nodeのHTTPエンドポイントアドレス。
   ```
 
-    *   Either run your own L1 beacon node like [Lighthouse](https://lighthouse-book.sigmaprime.io/run_a_node.html) 
-  or use a third-party beacon node RPC service, like [Allnodes](https://ethereum.publicnode.com/) or
-  [Quicknode](https://www.quicknode.com/docs/ethereum/eth-v1-beacon-genesis).
-  
+  *   自分自身のL1 beaconノードを運用するか、[Lighthouse](https://lighthouse-book.sigmaprime.io/run_a_node.html) のような第三者のbeaconノードRPCサービスを使用してください。例えば [Allnodes](https://ethereum.publicnode.com/)や
+  [Quicknode](https://www.quicknode.com/docs/ethereum/eth-v1-beacon-genesis)があります。
+
   <Callout type="default">
-    Existing node operators have additional steps to follow and should read the 
-    guide on [using blobs](/builders/node-operators/management/blobs).
+    既存のノードオペレーターは追加のステップを踏む必要があり、[using blobs](/builders/node-operators/management/blobs)のガイドを読むべきです。
   </Callout>
 
-  ### You can verify your node is configured correctly with the following:
-
-  *   `op-node` and `op-geth` will log their configurations at startup
-  *   Check that Ecotone time is set to `activation-timestamp` in the op-node logs
-  *   Check that Ecotone and Cancun time is set to `activation-timestamp` in the op-geth logs
+  ### ノードが正しく設定されているかを以下で確認できます：
+  * op-nodeとop-gethは起動時にその設定をログに記録します
+  * op-nodeのログでEcotone timeがactivation-timestampに設定されているか確認してください
+  * op-gethのログでEcotoneおよびCancun timeがactivation-timestampに設定されているか確認してください
 </Steps>
