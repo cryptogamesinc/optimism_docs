@@ -1,76 +1,90 @@
 ---
-title: Preparing for Fault Proofs Breaking Changes
+title: 故障証明の変更に備える
 lang: en-US
-description: Learn how to prepare for Fault Proofs breaking changes.
+description: 故障証明の変更にどのように備えるかを学びます。
 ---
 
 import { Steps, Callout } from 'nextra/components'
 
-# Preparing for Fault Proofs Breaking Changes
+# 故障証明の変更に備える
 
-This page outlines breaking changes related to Fault Proof upgrade for bridges, centralized exchanges, and custom solutions that use withdrawals. This page outlines changes for OP Mainnet and OP Sepolia only, and details for other OP Chains are forthcoming.
-If you experience difficulty at any stage of this process, please reach out to [developer support](https://github.com/ethereum-optimism/developers/discussions).
+このページでは、ブリッジ、中央集権型取引所、および出金を使用するカスタムソリューションに関連する
+故障証明(Fault Proof)のアップグレードの破壊的変更点について説明します。
+このページでは、OPメインネットおよびOP Sepolia の変更のみが記載されており、他のOPチェーンの詳細は今後提供されます。
+このプロセスのどの段階で問題が生じても、[開発者サポート](https://github.com/ethereum-optimism/developers/discussions)にご連絡ください。
 
 <Callout type="warning">
-  *   Fault Proofs are scheduled to launch on testnet on **Tuesday, March 19, 2024**.
-  *   Withdrawals between OP Sepolia and Sepolia will no longer be instant, since they are using the Fault Proofs mechanism.
+  *   故障証明は、**2024年3月19日火曜日**にテストネットでの導入が予定されています。
+  *   Sepolia と OP Sepolia 間の出金は、故障証明メカニズムを使用しているため、即時には行われなくなります。
 </Callout>
 
-## Overview of Changes
+## 変更の概要
 
-The `L2OutputOracle` is being entirely removed and replaced by the `OptimismPortal` and `DisputeGameFactory`. The `L2OutputOracle` smart contract is currently used by the trusted Proposer role to store L2 state output proposals.
-Presently, developers use these outputs to prove that their withdrawals actually happened on L2. But with fault proofs, developers will have to change how their client software proves withdrawals in the first step of the two-step withdrawal process.
+`L2OutputOracle` は完全に削除され、`OptimismPortal` と `DisputeGameFactory` に置き換えられます。
+`L2OutputOracle` スマートコントラクトは現在、信頼された提案者の役割によってL2の状態出力提案を格納するために使用されています。
+現在、開発者はこれらの出力を使用して、彼らの出金がL2で実際に発生したことを証明しています。
+しかし、故障証明を使用することで、開発者は2段階出金プロセスの第1ステップで出金を証明する方法を変更する必要があります。
+
 
 ### `L2OutputOracle`
 
-The `OptimismPortal` is changing slightly with Fault Proof Mainnet because it now points to the `DisputeGameFactory` contract instead of the `L2OutputOracle` contract.
-Most notable change for developers is that withdrawals will have to be proven against the `rootClaim` of some dispute game rather than referencing an output in the `L2OutputOracle` contract.
+`OptimismPortal` は、Fault Proof Mainnetの導入に伴い、`L2OutputOracle` コントラクトの代わりに `DisputeGameFactory` コントラクトを指すように変更されました。
+開発者にとって最も注目すべき変更点は、`L2OutputOracle` コントラクトの出力を参照する代わりに、ある紛争ゲームの `rootClaim` に対して出金を証明する必要があることです。
 
 ### `OptimismPortal`
 
-The `OptimismPortal` smart contract is the low-level contract on L1 used to execute deposits and withdrawals.
-Previously, developers would look at the `L2OutputOracle` to find the exact next output that included their withdrawal.
-Now, developers must look at the `OptimismPortal` contract to determine the `respectedGameType` and then use this information to query the `DisputeGameFactory` for a list of recent `DisputeGame` contracts with the correct game type.
+`OptimismPortal` スマートコントラクトは、L1で入金および出金を実行するための低レベルのcontractです。
+以前、開発者は `L2OutputOracle` を参照して、自分の出金を含む次の出力を特定していました。
+現在、開発者は `OptimismPortal` コントラクトを参照して `respectedGameType` を決定し、この情報を使用して `DisputeGameFactory` 
+から正しいゲームタイプの最近の `DisputeGame` コントラクトのリストを照会する必要があります。
+
 
 ### `DisputeGameFactory`
 
-It is recommended that developers search for a reasonable number of recent games, say 100 games, and pick the first proposal with a sufficient block number.
-Developers should then verify this proposal locally as the default game type will allow for permissionless proposals and there is no longer a strong guarantee that proposals will be valid.
+開発者は、合理的な数、例えば100ゲームを検索し、十分なブロック番号を持つ最初の提案を選ぶことを推奨します。
+開発者はその後、この提案をローカルで検証する必要があります。デフォルトのゲームタイプではpermissionlessの提案が可能であり、提案が有効であるという強い保証はもはやありません。
 
-## For Bridges and Centralized Exchanges
+## ブリッジおよび中央集権型取引所向け
 
-The proposed Fault Proof upgrade requires developers to enable Fault Proof changes before the Sepolia release. This impacts bridges, centralized exchanges, and custom solutions that use withdrawals.
+提案された故障証明(Fault Proof)のアップグレードでは、開発者はSepoliaのリリース前に故障証明(Fault Proof)の変更を有効にする必要があります。
+これは、ブリッジ、中央集権型取引所、および出金を使用するカスタムソリューションに影響を与えます。
 
 <Steps>
-  ### Update Logic to Support Fault Proofs
+  ### 故障証明(Fault Proof)をサポートするためのロジックの更新
 
   <Callout type="info">
-    Most teams use the Optimism SDK or Viem to handle this logic under the hood and will simply need to update their software version ahead of the upgrade. However, any project performing withdrawals programmatically will need to update their client code (see [`OptimismPortal`](#optimismportal) for details).
+    多くのチームは、Optimism SDKまたはViemを使用してこのロジックを処理しており、アップグレード前にソフトウェアバージョンを更新するだけで済みます。
+    ただし、プログラムによる出金を行うプロジェクトは、クライアントコードを更新する必要があります（詳細は [`OptimismPortal`](#optimismportal) を参照）。
   </Callout>
 
-  *   **Option 1: Optimism SDK Update.** If you use OptimismSDK for bridging, simply update to version 3.2.0 or higher.
-      The Optimism SDK changes do not break the API and require no changes other than updating to the correct software version to support the new `OptimismPortal` logic. The Optimism SDK will automatically begin to use the new logic once it detects that the FPM update has gone live.
-  *   **Option 2: Viem Update.** Viem changes will break the API and require both updating to latest version and replacing use of the currently used decorator with the `experimental` decorator that supports fault proofs. When fault proofs are on Mainnet in the future, `publicActionsL2` will be updated to support fault proofs by default, and it will be recommended that developers switch to the stable API.
+  *   **オプション1: Optimism SDKの更新。** OptimismSDKをブリッジングに使用している場合は、バージョン3.2.0以上に更新してください。
+      Optimism SDKの変更はAPIを破壊せず、新しい `OptimismPortal` ロジックをサポートするために正しいソフトウェアバージョンに更新する以外に変更は必要ありません。
+      Optimism SDKは、FPMアップデートがライブになったことを検出すると自動的に新しいロジックを使用し始めます。
+  *   **オプション2: Viemの更新。** Viemの変更はAPIを破壊し、最新バージョンへの更新と現在使用されているデコレータの `experimental` 
+      デコレータへの置き換えが必要です。将来的に故障証明(Fault Proof)がメインネットで使用されるとき、`publicActionsL2` は
+      デフォルトで故障証明(Fault Proof)をサポートするように更新され、開発者には安定したAPIへの切り替えが推奨されます。
 
-  ### Update Withdrawal Monitor
+  ### 出金モニター(withdrawal monitor)の更新
 
-  The Withdrawal Monitor service is an important part of the two-step withdrawal system that checks if anyone has been able to prove withdrawals that do not actually appear on L2.
-  The Withdrawal Monitor is now slightly slower at startup time but is more reliable, simpler, and compatible with more infrastructure to more easily support any OP Stack chain.
-  Changes to the Withdrawal Monitor are entirely backwards compatible.
+  出金モニターサービスは、L2に実際には現れない出金を証明できたかどうかをチェックする二段階出金システムの重要な部分です。
+  出金モニターは起動時に若干遅くなりますが、より信頼性が高く、より単純で、より多くのインフラと互換性があるため、任意のOPスタックチェーンをより容易にサポートできます。
+  出金モニターの変更は完全に後方互換性があります。
 
-  *   **Option 1: Withdrawal from source.** If building or using withdrawal-monitor from source, make sure that you are using the latest develop branch. All withdrawal monitor changes are fully backwards compatible.
-  *   **Option 2: Docker image.** If using docker, use the latest chain-mon docker image.
 
-  ### Update Dispute Monitor
+  *   **オプション1: ソースからの出金。** ソースからwithdrawal-monitorを構築または使用する場合は、最新のdevelopブランチを使用していることを確認してください。すべての出金モニターの変更は完全に後方互換性があります。
+  *   **オプション2: Dockerイメージ。** Dockerを使用している場合は、最新のchain-mon Dockerイメージ
 
-  The Dispute Monitor service detects when invalid outputs have been proposed. Given the large number of changes to the output proposal system, the current Fault Monitor is being replaced in favor of a new Dispute Monitor purposely built for the fault proof monitor system.
+  ### 紛争モニター(Dispute Monitor)の更新
+
+  紛争モニターサービスは無効な出力が提案されたときにこれを検出します。出力提案システムに多くの変更があったため、現在のFault Monitorは新しい故障証明(Fault Proof)モニターシステムのために特別に構築された新しいDispute Monitorに置き換えられます。
 
   <Callout type="warning">
-    Any team running the current Fault Monitor will see the monitor stop functioning when the Fault Proof Monitor upgrade goes live. These teams should run the new service and update their alerting accordingly.
+    現在Fault Monitorを運用しているチームは、故障証明(Fault Proof)モニターアップグレードがライブになるとモニターの機能が停止することを目の当たりにします。これらのチームは新しいサービスを実行し、その警告をそれに応じて更新する必要があります。
   </Callout>
 </Steps>
 
-## Next Steps
+## 次のステップ
 
-*   See the [Fault Proofs Overview](/stack/protocol/fault-proofs/overview) to learn more about the three main components of the Fault Proof System.
-*   You can also read more about [Cannon FPVM](/stack/protocol/fault-proofs/cannon) and [Mips.sol](/stack/protocol/fault-proofs/mips), the onchain smart contract implementation of Cannon.
+*   [故障証明の概要](/stack/protocol/fault-proofs/overview)を参照して、故障証明システムの三つの主要なコンポーネントについてさらに学びましょう。
+*   [Cannon FPVM](/stack/protocol/fault-proofs/cannon)と[Mips.sol](/stack/protocol/fault-proofs/mips)についてもっと読むことができます。これらはCannonのオンチェーンスマートコントラクト実装です。
+
