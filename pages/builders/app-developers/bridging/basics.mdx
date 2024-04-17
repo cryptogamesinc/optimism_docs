@@ -1,34 +1,37 @@
 ---
-title: Bridging Basics
+title: ブリッジングの基礎
 lang: en-US
-description: Learn about the fundamentals of sending data and tokens between Ethereum and OP Mainnet.
+description: EthereumとOP Mainnet間でデータとトークンを送信する基本を学びます。
 ---
 
-# Bridging Basics
+# ブリッジングの基礎
 
-OP Mainnet is a "Layer 2" system and is fundamentally connected to Ethereum.
-However, OP Mainnet is also a distinct blockchain with its own blocks and transactions.
-App developers commonly need to move data and tokens between OP Mainnet and Ethereum.
-This process of moving data and tokens between the two networks is called "bridging".
+OP Mainnetは「レイヤー2」システムであり、根本的にEthereumに接続されています。
+しかし、OP Mainnetは独自のブロックとトランザクションを持つ独立したブロックチェーンでもあります。
+アプリ開発者は一般的に、OP MainnetとEthereumの間でデータとトークンを移動する必要があります。
+この2つのネットワーク間でデータとトークンを移動するプロセスを「ブリッジング」と呼びます。
 
-## Sending Tokens
 
-One of the most common use cases for bridging is the need to send ETH or ERC-20 tokens between OP Mainnet and Ethereum.
-OP Mainnet has a system called the [Standard Bridge](./standard-bridge) that makes it easy to move tokens in both directions.
-If you mostly need to bridge tokens, make sure to check out the [Standard Bridge](./standard-bridge) guide.
+## トークンの送信
 
-## Sending Data
+ブリッジングの最も一般的なユースケースの一つは、ETHまたはERC-20トークンをOP MainnetとEthereumの間で送信する必要があります。
+OP Mainnetには、両方向にトークンを簡単に移動できる[Standard Bridge](./standard-bridge)というシステムがあります。
+主にトークンをブリッジする必要がある場合は、[Standard Bridge](./standard-bridge)ガイドを確認してください。
 
-Under the hood, the Standard Bridge is just an application that uses the OP Mainnet [message passing system to send arbitrary data between Ethereum and OP Mainnet](./messaging).
-Applications can use this system to have a contract on Ethereum interact with a contract on OP Mainnet, and vice versa.
-All of this is easily accessible with a simple, clean API.
 
-## Next Steps
+## データの送信
 
-Ready to start bridging?
-Check out these tutorials to get up to speed fast.
+内部的には、Standard BridgeはEthereumとOP Mainnet間で任意のデータを送信する[メッセージパッシングシステムを使用するアプリケーション](./messaging)に過ぎません。
+アプリケーションはこのシステムを使用して、Ethereum上のコントラクトがOP Mainnet上のコントラクトと相互作用し、その逆も可能にします。
+これらはすべて、シンプルでクリーンなAPIで簡単にアクセスできます。
 
-*   [Learn how to bridge ERC-20 tokens with the Optimism SDK](/builders/app-developers/tutorials/cross-dom-bridge-erc20)
-*   [Learn how to bridge ETH with the Optimism SDK](/builders/app-developers/tutorials/cross-dom-bridge-eth)
-*   [Learn how to create a standard bridged token](/builders/app-developers/tutorials/standard-bridge-standard-token)
-*   [Learn how to create a custom bridged token](/builders/app-developers/tutorials/standard-bridge-custom-token)
+
+## 次のステップ
+
+ブリッジングを始める準備はできましたか？
+これらのチュートリアルをチェックして、すぐにスピードアップしましょう。
+
+*   [Optimism SDKを使用してERC-20トークンをブリッジする方法を学ぶ](/builders/app-developers/tutorials/cross-dom-bridge-erc20)
+*   [Optimism SDKを使用してETHをブリッジする方法を学ぶ](/builders/app-developers/tutorials/cross-dom-bridge-eth)
+*   [標準ブリッジトークンを作成する方法を学ぶ](/builders/app-developers/tutorials/standard-bridge-standard-token)
+*   [カスタムブリッジトークンを作成する方法を学ぶ](/builders/app-developers/tutorials/standard-bridge-custom-token)
