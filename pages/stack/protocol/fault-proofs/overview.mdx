@@ -1,79 +1,79 @@
 ---
-title: Fault Proofs Overview
+title: フォルトプルーフの概要
 lang: en-US
-description: Learn about the fault proof system, its components, and how they will work together to enhance decentralization in the Optimism ecosystem.
+description: フォルトプルーフシステム、その構成要素、およびそれらがOptimismエコシステムの分散化を強化するためにどのように連携するかについて学びます。
 ---
 
 import Image from 'next/image'
 import { Callout } from 'nextra/components'
 
-# Fault Proof Overview
+# フォルトプルーフの概要
 
-The Fault Proof System is comprised of three main components: a Fault Proof Program (FPP), a Fault Proof Virtual Machine (FPVM), and a dispute game protocol.
-The system is designed to eventually enable secure bridging without central fallback.
-The modular design of the fault proof system lays the foundation for a multi-proof future, inclusive of ZK proofs, and significantly increases the opportunities for ecosystem contributors to build alternative fault proof components to secure the system.
+フォルトプルーフシステムは、フォルトプルーフプログラム(FPP)、フォルトプルーフ仮想マシン(FPVM)、および紛争ゲームプロトコルの3つの主要な構成要素で構成されています。
+このシステムは、最終的に中央のフォールバックなしで安全なブリッジングを可能にするように設計されています。
+フォルトプルーフシステムのモジュラー設計は、ZKプルーフを含むマルチプルーフの未来の基盤を築き、エコシステムの貢献者がシステムを保護するための代替フォルトプルーフコンポーネントを構築する機会を大幅に増加させます。
 
 <Callout type="info">
-  Visit the [Immunefi bug bounty page](https://immunefi.com/bounty/optimism/?ref=blog.oplabs.co) for details on testing and helping to build a robust fault proof system.
+  堅牢なフォルトプルーフシステムを構築するためのテストと支援の詳細については、[Immunefiのバグ報奨金ページ](https://immunefi.com/bounty/optimism/?ref=blog.oplabs.co)をご覧ください。
 </Callout>
 
-## System Design & Modularity
+## システム設計とモジュラリティ
 
-The Fault Proof System is comprised of three main components: a Fault Proof Program (FPP), a Fault Proof Virtual Machine (FPVM), and a dispute game protocol.
-These components will work together to challenge malicious or faulty activity on the network to preserve trust and consistency within the system.
-See the video below for a full technical walkthrough of the OP Stack's first fault proof system.
+フォルトプルーフシステムは、フォルトプルーフプログラム(FPP)、フォルトプルーフ仮想マシン(FPVM)、および紛争ゲームプロトコルの3つの主要な構成要素で構成されています。
+これらのコンポーネントは、ネットワーク上の悪意のある活動や不具合を挑戦し、システム内の信頼と一貫性を保持するために連携します。
+OPスタックの最初のフォルトプルーフシステムの完全な技術的ウォークスルーについては、以下のビデオをご覧ください。
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/nIN5sNc6nQM?si=TL9TcoV01PNcD8D2" title="Walkthrough: OP Stack Fault Proof System Alpha Release" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 
-The OP Stack's unique, modular design allows the decoupling of the FPP and FPVM, resulting in the following:
+OPスタックのユニークなモジュラーデザインにより、FPPとFPVMの分離が可能となり、以下を実現します：
 
-*   development of multiple proof systems, unique dispute games, and a variety of FPVMs in the future.
-*   custom-built fault proof systems comprised of any combination of these isolated components—including validity proofs, attestation proofs, or ZKVM.
-*   dispute games in the dispute protocol backed by multiple security mechanisms.
+*   将来的に複数のプルーフシステム、ユニークな紛争ゲーム、およびさまざまなFPVMの開発。
+*   これらの分離されたコンポーネントの任意の組み合わせから構成されるカスタムビルトフォルトプルーフシステムーー有効性プルーフ、証明プルーフ、またはZKVMを含む。
+*   複数のセキュリティメカニズムによって支えられた紛争プロトコル内の紛争ゲーム。
 
-## Fault Proof Program
+## フォルトプルーフプログラム
 
-The default for this system component is `op-program`, which implements a fault proof program that runs through the rollup state-transition to verify an L2 output from L1 inputs. This verifiable output can then resolve a disputed output on L1. 
-The FPP is a combination of `op-node` and `op-geth`, so it has both the consensus and execution "parts" of the protocol in a single process. This means Engine API calls that would normally be made over HTTP are instead made as direct method calls to the op-geth code.
+このシステムコンポーネントのデフォルトは`op-program`であり、L1の入力からL2の出力を検証するためにロールアップの状態遷移を通じて実行されるフォルトプルーフプログラムを実装します。この検証可能な出力は、その後、L1で紛争のある出力を解決することができます。
+FPPは`op-node`と`op-geth`の組み合わせであるため、プロトコルのコンセンサス部分と実行部分の両方を単一のプロセスで持っています。これは、通常HTTPを介して行われるエンジンAPIの呼び出しが、代わりにop-gethコードへの直接のメソッド呼び出しとして行われることを意味します。
 
-The FPP is designed so that it can be run in a deterministic way such that two invocations with the same input data will result in not only the same output, but the same program execution trace. This allows it to be run in an onchain VM as part of the dispute resolution process.
+FPPは、同じ入力データで2回実行された場合、同じ出力だけでなく、同じプログラム実行トレースも結果として得られるように決定論的に実行できるように設計されています。これにより、紛争解決プロセスの一部としてオンチェーンVMで実行することができます。
 
-All data is retrieved via the Preimage Oracle API. The preimages could be provided via the FPVM when onchain or by a native "host" implementation that can download the required data from nodes via JSON-RPC requests. The native host implementation is also provided by `op-program` but doesn't run as part of the onchain execution.  Basically op-program has two halves: the "client" Fault Proof Program part covered in this section and the "host" part used to fetch required preimages.
+すべてのデータは、Preimage Oracle APIを介して取得されます。プレイマージは、オンチェーンでFPVMによって提供されるか、またはJSON-RPCリクエストを介してノードから必要なデータをダウンロードできるネイティブの「ホスト」実装によって提供される可能性があります。ネイティブホスト実装も`op-program`によって提供されますが、オンチェーン実行の一部としては実行されません。基本的にop-programには2つの部分があります：このセクションでカバーされている「クライアント」フォルトプルーフプログラム部分と、必要なプレイマージをフェッチするために使用される「ホスト」部分です。
 
-## Fault Proof Virtual Machine
+## フォルトプルーフ仮想マシン
 
-The Fault Proof Virtual Machine (FPVM) is one of the modules in the OP Stack's fault proof system.
-OP Stack's modularity decouples the Fault Proof Program (FPP) from the Fault Proof Virtual Machine (FPVM) to enable next-level composability and efficient parallelized upgrades to both components. The FPP (client-side) that runs within the FPVM is the part that expresses the L2 state-transition, and the interface between FPVM and FPP is standardized and documented in the [specs](https://github.com/ethereum-optimism/optimism/blob/546fb2c7a5796b7fe50b0b7edc7666d3bd281d6f/specs/cannon-fault-proof-vm.md).
+フォルトプルーフ仮想マシン(FPVM)は、OPスタックのフォルトプルーフシステムのモジュールの1つです。
+OPスタックのモジュラリティは、フォルトプルーフプログラム(FPP)をフォルトプルーフ仮想マシン(FPVM)から切り離し、両方のコンポーネントへの次世代の組み合わせと効率的な並列アップグレードを可能にします。FPVM内で実行されるFPP（クライアント側）は、L2の状態遷移を表現する部分であり、FPVMとFPPの間のインターフェースは標準化され、[specs](https://github.com/ethereum-optimism/optimism/blob/546fb2c7a5796b7fe50b0b7edc7666d3bd281d6f/specs/cannon-fault-proof-vm.md)で文書化されています。
 
-Through this separation, the VM stays ultra-minimal: Ethereum protocol changes, like EVM op-code additions, do not affect the VM. Instead, when the protocol changes, the FPP can simply be updated to import the new state-transition components from the node software. Similar to playing a new version of a game on the same game console, the L1 proof system can be updated to prove a different program.
+この分離により、VMは超ミニマルに保たれます：Ethereumプロトコルの変更、例えばEVMオペコードの追加は、VMに影響を与えません。代わりに、プロトコルが変更されたとき、FPPは単にノードソフトウェアから新しい状態遷移コンポーネントをインポートして更新することができます。同じゲームコンソールで新しいバージョンのゲームをプレイするのと同様に、L1プルーフシステムは異なるプログラムを証明するために更新することができます。
 
-The FPVM is tasked with lower-level instruction execution. The FPP needs to be emulated. The VM requirements are low: the program is synchronous, and all inputs are loaded through the same pre-image oracle, but all of this still has to be proven in the L1 EVM onchain.
-To do this, only one instruction is proven at a time. The bisection game will narrow down the task of proving a full execution trace to just a single instruction. Proving the instruction may look different for each FPVM, but generally it looks similar to Cannon, which proves the instruction as follows:
+FPVMは、より低レベルの命令実行を担当します。FPPはエミュレートされる必要があります。VMの要件は低く、プログラムは同期的であり、すべての入力は同じプレイマージオラクルを通じてロードされますが、これらすべてはまだオンチェーンのL1 EVMで証明されなければなりません。
+これを行うために、一度に1つの命令のみが証明されます。二分法ゲームは、完全な実行トレースの証明を単一の命令の証明に絞り込むタスクを狭めます。命令の証明はFPVMごとに異なる場合がありますが、一般的にはCannonのように次のように見えます：
 
-*   To execute the instruction, the VM emulates something akin to an instruction-cycle of a thread-context: the instruction is read from memory, interpreted, and the register-file and memory may change a little.
-*   To support the pre-image oracle, and basic program runtime needs like memory-allocation, the execution also supports a subset of linux syscalls. Read/write syscalls allow interaction with the pre-image oracle: the program writes a hash as request for a pre-image, and then reads the value in small chunks at a time.
+*   命令を実行するために、VMはスレッドコンテキストの命令サイクルに似たものをエミュレートします：命令はメモリから読み取られ、解釈され、レジスタファイルとメモリが少し変更される場合があります。
+*   プレイマージオラクルをサポートし、メモリ割り当てなどの基本的なプログラムランタイムのニーズをサポートするために、実行はまた、linux syscallsのサブセットをサポートします。読み書きのsyscallsは、プレイマージオラクルとのやり取りを可能にします：プログラムはプレイマージの要求としてハッシュを書き込み、その後、一度に小さなチャンクで値を読み取ります。
 
-[Cannon](cannon) is the default FPVM used in all disputes. [MIPS](mips) is the onchain smart contract implementation of Cannon that can be implemented due to the modularity of the dispute game.
+[Cannon](cannon)は、すべての紛争で使用されるデフォルトのFPVMです。[MIPS](mips)は、紛争ゲームのモジュラリティのために実装できるCannonのオンチェーンスマートコントラクト実装です。
 
-## Dispute Game Protocol
+## 紛争ゲームプロトコル
 
-In the Dispute protocol, different types of dispute games can be created, managed, and upgraded through the [DisputeGameFactory](https://github.com/ethereum-optimism/optimism/blob/6a53c7a3294edf140d552962f81c0f742bf445f9/packages/contracts-bedrock/src/dispute/DisputeGameFactory.sol#L4).
-This opens the door to innovative features, like aggregate proof systems and the ability to expand the protocol to allow for disputing things apart from the state of L2, such as a `FaultDisputeGame` geared towards onchain binary verification.
+紛争プロトコルでは、[DisputeGameFactory](https://github.com/ethereum-optimism/optimism/blob/6a53c7a3294edf140d552962f81c0f742bf445f9/packages/contracts-bedrock/src/dispute/DisputeGameFactory.sol#L4)を通じて異なるタイプの紛争ゲームを作成、管理、アップグレードすることができます。
+これにより、集約プルーフシステムのような革新的な機能や、L2の状態以外のもの、例えばオンチェーンバイナリ検証に向けた`FaultDisputeGame`など、プロトコルを拡張する能力が開かれます。
 
-A dispute game is a core primitive to the dispute protocol. It models a simple state machine, and it is initialized with a 32 byte commitment to any piece of information of which the validity can be disputed.
-They contain a function to resolve this commitment to be true or false, which is left for the implementor of the primitive to define. Dispute games themselves rely on two fundamental properties:
+紛争ゲームは、紛争プロトコルのコアプリミティブです。それはシンプルな状態マシンをモデル化し、その有効性が紛争される可能性のある任意の情報の32バイトのコミットメントで初期化されます。
+それらには、プリミティブの実装者が定義する必要がある、このコミットメントを真または偽として解決する関数が含まれています。紛争ゲーム自体は、2つの基本的な特性に依存しています：
 
-*   Incentive Compatibility: The system penalizes false claims and rewards truthful ones to ensure fair participation.
-*   Resolution: Each game has a mechanism to definitively validate or invalidate the root claim.
+*   インセンティブの互換性：システムは偽の主張を罰し、真実のものに報酬を与えることで、公正な参加を保証します。
+*   解決：各ゲームには、根本的な主張を確実に検証または無効にするメカニズムがあります。
 
-The standard is the bi-section game. This is a specific type of dispute game, and the first game built in the OP Stack's dispute protocol.
-We bisect over output roots (which each correspond to single L2 blocks), until we get to a single block `n -> n+1` state transition. Then, we bisect over a single block state transition's execution trace as described before. This is an optimization to reduce the runtime of the off-chain VM.
-After bisection has reached commitments to the state at individual trace instructions, the `FaultDisputeGame` executes a single instruction step on chain using a generic VM.
-The VM's state transition function, which we'll call `T`, can be anything, so long as it adheres to the form `T(s, i) -> s'`, where `s` = the agreed upon prestate, `i` = the state transition inputs, and `s'` = the post state.
+標準は二分法ゲームです。これは特定のタイプの紛争ゲームであり、OPスタックの紛争プロトコルで最初に構築されたゲームです。
+私たちは出力ルーツ（それぞれが単一のL2ブロックに対応）を二分法で分割し、単一のブロック`n -> n+1`状態遷移に到達するまで続けます。その後、以前に説明したように、単一ブロック状態遷移の実行トレースを二分法で分割します。これは、オフチェーンVMのランタイムを削減するための最適化です。
+二分法が個々のトレース命令の状態へのコミットメントに到達した後、`FaultDisputeGame`は、一般的なVMを使用してオンチェーンで単一の命令ステップを実行します。
+VMの状態遷移関数、`T`と呼ぶことにしますが、それは形式`T(s, i) -> s'`に従う限り、何でもかまいません。ここで`s` = 合意された事前状態、`i` = 状態遷移の入力、`s'` = 後状態です。
 
-The first full implementation of the VM generic in the bisection game includes a single MIPS thread context on top of the EVM to execute single instructions within an execution trace generated by `Cannon` and the `op-program`.
+二分法ゲームでのVMジェネリックの最初の完全な実装には、`Cannon`と`op-program`によって生成された実行トレース内の単一命令を実行するためにEVMの上に単一のMIPSスレッドコンテキストが含まれます。
 
-## Next Steps
+## 次のステップ
 
-*   See [Mips.sol](mips) to learn more about the onchain smart contract implementation of Cannon.
-*   See [Cannon FPVM Specification](https://github.com/ethereum-optimism/optimism/blob/546fb2c7a5796b7fe50b0b7edc7666d3bd281d6f/specs/cannon-fault-proof-vm.md) for more detail.
+*   [Mips.sol](mips)を参照して、Cannonのオンチェーンスマートコントラクト実装についてもっと学びましょう。
+*   [Cannon FPVM Specification](https://github.com/ethereum-optimism/optimism/blob/546fb2c7a5796b7fe50b0b7edc7666d3bd281d6f/specs/cannon-fault-proof-vm.md)で詳細をご覧ください。
