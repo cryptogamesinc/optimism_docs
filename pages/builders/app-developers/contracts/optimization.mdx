@@ -1,79 +1,79 @@
 ---
-title: Contract Optimization on OP Mainnet
-lang: en-US
-description: Learn how to optimize contracts for OP Mainnet and what to look out for when you do so.
+title: OPメインネット上でのコントラクト最適化
+lang: ja-JP
+description: OPメインネットでコントラクトを最適化する方法と、それを行う際に注意すべき点を学びます。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Contract Optimization on OP Mainnet
+# OPメインネット上でのコントラクト最適化
 
-OP Mainnet is designed to be [EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306), which means OP Mainnet looks exactly like Ethereum in every way possible.
-One large and mostly unavoidable discrepancy between OP Mainnet and Ethereum is a slight [difference in transaction fee models](/stack/transactions/fees).
-This difference means that there are some opportunities to optimize OP Mainnet contracts to better take advantage of the OP Mainnet fee model.
+OPメインネットは[EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306)と設計されており、可能な限りEthereumと全く同じように見えるようになっています。
+しかし、OPメインネットとEthereumの間には、避けられない大きな違いが一つあります。それは[取引手数料モデルの違い](/stack/transactions/fees)です。
+この違いにより、OPメインネットのコントラクトを最適化し、OPメインネットの手数料モデルをより有効に活用する機会が生まれます。
 
-This guide explains the basic concepts that allow you to optimize OP Mainnet contracts and provides several examples of how you might take advantage of these concepts.
-You'll also get a better understanding of the tradeoffs and risks involved with potential contract optimizations.
-By the end of this guide you should have a clear understanding of how OP Mainnet contracts can be optimized and whether or not these optimizations make sense for your application.
-
-<Callout>
-Contract optimizations are powerful but can also create additional contract complexity.
-Some types of optimizations may also become unnecessary as OP Mainnet evolves.
-Make sure to read through all of the considerations on this page before committing to any optimizations.
-</Callout>
-
-## Fundamentals
-
-App developers might already be familiar with the concept of [gas optimization](https://www.alchemy.com/overviews/solidity-gas-optimization) to decrease the cost of interacting with smart contracts.
-Gas optimization can reduce the amount of gas used by a contract and make your application cheaper (and therefore improve user experience).
-
-OP Mainnet contracts can be gas optimized to reduce overall transaction costs, just like contracts on Ethereum.
-However, OP Mainnet transactions must also pay for another fee called the L1 Data Fee which accounts for the cost of publishing transaction data to Ethereum.
-At the time this guide was written, this L1 Data Fee makes up the majority of the cost of most transactions on OP Mainnet.
-
-Because the L1 Data Fee tends to be larger than the execution gas fee, **OP Mainnet contracts can be further optimized by increasing the amount of storage/execution used in order to decrease the amount of user-provided data in each transaction.**
-This is the basic premise that makes OP Mainnet contract optimization slightly different than on Ethereum.
-
-## Considerations
-
-### Additional Complexity
-
-Contract optimizations can create additional complexity, which can in turn create additional risk.
-Developers should always consider whether this added complexity is worth the reduction in cost.
-
-### Changing Economics
-
-Various potential upgrades to OP Mainnet may also make optimizations to the L1 Data Fee less relevant.
-For instance, [EIP-4844](https://www.eip4844.com/), if adopted, should significantly reduce the cost of publishing data to Ethereum and would therefore also decrease the L1 Data Fee.
-
-OP Mainnet also uses an [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md) mechanism that automatically increases the base fee as chain usage increases.
-Optimizations based on reducing the L1 Data Fee may become less relevant if the base fee becomes a larger part of the total transaction cost.
+このガイドでは、OPメインネットのコントラクトを最適化するための基本的な概念を説明し、これらの概念を活用するいくつかの例を提供します。
+また、潜在的なコントラクト最適化に関連するトレードオフとリスクについてもより良く理解できます。
+このガイドを終えた時には、OPメインネットのコントラクトをどのように最適化できるか、そしてそれらの最適化があなたのアプリケーションにとって意味があるかどうかを明確に理解できるはずです。
 
 <Callout>
-Generally speaking, **developers should assume that L1 Data Fee optimizations will become less useful as time goes on**.
-If you expect your contracts to be used for long periods of time, you may wish to avoid optimizations that can potentially decrease long-term gas efficiency.
-If you expect your contracts to be used mostly in the short term or you have the ability to upgrade contracts in the future, optimizations may be better suited for you.
+コントラクトの最適化は強力ですが、追加の複雑性を生じさせることもあります。
+最適化の種類によっては、OPメインネットが進化するにつれて不要になる可能性もあります。
+最適化を進める前に、このページのすべての考慮事項をよく読んでください。
 </Callout>
 
-## Techniques
+## 基本
 
-### Calldata Compression
+アプリ開発者は、スマートコントラクトとのやり取りのコストを減らすための[gas optimization](https://www.alchemy.com/overviews/solidity-gas-optimization)の概念にすでに精通しているかもしれません。
+ガスの最適化により、コントラクトが使用するガスの量を減らすことができ、アプリケーションを安くすることができます（これによりユーザーエクスペリエンスが向上します）。
 
-Compressing user data on the client side and decompressing it on the contract side can be an effective way to decrease costs on OP Mainnet.
-This technique decreases the amount of data provided by the user in exchange for a significant increase in onchain computation.
+OPメインネットのコントラクトも、Ethereum上のコントラクトと同様に、全体的な取引コストを削減するためにガス最適化が可能です。
+ただし、OPメインネットの取引は、Ethereumへのトランザクションデータの公開コストをカバーするための別の料金であるL1 Data Feeも支払う必要があります。
+このガイドが書かれた時点では、このL1 Data FeeがOPメインネットのほとんどの取引のコストの大部分を占めています。
 
-Although several libraries exist to perform this calldata compression, none of these libraries have been audited as of the writing of this page.
-As a result, links to these libraries have been explicitly omitted here to avoid encouraging developers from using potentially buggy software.
-Most of these libraries can be found with a quick search online but, as always, be careful with code you find on the internet.
+L1 Data Feeが実行ガス料金よりも大きい傾向にあるため、**OPメインネットのコントラクトは、各取引でユーザーが提供するデータの量を減らすことで、ストレージ/実行の使用量を増やすことによってさらに最適化が可能です。**
+これが、OPメインネットのコントラクト最適化がEthereumとは少し異なる基本的な前提です。
 
-### Custom Encoding
+## 考慮事項
 
-The [Solidity ABI encoding scheme](https://docs.soliditylang.org/en/v0.8.23/abi-spec.html#argument-encoding) is not particularly data efficient.
-Contracts can often reduce the amount of calldata provided by defining a custom argument encoding protocol.
+### 追加の複雑性
 
-Custom argument encodings can be combined with stored data to further reduce costs.
-For example, `address` arguments could potentially be replaced with a `uint64` pointer that performs a lookup in a stored mapping of `uint64 => address`.
-This would cut out a significant number of bytes with further reductions if the total number of addresses that need to be looked up is small (which would allow `uint64` to be reduced to `uint32` or less).
+コントラクトの最適化は追加の複雑性を生じさせ、それによって追加のリスクも生じます。
+開発者は、この追加の複雑性がコスト削減のメリットに値するかどうか常に考慮する必要があります。
 
-Custom encodings are typically less complex that general-purpose calldata compression libraries but carry additional complexity no matter what.
-When combined with stored data, application-specific custom encodings can be significantly more efficient than general-purpose compression mechanisms.
+### 経済の変化
+
+OPメインネットへの様々な潜在的なアップグレードによって、L1 Data Feeの最適化の関連性が低下する可能性もあります。
+たとえば、[EIP-4844](https://www.eip4844.com/)が採用された場合、Ethereumへのデータの公開コストを大幅に削減するため、L1 Data Feeも減少します。
+
+OPメインネットはまた、チェーン使用が増加すると基本料金を自動的に増加させる[EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md)メカニズムを使用しています。
+L1 Data Feeを減らすための最適化は、基本料金が取引コストの大部分を占めるようになると、関連性が低くなるかもしれません。
+
+<Callout>
+一般的に言って、**開発者はL1 Data Feeの最適化が時間が経つにつれて役に立たなくなると考えるべきです。**
+もし契約が長期間使用されることを期待する場合、長期的なガス効率を低下させる可能性のある最適化を避けることを検討するかもしれません。
+もし契約が短期間で主に使用されることを期待している、または将来契約をアップグレードする能力がある場合、最適化はより適しているかもしれません。
+</Callout>
+
+## 技術
+
+### Calldata圧縮
+
+ユーザーデータをクライアント側で圧縮し、契約側で展開することは、OPメインネット上でコストを減らす効果的な方法です。
+この技術は、ユーザーが提供するデータの量を減らす代わりに、オンチェーン計算を大幅に増やします。
+
+このcalldata圧縮を行うためのいくつかのライブラリが存在しますが、このページの執筆時点でどのライブラリも監査されていません。
+そのため、開発者がバグのあるソフトウェアを使用することを奨励しないように、ここではこれらのライブラリへのリンクは意図的に省略されています。
+これらのライブラリのほとんどはオンラインで簡単に見つかりますが、インターネット上で見つかるコードには常に注意してください。
+
+### カスタムエンコーディング
+
+[Solidity ABIエンコーディングスキーム](https://docs.soliditylang.org/en/v0.8.23/abi-spec.html#argument-encoding)は特にデータ効率が良いわけではありません。
+契約は、カスタム引数エンコーディングプロトコルを定義することによって、提供されるcalldataの量をしばしば減らすことができます。
+
+カスタム引数エンコーディングは、保存されたデータと組み合わせることで、さらにコストを削減することができます。
+たとえば、`address`引数は、`uint64 => address`の保存されたマッピングでルックアップを実行する`uint64`ポインターに置き換えることができます。
+これにより、トータルで必要なアドレスの数が少ない場合（`uint64`を`uint32`やそれ以下に減らすことが可能な場合）、さらに多くのバイト数をカットできます。
+
+カスタムエンコーディングは、一般的なcalldata圧縮ライブラリよりは複雑性が低いことが多いですが、どんな場合でも追加の複雑性を伴います。
+アプリケーション固有のカスタムエンコーディングは、一般的な圧縮メカニズムよりもはるかに効率的です。

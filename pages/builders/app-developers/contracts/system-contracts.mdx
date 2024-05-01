@@ -1,87 +1,89 @@
 ---
-title: Using OP Mainnet System Contracts
-lang: en-US
-description: Learn how to work with OP Mainnet contracts directly from other contracts and how to work with contracts from the client side.
+title: OPメインネットシステムコントラクトの利用方法
+lang: ja-JP
+description: 他のコントラクトやクライアント側から直接OPメインネットのコントラクトを操作する方法を学びます。
 ---
 
 import { Steps } from 'nextra/components'
 
-# Using OP Mainnet System Contracts
+# OPメインネットシステムコントラクトの利用方法
 
-System contracts on Ethereum (L1) and OP Mainnet (L2) are an important part of the OP Mainnet ecosystem.
-You may want to interact with these system contracts for any number of reasons, including:
+Ethereum（L1）およびOPメインネット（L2）のシステムコントラクトは、OPメインネットエコシステムの重要な部分です。
+以下のような理由でこれらのシステムコントラクトとのやり取りが必要になるかもしれません：
 
-*   Sending messages between L1 and L2
-*   Sending tokens between L1 and L2
-*   Querying information about the current [L1 data fee](/stack/transactions/fees#the-l1-data-fee)
-*   And lots more!
+*   L1とL2間でメッセージを送信する
+*   L1とL2間でトークンを送信する
+*   現在の[L1データ料金](/stack/transactions/fees#the-l1-data-fee)についての情報を照会する
+*   その他多数！
 
-In this tutorial, you'll learn how to work with OP Mainnet contracts directly from other contracts and how to work with them from the client side.
+このチュートリアルでは、他のコントラクトから直接OPメインネットのコントラクトを操作する方法やクライアント側からの操作方法を学びます。
 
-## Before You Begin
+## 始める前に
 
-You'll need to find the address of the particular contract that you want to interact with before you can actually interact with it.
+実際にやり取りを始める前に、関与したい特定のコントラクトのアドレスを見つける必要があります。
 
-*   Check out the [Networks and Connection Details page](/chain/networks) for links to public RPC endpoints and contract addresses.
-*   Find the addresses for all networks on the [Contract Addresses](/chain/addresses) page.
-*   Use the JSON file including contract addresses for all Superchain networks in the [Superchain Registry](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/extra/addresses/addresses.json).
+*   [ネットワークと接続詳細ページ](/chain/networks)をチェックして、公開RPCエンドポイントとコントラクトアドレスへのリンクを確認してください。
+*   [コントラクトアドレス](/chain/addresses)ページで、すべてのネットワークのアドレスを見つけます。
+*   [スーパーチェーンレジストリ](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/extra/addresses/addresses.json)にあるJSONファイルを使って、全スーパーチェーンネットワークのコントラクトアドレスを使用します。
 
-## Using System Contracts in Solidity
+## Solidityでのシステムコントラクトの使用
 
-All you need to interact with the OP Mainnet system contracts from another contract is an address and an interface.
-You can follow [the instructions above](#finding-contract-addresses) to find the address of the contract you want to interact with.
-Now you simply need to import the appropriate contracts.
+他のコントラクトからOPメインネットのシステムコントラクトとやり取りするには、アドレスとインターフェースが必要です。
+[上記の指示](#finding-contract-addresses)に従って、やり取りしたいコントラクトのアドレスを見つけてください。
+次に、適切なコントラクトをインポートするだけです。
 
 <Steps>
-### Installing via NPM
+### NPM経由でのインストール
 
-You can use the [`@eth-optimism/contracts-bedrock`](https://www.npmjs.com/package/@eth-optimism/contracts-bedrock?activeTab=readme) npm package to import system contracts and their interfaces.
-Install the package as follows:
+システムコントラクトとそのインターフェースをインポートするために、[`@eth-optimism/contracts-bedrock`](https://www.npmjs.com/package/@eth-optimism/contracts-bedrock?activeTab=readme) npmパッケージを使用できます。
+パッケージのインストールは次の通りです：
 
 ```bash
 npm install @eth-optimism/contracts-bedrock
 ```
 
-### Importing Contracts
 
-Simply import the desired contract or interface from the `@eth-optimism/contracts-bedrock` package:
+### コントラクトのインポート
+
+`@eth-optimism/contracts-bedrock`パッケージから必要なコントラクトやインターフェースを単にインポートします：
 
 ```solidity
 import { SomeOptimismContract } from "@eth-optimism/contracts-bedrock/path/to/SomeOptimismContract.sol";
 ```
 
-Please note that `path/to/SomeOptimismContract` is the path to the contract [within this folder](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src).
-For example, if you wanted to import the [`L1CrossDomainMessenger`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol) contract, you would use the following import:
+`path/to/SomeOptimismContract`は[このフォルダ](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src)内のコントラクトへのパスです。
+例えば、[`L1CrossDomainMessenger`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol)コントラクトをインポートしたい場合、以下のインポートを使用します：
 
 ```solidity
 import { L1CrossDomainMessenger } from "@eth-optimism/contracts/L1/messaging/L1CrossDomainMessenger.sol";
 ```
 
-### Getting L2 Contract Addresses
 
-System contracts on L2 are "pre-deployed" to special addresses that are the same on most OP Stack chains.
-You can find these addresses on the [Contract Addresses](/chain/addresses) page.
-These addresses are also provided as constants in the [`Predeploys`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/libraries/Predeploys.sol) contract for use in Solidity.
+### L2コントラクトアドレスの取得
+
+L2のシステムコントラクトは、ほとんどのOPスタックチェーンで同じ特別なアドレスに「事前配置」されています。
+これらのアドレスは[コントラクトアドレス](/chain/addresses)ページで見ることができます。
+これらのアドレスはSolidityでの使用に便利な定数として[`Predeploys`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/libraries/Predeploys.sol)コントラクトにも提供されています。
 </Steps>
 
-## Using System Contracts in JavaScript
+## JavaScriptでのシステムコントラクトの使用
 
-You can also interact with the OP Mainnet system contracts from the client side.
+クライアント側からもOPメインネットのシステムコントラクトとのやり取りが可能です。
 <Steps>
-### Installing via NPM
+### NPM経由でのインストール
 
-You can use the [`@eth-optimism/contracts-ts`](https://www.npmjs.com/package/@eth-optimism/contracts-ts?activeTab=readme) npm package to import system contracts and their interfaces.
-Install the package as follows:
+システムコントラクトとそのインターフェースをインポートするために、[`@eth-optimism/contracts-ts`](https://www.npmjs.com/package/@eth-optimism/contracts-ts?activeTab=readme) npmパッケージを使用できます。
+パッケージのインストールは次の通りです：
 
 ```bash
 npm install @eth-optimism/contracts-ts
 ```
 
-### Getting Contract Artifacts and Interfaces
+### コントラクトのアーティファクトとインターフェースの取得
 
-You can use the `@eth-optimism/contracts-ts` package to easily access the address or ABI of any OP Mainnet contract.
+`@eth-optimism/contracts-ts`パッケージを使用して、任意のOPメインネットコントラクトのアドレスやABIに簡単にアクセスできます。
 
-Here's an example of how you can grab the ABI and address of the `L2OutputOracleProxy` contract on OP Mainnet (chain ID 10):
+以下はOPメインネット（チェーンID 10）の`L2OutputOracleProxy`コントラクトのABIとアドレスを取得する例です：
 
 ```ts
 import {
@@ -92,9 +94,11 @@ import {
 // Note that the address is keyed by chain ID!
 console.log(l2OutputOracleAddresses[10], abi)
 ```
-### Interacting with the Contract
-You can then feed this address and ABI into your favorite web3 library to interact with the contract.
 
-`@eth-optimism/contracts-ts` also exports [React hooks](https://wagmi.sh/cli/api/plugins/react) and [wagmi actions](https://wagmi.sh/react/api/actions) for interacting with OP Mainnet contracts.
-Check out the full [README](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/packages/contracts-ts#readme) for more information.
+### コントラクトとのやり取り
+
+このアドレスとABIを使用して、お好みのweb3ライブラリを通じてコントラクトとやり取りすることができます。
+
+`@eth-optimism/contracts-ts`はまた、OPメインネットコントラクトとのやり取りに[React hooks](https://wagmi.sh/cli/api/plugins/react)および[wagmi actions](https://wagmi.sh/react/api/actions)をエクスポートしています。
+詳細については、完全な[README](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/packages/contracts-ts#readme)をご覧ください。
 </Steps>
