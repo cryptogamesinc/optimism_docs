@@ -1,24 +1,23 @@
 ---
-title: Solidity Compatibility
-lang: en-US
-description: Learn about the differences between OP Mainnet and Ethereum when building Solidity contracts.
+title: Solidityの互換性
+lang: ja-JP
+description: Solidityコントラクトを構築する際、OPメインネットとEthereumの違いについて学びましょう。
 ---
 
-# Solidity Compatibility
+# Solidityの互換性
 
-OP Mainnet is designed to be [EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306), which means OP Mainnet looks exactly like Ethereum in every way possible.
-Almost all Ethereum tooling works out of the box on OP Mainnet, including the [Solidity](https://soliditylang.org/) smart contract language.
-However, there are a few minor differences between OP Mainnet and Ethereum that you should be aware of when building Solidity contracts.
+OPメインネットは[EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306)と設計されており、Ethereumと全く同じように動作します。
+ほとんどのEthereumツールはOPメインネットでもそのまま動作しますが、Solidityスマートコントラクト言語を含めます。しかし、Solidityコントラクトを構築する際には、OPメインネットとEthereumの間に幾つかの小さな違いがある点に注意が必要です。
 
-## EVM/Opcode Differences
+## EVM/Opcodeの違い
 
-Most smart contracts will work on OP Mainnet without any changes.
-Check out the [Differences Between Ethereum and OP Mainnet](/chain/differences#opcodes) page for a detailed list of the few differences you should know about.
+ほとんどのスマートコントラクトは、変更を加えずにOPメインネットで動作します。
+具体的な違いについては、[EthereumとOPメインネットの違い](/chain/differences#opcodes)ページを確認してください。
 
-## Gas Differences
+## ガスの違い
 
-OP Mainnet uses the same gas costs as Ethereum.
-However, OP Mainnet also charges an [L1 Data Fee](/stack/transactions/fees#l1-data-fee) for the cost of publishing an L2 transaction to L1.
-This fee is charged based on the size of a transaction in bytes.
-As a result, smart contract optimization techniques can differ slightly on OP Mainnet.
-Refer to the [Contract Optimization guide](./optimization) for more information.
+OPメインネットはEthereumと同じガスコストを使用します。
+ただし、L2トランザクションをL1に公開するコストの[L1 Data Fee](/stack/transactions/fees#l1-data-fee)も請求されます。
+この料金は、トランザクションのバイトサイズに基づいて請求されます。
+その結果、OPメインネットではスマートコントラクトの最適化技術が若干異なることがあります。
+詳細については、[コントラクト最適化ガイド](./optimization)を参照してください。

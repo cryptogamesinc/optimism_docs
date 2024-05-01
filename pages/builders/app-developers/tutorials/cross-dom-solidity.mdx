@@ -1,352 +1,370 @@
 ---
-title: Communicating Between OP Mainnet and Ethereum in Solidity
+title: SolidityにおけるOP MainnetとEthereum間の通信
 lang: en-US
-description: Learn how to write Solidity contracts on OP Mainnet and Ethereum that can talk to each other.
+description: OP MainnetとEthereumでお互いに通信できるSolidityコントラクトの作成方法を学びます。
 ---
 
 import { Steps, Callout, Tabs } from 'nextra/components'
 
-# Communicating Between OP Mainnet and Ethereum in Solidity
+# SolidityにおけるOP MainnetとEthereum間の通信
 
-This tutorial explains how to write Solidity contracts on OP Mainnet and Ethereum that can talk to each other.
-Here you'll use a contract on OP Mainnet that can set a "greeting" variable on a contract on Ethereum, and vice-versa.
-This is a simple example, but the same technique can be used to send any kind of message between the two chains.
+このチュートリアルでは、OP MainnetとEthereumでお互いに通信できるSolidityコントラクトの書き方を説明します。
+ここでは、OP Mainnet上のコントラクトがEthereum上のコントラクトの「greeting」変数を設定し、その逆もできるようにします。
+これはシンプルな例ですが、同じ技術を使って両チェーン間で任意の種類のメッセージを送信することができます。
 
-You won't actually be deploying any smart contracts as part of this tutorial.
-Instead, you'll reuse existing contracts that have already been deployed to OP Mainnet and Ethereum.
-Later in the tutorial you'll learn exactly how these contracts work so you can follow the same pattern to deploy your own contracts.
+このチュートリアルの一環として実際にスマートコントラクトをデプロイするわけではありません。
+代わりに、既にOP MainnetとEthereumにデプロイされている既存のコントラクトを再利用します。
+チュートリアルの後半で、これらのコントラクトがどのように機能するかを正確に学び、自分のコントラクトをデプロイするために同じパターンをたどることができます。
 
 <Callout type="info">
-Just looking to bridge tokens between OP Mainnet and Ethereum?
-Check out the tutorial on [Bridging ERC-20 Tokens to OP Mainnet With the Optimism SDK](./cross-dom-bridge-erc20).
+OP MainnetとEthereum間でトークンをブリッジしたいだけですか？
+[Optimism SDKを使用してOP MainnetへERC-20トークンをブリッジするチュートリアル](./cross-dom-bridge-erc20)をチェックしてください。
 </Callout>
 
-## Message Passing Basics
+## メッセージパッシングの基礎
 
-OP Mainnet uses a smart contract called the `CrossDomainMessenger` to pass messages between OP Mainnet and Ethereum.
-Both chains have a version of this contract (the `L1CrossDomainMessenger` and the `L2CrossDomainMessenger`).
-Messages sent from Ethereum to OP Mainnet are automatically relayed behind the scenes.
-Messages sent from OP Mainnet to Ethereum must be explicitly relayed with a second transaction on Ethereum.
-Read more about message passing in the guide to [Sending Data Between L1 and L2](/builders/app-developers/bridging/messaging).
+OP Mainnetは`CrossDomainMessenger`と呼ばれるスマートコントラクトを使用して、OP MainnetとEthereum間でメッセージを送信します。
+両チェーンにはこのコントラクトのバージョン（`L1CrossDomainMessenger`と`L2CrossDomainMessenger`）が存在します。
+EthereumからOP Mainnetへのメッセージは裏で自動的に中継されます。
+OP MainnetからEthereumへのメッセージは、Ethereum上で2回目のトランザクションを明示的に中継する必要があります。
+メッセージパッシングについては、[L1とL2間でデータを送信する](/builders/app-developers/bridging/messaging)ガイドを読んでください。
 
-## Dependencies
+## 依存関係
 
 *   [node](https://nodejs.org/en/)
 *   [pnpm](https://pnpm.io/installation)
 
-## Get ETH on Sepolia and OP Sepolia
+## SepoliaとOP SepoliaでETHを入手する
 
-This tutorial explains how to send messages from Sepolia to OP Sepolia.
-You will need to get some ETH on both of these testnets.
+このチュートリアルでは、SepoliaからOP Sepoliaへメッセージを送信する方法を説明します。
+これらのテストネットの両方でいくらかのETHを入手する必要があります。
 
 <Callout type="info">
-You can use [this faucet](https://sepoliafaucet.com/) to get ETH on Sepolia.
-You can use the [Superchain Faucet](https://app.optimism.io/faucet?utm_source=docs) to get ETH on OP Sepolia.
+[この蛇口](https://sepoliafaucet.com/)を使用してSepoliaでETHを入手できます。
+[Superchain Faucet](https://app.optimism.io/faucet?utm_source=docs)を使用してOP SepoliaでETHを入手できます。
 </Callout>
 
-## Review the Contracts
-You're about to use two contracts that have already been deployed to Sepolia and OP Sepolia, the `Greeter` contracts.
-You can review the source code for the L1 `Greeter` contract [here on Etherscan](https://sepolia.etherscan.io/address/0x31A6Dd971306bb72f2ffF771bF30b1B98dB8B2c5#code).
-You can review the source code for the L2 `Greeter` contract [here on Etherscan](https://sepolia-optimism.etherscan.io/address/0x5DE8a2957eddb140567fF90ba5d57bc9769f3055#code).
-Both contracts have exactly the same source code.
+## コントラクトを確認する
+あなたが使用しようとしている2つのコントラクトは、SepoliaとOP Sepoliaにすでにデプロイされています。それは`Greeter`コントラクトです。
+L1 `Greeter`コントラクトのソースコードは[こちらのEtherscan](https://sepolia.etherscan.io/address/0x31A6Dd971306bb72f2ffF771bF30b1B98dB8B2c5#code)で確認できます。
+L2 `Greeter`コントラクトのソースコードは[こちらのEtherscan](https://sepolia-optimism.etherscan.io/address/0x5DE8a2957eddb140567fF90ba5d57bc9769f3055#code)で確認できます。
+両方のコントラクトはまったく同じソースコードを持っています。
 
-Feel free to review the source code for these two contracts now if you'd like.
-This tutorial will explain how these contracts work in detail later on in the [How It Works](#how-it-works) section below.
+これらの二つのコントラクトのソースコードを今すぐ確認したい場合はお気軽にどうぞ。
+このチュートリアルでは、後ほど[How It Works](#how-it-works)セクションでこれらのコントラクトの動作について詳しく説明します。
 
-## Interact With the L1 Greeter
 
-You're first going to use the L1 `Greeter` contract to set the greeting on the L2 `Greeter` contract.
-You'll send a transaction directly to the L1 `Greeter` contract which will ask the `L1CrossDomainMessenger` to send a message to the L2 `Greeter` contract.
-After just a few minutes, you'll see the corresponding greeting set on the L2 `Greeter` contract.
+## L1 Greeterとのインタラクション
+
+まず、L1の`Greeter`コントラクトを使用して、L2の`Greeter`コントラクトに挨拶を設定します。
+L1の`Greeter`コントラクトに直接トランザクションを送信し、`L1CrossDomainMessenger`にL2の`Greeter`コントラクトにメッセージを送るよう依頼します。
+数分後、L2の`Greeter`コントラクトに設定した挨拶が表示されます。
 
 <Steps>
 
-{<h3>Connect to Etherscan</h3>}
+{<h3>Etherscanに接続する</h3>}
 
-Sending a message to the L2 `Greeter` contract via the L1 `Greeter` contract requires that you call the `sendGreeting` function.
-For simplicity, you'll interact with the contract directly on Etherscan.
-Open up the [L1 `Greeter` contract on Sepolia Etherscan](https://sepolia.etherscan.io/address/0x31A6Dd971306bb72f2ffF771bF30b1B98dB8B2c5#writeContract) and click the "Connect to Web3" button.
+L1の`Greeter`コントラクトを通じてL2の`Greeter`コントラクトにメッセージを送るには、`sendGreeting`関数を呼び出す必要があります。
+簡単のために、Etherscan上で直接コントラクトと対話します。
+[Sepolia EtherscanのL1 `Greeter`コントラクトページ](https://sepolia.etherscan.io/address/0x31A6Dd971306bb72f2ffF771bF30b1B98dB8B2c5#writeContract)を開き、「Connect to Web3」ボタンをクリックしてください。
 
-{<h3>Send your greeting</h3>}
+{<h3>挨拶を送信する</h3>}
 
-Put a greeting into the field next to the "sendGreeting" function and click the "Write" button.
-You can use any greeting you'd like.
+"sendGreeting"関数の隣にあるフィールドに挨拶を入力し、「Write」ボタンをクリックします。
+好きな挨拶を使用できます。
 
-{<h3>Wait a few minutes</h3>}
+{<h3>数分間待つ</h3>}
 
-It will take a few minutes for your message to reach L2.
-Feel free to take a quick break while you wait.
+メッセージがL2に到達するまでに数分かかります。
+待っている間、少し休憩を取ることができます。
 
 <Callout type="info">
-You can use the Optimism SDK to programmatically check the status of any message between L1 and L2.
-Later on in this tutorial you'll learn how to use the Optimism SDK and the `waitForMessageStatus` function to wait for various message statuses.
-This same function can be used to wait for a message to be relayed from L1 to L2.
+L1とL2間の任意のメッセージの状態をプログラムでチェックするには、Optimism SDKを使用できます。
+このチュートリアルの後半で、`waitForMessageStatus`関数を使用して様々なメッセージステータスを待つ方法を学びます。
+この関数はL1からL2へのメッセージを中継するときにも使用できます。
 </Callout>
 
-{<h3>Check the L2 Greeter</h3>}
+{<h3>L2 Greeterを確認する</h3>}
 
-After a few minutes, you should see the greeting on the L2 `Greeter` contract change to the greeting you set.
-Open up the [L2 `Greeter` contract on OP Sepolia Etherscan](https://sepolia-optimism.etherscan.io/address/0x5DE8a2957eddb140567fF90ba5d57bc9769f3055#readContract) and click the "Read Contract" button.
-Paste your address into the field next to the "greeting" function and click the "Query" button.
-You should see the message you sent from L1.
+数分後、設定した挨拶がL2の`Greeter`コントラクトに表示されるはずです。
+[OP Sepolia EtherscanのL2 `Greeter`コントラクトページ](https://sepolia-optimism.etherscan.io/address/0x5DE8a2957eddb140567fF90ba5d57bc9769f3055#readContract)を開き、「Read Contract」ボタンをクリックしてください。
+「greeting」関数の隣のフィールドにあなたのアドレスを貼り付け、「Query」ボタンをクリックしてください。
+L1から送信したメッセージが表示されるはずです。
 
 <Callout>
-Don't see your message yet?
-You might need to wait a little longer.
-L2 transactions triggered on L1 are typically processed within one minute but can occasionally be slightly delayed.
+まだメッセージが見えないですか？
+もう少し待つ必要があるかもしれません。
+L1でトリガーされたL2トランザクションは通常1分以内に処理されますが、時々わずかに遅延することがあります。
 </Callout>
 
 </Steps>
 
-## Interact With the L2 Greeter
+## L2 Greeterとのインタラクション
 
-Now you're going to use the L2 `Greeter` contract to set the greeting on the L1 `Greeter` contract.
-You'll send a transaction directly to the L2 `Greeter` contract which will ask the `L2CrossDomainMessenger` to send a message to the L1 `Greeter` contract.
-Unlike the previous step, you'll need to relay the message from L2 to L1 yourself!
-You'll do this by sending two transactions on Sepolia, one proving transaction and one relaying transaction.
+次に、L2の`Greeter`コントラクトを使用して、L1の`Greeter`コントラクトに挨拶を設定します。
+L2の`Greeter`コントラクトに直接トランザクションを送信し、`L2CrossDomainMessenger`にL1の`Greeter`コントラクトにメッセージを送るよう依頼します。
+前のステップとは異なり、メッセージをL1に中継する作業は自分で行う必要があります！
+Sepoliaで2つのトランザクションを送信することになります。1つは証明トランザクション、もう1つは中継トランザクションです。
 
 <Steps>
 
-{<h3>Connect to Etherscan</h3>}
+{<h3>Etherscanに接続する</h3>}
 
-Just like before, sending a message to the L1 `Greeter` contract via the L2 `Greeter` contract requires that you call the `sendGreeting` function.
-Open up the [L2 `Greeter` contract on OP Sepolia Etherscan](https://sepolia-optimism.etherscan.io/address/0x5DE8a2957eddb140567fF90ba5d57bc9769f3055#writeContract) and click the "Connect to Web3" button.
+前と同じように、L2の`Greeter`コントラクトを通じてL1の`Greeter`コントラクトにメッセージを送るには、`sendGreeting`関数を呼び出す必要があります。
+[OP Sepolia EtherscanのL2 `Greeter`コントラクトページ](https://sepolia-optimism.etherscan.io/address/0x5DE8a2957eddb140567fF90ba5d57bc9769f3055#writeContract)を開き、「Connect to Web3」ボタンをクリックしてください。
 
-{<h3>Send your greeting</h3>}
+{<h3>挨拶を送信する</h3>}
 
-Put a greeting into the field next to the "sendGreeting" function and click the "Write" button.
-You can use any greeting you'd like.
+"sendGreeting"関数の隣にあるフィールドに挨拶を入力し、「Write」ボタンをクリックします。
+好きな挨拶を使用できます。
 
 <Callout>
-Copy the transaction hash from the transaction you just sent.
-You'll need this for the next few steps.
-Feel free to keep this tab open so you can easily copy the transaction hash later.
+送信したトランザクションのハッシュをコピーしてください。
+次の数ステップに必要になります。
+このタブを開いたままにして、後で簡単にトランザクションハッシュをコピーできるようにしてください。
 </Callout>
 
-{<h3>Create a demo project folder</h3>}
+{<h3>デモプロジェクトフォルダーを作成する</h3>}
 
-You're going to use the Optimism SDK to prove and relay your message to L1.
-Since the Optimism SDK is a [Node.js](https://nodejs.org/en/) library, you'll need to create a Node.js project to use it.
+L1にメッセージを証明して中継するために、Optimism SDKを使用します。
+Optimism SDKは[Node.js](https://nodejs.org/en/)ライブラリですので、それを使用するためにNode.jsプロジェクトを作成する必要があります。
 
 ```bash
 mkdir op-sample-project
 cd op-sample-project
 ```
 
-{<h3>Initialize the Project</h3>}
+{<h3>プロジェクトの初期化</h3>}
 
-Set up the project as a basic Node.js project with `pnpm` or your favorite package manager.
+`pnpm`またはお好きなパッケージマネージャーを使用して、基本的なNode.jsプロジェクトとしてプロジェクトを設定します。
 
 ```bash
 pnpm init
 ```
 
-{<h3>Install the Optimism SDK</h3>}
+{<h3>Optimism SDKをインストールする</h3>}
 
-Install the Optimism SDK with `pnpm` or your favorite package manager.
+`pnpm`またはお好きなパッケージマネージャーを使用してOptimism SDKをインストールします。
 
 ```bash
 pnpm add @eth-optimism/sdk
 ```
 
-{<h3>Install ethers.js</h3>}
+{<h3>ethers.jsをインストールする</h3>}
 
-Install `ethers` with `pnpm` or your favorite package manager.
+`pnpm`またはお好きなパッケージマネージャーを使用して`ethers`をインストールします。
 
 ```bash
 pnpm add ethers@^5
 ```
 
-{<h3>Add your private key to your environment</h3>}
+{<h3>環境にプライベートキーを追加する</h3>}
 
-You need a private key in order to sign transactions.
-Set your private key as an environment variable with the `export` command.
-Make sure this is the private key for the address you used to send the transaction to the L2 `Greeter` contract.
+トランザクションに署名するためにはプライベートキーが必要です。
+`export`コマンドで環境変数としてプライベートキーを設定します。
+これは、L2の`Greeter`コントラクトにトランザクションを送信するために使用したアドレスのプライベートキーであることを確認してください。
 
 ```bash
 export TUTORIAL_PRIVATE_KEY=0x...
 ```
 
-{<h3>Add your transaction hash to your environment</h3>}
+{<h3>トランザクションハッシュを環境に追加する</h3>}
 
-You'll also need the hash of the transaction you sent to the L2 `Greeter` contract.
-Set this as an environment variable with the `export` command.
+L2の`Greeter`コントラクトに送信したトランザクションのハッシュも必要です。
+`export`コマンドで環境変数として設定します。
 
 ```bash
 export TUTORIAL_TRANSACTION_HASH=0x...
 ```
 
-{<h3>Start a Node REPL</h3>}
+{<h3>Node REPLを起動する</h3>}
 
-Now you'll use the Node.js REPL to run a few commands.
-Start the Node.js REPL with the `node` command.
+いくつかのコマンドを実行するために、Node.js REPLを使用します。
+`node`コマンドでNode.js REPLを開始します。
 
 ```bash
 node
 ```
 
-{<h3>Import the Optimism SDK</h3>}
+{<h3>Optimism SDKをインポートする</h3>}
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L3 hash=26b2fdb17dd6c8326a54ec51f0769528
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L3 hash=26b2fdb17dd6c8326a54ec51f0769528
 ```
 
-{<h3>Import ethers.js</h3>}
+{<h3>ethers.jsをインポートする</h3>}
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L4 hash=69a65ef97862612e4978b8563e6dbe3a
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L4 hash=69a65ef97862612e4978b8563e6dbe3a
 ```
 
-{<h3>Load your private key</h3>}
+{<h3>プライベートキーを読み込む</h3>}
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L6 hash=755b77a7ffc7dfdc186f36c37d3d847a
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L6 hash=755b77a7ffc7dfdc186f36c37d3d847a
 ```
 
-{<h3>Load your transaction hash</h3>}
+{<h3>トランザクションハッシュを読み込む</h3>}
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L8 hash=320cd4f397d7bed8d914d4be0c99f8dc
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L8 hash=320cd4f397d7bed8d914d4be0c99f8dc
 ```
 
-{<h3>Create the RPC providers and wallets</h3>}
+{<h3>RPCプロバイダとウォレットを作成する</h3>}
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L10-L13 hash=9afdce50665ae93bce602068071ffaa1
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L10-L13 hash=9afdce50665ae93bce602068071ffaa1
 ```
 
-{<h3>Create a CrossChainMessenger instance</h3>}
+{<h3>CrossChainMessengerインスタンスを作成する</h3>}
 
-The Optimism SDK exports a `CrossChainMessenger` class that makes it easy to prove and relay cross-chain messages.
+Optimism SDKは、クロスチェーンメッセージを証明して中継するのを容易にする`CrossChainMessenger`クラスをエクスポートします。
 
-Create an instance of the `CrossChainMessenger` class:
+`CrossChainMessenger`クラスのインスタンスを作成します：
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L15-L20 hash=997b9c4cdd5fb1f9d4e0882a683ae016
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L15-L20 hash=997b9c4cdd5fb1f9d4e0882a683ae016
 ```
 
-{<h3>Wait until the message is ready to prove</h3>}
+{<h3>メッセージが証明する準備ができるまで待つ</h3>}
 
-The second step to send messages from L2 to L1 is to prove that the message was sent on L2.
-You first need to wait until the message is ready to prove.
+L2からL1へのメッセージを送る第二のステップは、L2でメッセージが送信されたことを証明することです。
+まず、メッセージが証明する準備ができるまで待つ必要があります。
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L23 hash=25a072666b6147f8d8983d8223f045b8
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L23 hash=25a072666b6147f8d8983d8223f045b8
 ```
 
 <Callout type="info">
-This step can take a few minutes.
-Feel free to take a quick break while you wait.
+このステップには数分かかることがあります。
+待っている間に、少し休憩を取ることができます。
 </Callout>
 
-{<h3>Prove the message on L1</h3>}
+{<h3>L1でメッセージを証明する</h3>}
 
-Once the message is ready to be proven, you'll send an L1 transaction to prove that the message was sent on L2.
+メッセージが証明する準備ができたら、L2でメッセージが送信されたことを証明するためにL1トランザクションを送信します。
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L26 hash=17922abea43b3d379404fedd87422dde
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L26 hash=17922abea43b3d379404fedd87422dde
 ```
 
-{<h3>Wait until the message is ready for relay</h3>}
+{<h3>メッセージが中継する準備ができるまで待つ</h3>}
 
-The final step to sending messages from L2 to L1 is to relay the messages on L1.
-This can only happen after the fault proof period has elapsed.
-On OP Sepolia, this is only a few seconds.
-On OP Mainnet, this takes 7 days.
+L2からL1へのメッセージを送る最終ステップは、L1でメッセージを中継することです。
+これは故障証明期間が経過した後にのみ発生できます。
+OP Sepoliaでは、これは数秒です。
+OP Mainnetでは、これに7日かかります。
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L29 hash=45d995aab47ec29afee4bb4577ae9303
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L29 hash=45d995aab47ec29afee4bb4577ae9303
 ```
 
-{<h3>Relay the message on L1</h3>}
+{<h3>L1でメッセージを中継する</h3>}
 
-Once the withdrawal is ready to be relayed you can finally complete the message sending process.
+引き出しが中継する準備ができたら、メッセージ送信プロセスを完了できます。
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L32 hash=b5515811ffcf8b9ada15dea8ae666e44
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L32 hash=b5515811ffcf8b9ada15dea8ae666e44
 ```
 
-{<h3>Wait until the message is relayed</h3>}
+{<h3>メッセージが中継されるのを待つ</h3>}
 
-Now you simply wait until the message is relayed.
+これで、メッセージが中継されるのを待つだけです。
 
-```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L35 hash=d6e7f89e929eea0ac3217a6751b7e578
+```js
+file=<rootDir>/public/tutorials/cross-dom-solidity.js#L35 hash=d6e7f89e929eea0ac3217a6751b7e578
 ```
 
-{<h3>Check the L1 Greeter</h3>}
+{<h3>L1 Greeterを確認する</h3>}
 
-Now that you've relayed the message, you should see the greeting on the L1 `Greeter` contract change to the greeting you set.
-Open up the [L1 `Greeter` contract on Sepolia Etherscan](https://sepolia.etherscan.io/address/0x31A6Dd971306bb72f2ffF771bF30b1B98dB8B2c5#readContract) and click the "Read Contract" button.
-Paste your address into the field next to the "greeting" function and click the "Query" button.
-You should see the message you sent from L2.
+メッセージを中継したので、L1の`Greeter`コントラクトの挨拶が設定した挨拶に変更されているはずです。
+[Sepolia EtherscanのL1 `Greeter`コントラクトページ](https://sepolia.etherscan.io/address/0x31A6Dd971306bb72f2ffF771bF30b1B98dB8B2c5#readContract)を開き、「Read Contract」ボタンをクリックしてください。
+「greeting」機能の隣のフィールドにあなたのアドレスを貼り付け、「Query」ボタンをクリックしてください。
+L2から送信したメッセージが表示されるはずです。
 
 </Steps>
 
-## How It Works
+## 動作原理
 
-Congratulations!
-You've successfully sent a message from L1 to L2 and from L2 to L1.
-This section will explain how the `Greeter` contracts work so you can follow the same pattern to deploy your own contracts.
-Luckily, both `Greeter` contracts are exactly the same so it's easy to see how everything comes together.
+おめでとうございます！
+L1からL2、そしてL2からL1へのメッセージを成功させました。
+このセクションでは、`Greeter`コントラクトがどのように機能するかを説明し、あなたが同じパターンをたどって自分のコントラクトをデプロイできるようにします。
+幸いにも、両方の`Greeter`コントラクトはまったく同じなので、すべてがどのように一緒に機能するかを簡単に理解できます。
 
-### The Messenger Variable
+### メッセンジャー変数
 
-The `Greeter` contract has a `MESSENGER` variable that keeps track of the `CrossDomainMessenger` contract on the current chain.
-Check out the [Contract Addresses page](/chain/addresses) to see the addresses of the `CrossDomainMessenger` contracts on whichever network you'll be using.
+`Greeter`コントラクトには、現在のチェーン上の`CrossDomainMessenger`コントラクトを追跡する`MESSENGER`変数があります。
+使用するネットワーク上の`CrossDomainMessenger`コントラクトのアドレスを確認するには、[Contract Addresses page](/chain/addresses)をチェックしてください。
 
-```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L14 hash=ce8be857d4b4e1992cd3c16b8f2864b9
+```solidity
+file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L14 hash=ce8be857d4b4e1992cd3c16b8f2864b9
 ```
 
-### The Other Greeter Variable
+### 他のGreeter変数
 
-The `Greeter` contract also has an `OTHER_GREETER` variable that keeps track of the `Greeter` contract on the other chain.
-On L1, this variable is set to the address of the L2 `Greeter` contract, and vice-versa.
+`Greeter`コントラクトには、他のチェーン上の`Greeter`コントラクトを追跡する`OTHER_GREETER`変数もあります。
+L1では、この変数はL2の`Greeter`コントラクトのアドレスに設定され、その逆も同様です。
 
-```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L15 hash=eedd8c3050a83e56f37f367c6faa6f5d
+```solidity
+file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L15 hash=eedd8c3050a83e56f37f367c6faa6f5d
 ```
 
-### The Greetings Mapping
+### 挨拶マッピング
 
-The `Greeter` contract keeps track of the different greetings that users have sent inside a `greetings` mapping.
-By using a mapping, this contract can keep track of greetings from different users at the same time.
+`Greeter`コントラクトは、異なるユーザーから送られた異なる挨拶を`greetings`マッピング内で追跡します。
+マッピングを使用することで、このコントラクトは同時に異なるユーザーの挨拶を追跡することができます。
 
-```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L16 hash=832732d9d5aface44c16c1ae9ecde7b2
+```solidity
+file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L16 hash=832732d9d5aface44c16c1ae9ecde7b2
 ```
 
-### The Constructor
+### コンストラクタ
 
-The `Greeter` has a simple constructor that sets the `MESSENGER` and `OTHER_GREETER` variables.
+`Greeter`にはシンプルなコンストラクタがあり、`MESSENGER`および`OTHER_GREETER`変数を設定します。
 
-```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L18-L24 hash=718f3dc498975548eec30da99e47adf2
+```solidity
+file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L18-L24 hash=718f3dc498975548eec30da99e47adf2
 ```
 
-### The Send Greeting Function
+### 挨拶を送る関数
 
-The `sendGreeting` function is the most important function in the `Greeter` contract.
-This is what you called earlier to send messages in both directions.
-All this function is doing is using the `sendMessage` function found within the `CrossChainMessenger` contract to send a message to the `Greeter` contract on the other chain.
+`sendGreeting`関数は`Greeter`コントラクトの中で最も重要な関数です。
+これはあなたが先ほど両方向でメッセージを送るために呼び出したものです。
+この関数は、`CrossChainMessenger`コントラクト内にある`sendMessage`関数を使用して、他のチェーン上の`Greeter`コントラクトにメッセージを送信します。
 
-Here, the first parameter is the address of the recipient of the message (the `Greeter` contract on the other chain).
-The second parameter is the ABI-encoded function call to the `setMessage` function.
-The final parameter is the gas limit that gets used when the message is relayed on the other side.
+ここで、最初のパラメータはメッセージの受信者のアドレス（他のチェーン上の`Greeter`コントラクト）です。
+2番目のパラメータは`setMessage`関数へのABIエンコードされた関数呼び出しです。
+最後のパラメータは、他の側でメッセージが中継されるときに使用されるガスリミットです。
 
-```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L26-L38 hash=3104a6775fe3a505cf2f84b71b078aee
+```solidity
+file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L26-L38 hash=3104a6775fe3a505cf2f84b71b078aee
 ```
 
-### The Set Greeting Function
+### 挨拶を設定する関数
 
-The `setMessage` function is the function that actually sets the greeting.
-This function is called by the `CrossDomainMessenger` contract on the other chain.
-It checks explicitly that the function can only be called by the `CrossDomainMessenger` contract.
-It also checks that the `CrossChainMessenger` is saying that the message came from the `Greeter` contract on the other chain.
-Finally, it sets the greeting in the `greetings` mapping.
+`setMessage`関数は、実際に挨拶を設定する関数です。
+この関数は、他のチェーンの`CrossDomainMessenger`コントラクトによって呼び出されます。
+明示的にこの関数は`CrossDomainMessenger`コントラクトによってのみ呼び出されることができるとチェックします。
+また、`CrossChainMessenger`が他のチェーンの`Greeter`コントラクトからメッセージが来たと言っていることを確認します。
+最後に、`greetings`マッピングに挨拶を設定します。
 
-```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L40-L52 hash=f50a94e77ecb2f76b9fe278b058a79e4
+```solidity
+file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L40-L52 hash=f50a94e77ecb2f76b9fe278b058a79e4
 ```
 
 <Callout>
-The two `require` statements in this function are important!
-Without them, anyone could call this function and set the greeting to whatever they want.
-You can follow a similar pattern in your own smart contracts.
+この関数の2つの`require`ステートメントは重要です！
+これらがなければ、誰でもこの関数を呼び出して、好きな挨拶を設定することができます。
+あなたのスマートコントラクトでも同様のパターンに従うことができます。
 </Callout>
 
-## Conclusion
+## 結論
 
-You just learned how you can write Solidity contracts on Sepolia and OP Sepolia that can talk to each other.
-You can follow the same pattern to write contracts that can talk to each other on Ethereum and OP Mainnet.
+あなたはSepoliaとOP Sepoliaで互いに通信できるSolidityコントラクトを書く方法を学びました。
+EthereumとOP Mainnet上で互いに通信できるコントラクトを書くために同じパターンに従うことができます。
 
-This sort of cross-chain communication is useful for a variety of reasons.
-For example, the [Standard Bridge](/builders/app-developers/bridging/standard-bridge) contracts use this same system to bridge ETH and ERC-20 tokens between Ethereum and OP Mainnet.
+この種のクロスチェーン通信は様々な理由で便利です。
+たとえば、[Standard Bridge](/builders/app-developers/bridging/standard-bridge)コントラクトは、この同じシステムを使用して、EthereumとOP Mainnet間でETHとERC-20トークンをブリッジします。
 
-One cool way to take advantage of cross-chain communication is to do most of your heavy lifting on OP Mainnet and then send a message to Ethereum only when you have important results to share.
-This way you can take advantage of the low gas costs on OP Mainnet while still being able to use Ethereum when you need it.
+クロスチェーン通信を活用するクールな方法の一つは、OP Mainnetでほとんどの重い処理を行い、重要な結果を共有するときだけEthereumにメッセージを送信することです。
+この方法では、OP Mainnetの低いガスコストを利用しながら、必要なときにはEthereumを使用することができます。
