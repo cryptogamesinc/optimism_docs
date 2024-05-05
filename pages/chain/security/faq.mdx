@@ -1,75 +1,75 @@
 ---
-title: OP Mainnet Security Model
-lang: en-US
-description: Learn about the OP Mainnet security model and answers to common questions.
+タイトル OPメインネットのセキュリティ・モデル
+言語: ja-JP
+説明 OPメインネットのセキュリティ・モデルと、よくある質問に対する回答。
 ---
 
 import { Callout } from 'nextra/components'
 
-# OP Mainnet Security Model
+# OPメインネットのセキュリティ・モデル
 
-OP Mainnet is a work in progress.
-Constant, iterative improvement of the security mechanisms that safeguard OP Mainnet users is a top priority for the entire [Optimism Collective](https://community.optimism.io/docs/governance/).
-The Optimism Collective strives to be clear and transparent about the security of OP Mainnet and the OP Stack as a whole.
+OPメインネットは現在進行中です。
+OPメインネットのユーザーを保護するセキュリティ・メカニズムの絶え間ない反復的な改善は、[Optimism Collective](https://community.optimism.io/docs/governance/)全体の最優先事項です。
+Optimism Collectiveは、OPメインネットおよびOPスタック全体のセキュリティについて、明確かつ透明性を保つよう努めています。
 
-## Bottom Line
+## 結論
 
-The security model of any blockchain system is only as strong as its lowest common denominator.
-At the moment, **it's important to understand that the security of OP Mainnet is dependent on a [multisig](https://etherscan.io/address/0x5a0Aae59D09fccBdDb6C6CcEB07B7279367C3d2A)** managed jointly by the [Optimism Security Council](https://gov.optimism.io/t/intro-to-optimisms-security-council/6885) and the Optimism Foundation.
-OP Mainnet and the OP Stack in general **may also contain unknown bugs that could lead to the loss of some or all of the ETH or tokens held within the system**.
+どのようなブロックチェーン・システムのセキュリティ・モデルも、その最小公倍数と同じ強さしかありません。
+現時点では、**OPメインネットのセキュリティは、[Optimism Security Council](https://gov.optimism.io/t/intro-to-optimisms-security-council/6885)とOptimism Foundationが共同で管理する[multisig](https://etherscan.io/address/0x5a0Aae59D09fccBdDb6C6CcEB07B7279367C3d2A)**に依存していることを理解することが重要です。
+また、OPメインネットおよびOPスタック全般には、システム内に保持されているETHまたはトークンの一部またはすべての損失につながる可能性のある未知のバグが含まれている可能性があります**。
 
-## OP Mainnet Multisig
+##OPメインネットのマルチシグ
 
-The security of OP Mainnet is currently dependent on a multisig managed jointly by the [Optimism Security Council](https://gov.optimism.io/t/intro-to-optimisms-security-council/6885) and the Optimism Foundation.
-This multisig is a [2-of-2 nested multisig](https://etherscan.io/address/0x5a0Aae59D09fccBdDb6C6CcEB07B7279367C3d2A) which is in turn governed by a [4-of-13 multisig](https://etherscan.io/address/0xc2819DC788505Aac350142A7A707BF9D03E3Bd03) managed by the Optimism Security Council and a [5-of-7 multisig](https://etherscan.io/address/0x847B5c174615B1B7fDF770882256e2D3E95b9D92) managed by the Optimism Foundation.
+OPメインネットのセキュリティは現在、[Optimism Security Council](https://gov.optimism.io/t/intro-to-optimisms-security-council/6885)とOptimism Foundationが共同で管理するマルチシグに依存しています。
+このマルチシグは[2-of-2入れ子マルチシグ](https://etherscan.io/address/0x5a0Aae59D09fccBdDb6C6CcEB07B7279367C3d2A)であり、さらにOptimism Security Councilが管理する[4-of-13マルチシグ](https://etherscan.io/address/0xc2819DC788505Aac350142A7A707BF9D03E3Bd03)とOptimism Foundationが管理する[5-of-7マルチシグ](https://etherscan.io/address/0x847B5c174615B1B7fDF770882256e2D3E95b9D92)によって管理されています。
 
-This multisig can be used to upgrade core OP Mainnet smart contracts **without upgrade delays** to allow for quick responses to potential security concerns.
-All upgrades to the OP Mainnet system must be approved by both component multisigs and either can veto an upgrade.
+このマルチシグは、潜在的なセキュリティ懸念への迅速な対応を可能にするため、**アップグレードの遅延**なく、OPメインネットのコアスマートコントラクトをアップグレードするために使用できます。
+OPメインネットのシステムに対するすべてのアップグレードは、両方のコンポーネントのマルチシグによって承認される必要があり、どちらかがアップグレードを拒否することができます。
 
-## Bugs and Unknowns
+## バグと未知
 
-Please also keep in mind that just like any other system, **the Optimism codebase may contain unknown bugs** that could lead to the loss of some or all of the ETH or tokens held within the system.
-The OP Stack has been audited [on many occasions](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/technical-documents/security-reviews), but **audits are not a stamp of approval** and **a completed audit does not mean that the audited codebase is free of bugs.**
+他のシステムと同様に、**Optimismのコードベースには未知のバグ**が含まれている可能性があり、システム内で保有されているETHまたはトークンの一部またはすべてを失う可能性があることもご留意ください。
+OPスタックは[何度も](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/technical-documents/security-reviews)監査を受けていますが、**監査は承認印**ではなく、**監査が完了したからといって、監査対象のコードベースにバグがないことを意味するものではありません**。
 
-It's important to understand that using OP Mainnet inherently exposes you to the risk of bugs within the Optimism codebase, and that you use OP Mainnet at your own risk.
+OPメインネットを使用することは、本質的にOptimismコードベース内のバグのリスクに晒されることを理解することが重要であり、OPメインネットの使用は自己責任で行ってください。
 
-## Work in Progress
+## 進行中の作業
 
-### Fault Proofs
+### 障害証明
 
-Fault proofs are a mechanism that allow users to prove if a transaction output published to the [`L2OutputOracle`](https://github.com/ethereum-optimism/optimism/blob/5877ee24cc9aaef5848c1372e0e196707fb336a0/packages/contracts-bedrock/src/L1/L2OutputOracle.sol) contract is invalid.
-Fault proofs are an important part of future of OP Mainnet security and begin to reduce the need for a multisig.
-An alpha version of the first fault proof mechanism is [currently in testing](https://blog.oplabs.co/building-a-fault-proof-system/).
+障害証明は、[`L2OutputOracle`](https://github.com/ethereum-optimism/optimism/blob/5877ee24cc9aaef5848c1372e0e196707fb336a0/packages/contracts-bedrock/src/L1/L2OutputOracle.sol) 契約に公開されたトランザクション出力が無効であることをユーザーが証明できるようにするメカニズムである。
+フォールトプルーフは将来のOPメインネットのセキュリティの重要な部分であり、マルチシグの必要性を減らし始めるものである。
+最初のフォールト・プルーフ・メカニズムのアルファ版は[現在テスト中](https://blog.oplabs.co/building-a-fault-proof-system/)である。
 
-<Callout>
-It is important to understand that **fault proofs are not a silver bullet** and that **fault proofs do not meaningfully improve the security of a system if the system still has a multisig or security council that can instantly upgrade the system**.
-OP Mainnet is following a multi-client and multi-proof approach designed to eventually remove the need for instant upgrades entirely.
-</Callout>
+<Callout
+フォールト・プルーフは銀の弾丸**ではなく、**フォールト・プルーフがシステムのセキュリティを有意に向上させるわけではないことを理解することが重要です。
+OPメインネットは、最終的にインスタント・アップグレードの必要性を完全になくすよう設計されたマルチクライアント・マルチプルーフ・アプローチに従っている。
+</Callout
 
-### Sequencer Decentralization
+### シーケンサーの分散化
 
-The Optimism Foundation currently operates the sole sequencer on OP Mainnet.
-Although users can always bypass the Sequencer by sending transactions directly to the [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/5877ee24cc9aaef5848c1372e0e196707fb336a0/packages/contracts-bedrock/src/L1/OptimismPortal.sol) contract, sequencer decentralization can still help mitigate the effect of short-term outages for users.
+オプティミズム財団は現在、OPメインネット上で唯一のシーケンサーを運営している。
+ユーザーは、[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/5877ee24cc9aaef5848c1372e0e196707fb336a0/packages/contracts-bedrock/src/L1/OptimismPortal.sol)コントラクトに直接トランザクションを送信することで、常にシーケンサーをバイパスすることができますが、シーケンサーの分散化は、ユーザーにとって短期的な停止の影響を軽減するのに役立ちます。
 
-## Security Model FAQ
+## セキュリティ・モデル FAQ
 
-### Does OP Mainnet have fault proofs?
+### OPメインネットは障害証明を持っていますか？
 
-**No**, OP Mainnet does not currently have fault proofs.
-**Fault proofs do not meaningfully improve the security of a system if that system can be upgraded within the 7 day challenge window ("fast upgrade keys")**.
-A system with fast upgrade keys, such as OP Mainnet, is fully dependent on the upgrade keys for security.
-OP Mainnet's goal is to be the first system that deploys fault proofs that can secure the system by themselves, without fast upgrade keys.
+**いいえ**、OPメインネットには現在のところ障害証明はありません。
+**7日間のチャレンジ・ウィンドウ（「高速アップグレード・キー」）***内にアップグレードできるシステムであれば、フォールト・プルーフを導入しても、システムのセキュリティは実質的に向上しません。
+OPメインネットのような高速アップグレード鍵を持つシステムは、セキュリティの面でアップグレード鍵に完全に依存している。
+OPメインネットの目標は、高速アップグレード・キーがなくても、それだけでシステムを保護できるフォールト・プルーフを導入した最初のシステムになることです。
 
-### How is Optimism planning to remove the multisig?
+### Optimism はどのようにマルチシグを削除する予定ですか？
 
-Check out Optimism's detailed [Pragmatic Path to Decentralization](https://web.archive.org/web/20230331065342/https://medium.com/ethereum-optimism/our-pragmatic-path-to-decentralization-cb5805ca43c1) post for a detailed view into how the multisig may be removed in a way that makes OP Mainnet the first chain with true fault proof security.
+Optimismの詳細な[Pragmatic Path to Decentralization](https://web.archive.org/web/20230331065342/https://medium.com/ethereum-optimism/our-pragmatic-path-to-decentralization-cb5805ca43c1)の投稿で、OPメインネットを真のフォールト・プルーフ・セキュリティを備えた最初のチェーンにするために、どのようにマルチシグを削除するかについての詳細な見解を確認してください。
 
-### How can I help make OP Mainnet more secure?
+### どうすればOPメインネットの安全性を高めることができますか？
 
-[OP Mainnet has one of the biggest bug bounties (ever)](/chain/security/security-policy).
-You can earn up to $2,000,042 by finding critical bugs in the Optimism codebase.
-You can also run your own verifier node to detect network faults.
+[OPメインネットは（史上）最大級のバグ報奨金を用意しています](/chain/security/security-policy)。
+Optimismコードベースの重大なバグを発見することで、最高$2,000,042を獲得できます。
+また、あなた自身の検証ノードを動かして、ネットワーク障害を検出することもできます。
 
-### Where do I report bugs?
+### バグを報告するには？
 
-For details about reporting vulnerabilities and available bug bounty programs, see the [Security Policy](/chain/security/security-policy).
+脆弱性の報告や利用可能なバグ報奨金プログラムの詳細については、[Security Policy](/chain/security/security-policy)を参照してください。
