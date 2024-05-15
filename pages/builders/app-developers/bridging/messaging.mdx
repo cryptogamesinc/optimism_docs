@@ -1,27 +1,27 @@
 ---
-title: Sending Data Between L1 and L2
+title: L1とL2間でデータを送信する方法
 lang: en-US
-description: Learn how bridging works between L1 and L2, how to use it, and what to watch out for.
+description: L1とL2間でブリッジングがどのように機能するか、その使用方法、注意点について学びます。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Sending Data Between L1 and L2
+# L1とL2間でデータを送信する方法
 
-Smart contracts on L1 (Ethereum) can interact with smart contracts on L2 (OP Mainnet) through a process called "bridging".
-This page explains how bridging works, how to use it, and what to watch out for.
+L1（Ethereum）のスマートコントラクトは、L2（OP Mainnet）のスマートコントラクトと「ブリッジング」と呼ばれるプロセスを通じて相互作用できます。
+このページでは、ブリッジングの仕組み、その使用方法、および注意点について説明します。
 
 <Callout type="info">
-  This is a high-level overview of the bridging process.
-  For a step-by-step tutorial on how to send data between L1 and L2, check out the [Solidity tutorial](/builders/app-developers/tutorials/cross-dom-solidity).
+  これはブリッジングプロセスのハイレベルな概要です。
+  L1とL2間でデータを送信する方法のステップバイステップチュートリアルについては、[Solidityチュートリアル](/builders/app-developers/tutorials/cross-dom-solidity)をご覧ください。
 </Callout>
 
-## Understanding Contract Calls
+## コントラクト呼び出しの理解
 
-It can be easier to understand bridging if you first have a basic understanding of how contracts on EVM-based blockchains like OP Mainnet and Ethereum communicate within the *same* network.
-The interface for sending messages *between* Ethereum and OP Mainnet is designed to mimic the standard contract communication interface as much as possible.
+まず、OP MainnetやEthereumなどのEVMベースのブロックチェーン上で、同じネットワーク内でコントラクトがどのように通信するかの基本を理解すると、ブリッジングを理解しやすくなります。
+EthereumとOP Mainnetの間でメッセージを送信するためのインターフェースは、標準のコントラクト通信インターフェースを可能な限り模倣するように設計されています。
 
-Here's how a contract on Ethereum might trigger a function within another contract on Ethereum:
+以下は、Ethereum上のコントラクトが他のコントラクト内の関数をトリガーする方法の例です：
 
 ```solidity
 contract MyContract {
@@ -31,12 +31,12 @@ contract MyContract {
 }
 ```
 
-Here, `MyContract.doTheThing` triggers a call to `MyOtherContract.doSomething`.
-Under the hood, Solidity is triggering the code for `MyOtherContract` by sending an [ABI encoded](https://docs.soliditylang.org/en/v0.8.23/abi-spec.html) call for the `doSomething` function.
-A lot of this complexity is abstracted away to simplify the developer experience.
-Solidity also has manual encoding tools that allow us to demonstrate the same process in a more verbose way.
+ここで、MyContract.doTheThingがMyOtherContract.doSomethingの呼び出しをトリガーしています。
+内部的には、SolidityはdoSomething関数のABIエンコードされた呼び出しを送信することでMyOtherContractのコードをトリガーしています。
+この複雑さの多くは、開発者の経験を簡素化するために抽象化されています。
+Solidityには、同じプロセスをより冗長な方法で示すための手動エンコードツールもあります。
 
-Here's how you might manually encode the same call:
+以下は、同じ呼び出しを手動でエンコードする方法です：
 
 ```solidity
 contract MyContract {
@@ -53,18 +53,18 @@ contract MyContract {
 }
 ```
 
-Here you're using the [low-level "call" function](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#members-of-address-types) and one of the [ABI encoding functions built into Solidity](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#abi-encoding-and-decoding-functions).
-Although these two code snippets look a bit different, they're doing the exact same thing.
-Because of limitations of Solidity, **the OP Stack's bridging interface is designed to look like the second code snippet**.
+ここでは、[低レベルの「call」関数](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#members-of-address-types)と、Solidityに組み込まれている[ABIエンコード関数](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#abi-encoding-and-decoding-functions)の一つを使用しています。
+これらの2つのコードスニペットは見た目は少し異なりますが、実際には同じことをしています。
+Solidityの制限のため、**OPスタックのブリッジングインターフェースは、2番目のコードスニペットに似せて設計されています**。
 
-## Basics of Communication Between Layers
 
-At a high level, the process for sending data between L1 and L2 is pretty similar to the process for sending data between two contracts on Ethereum (with a few caveats).
-Communication between L1 and L2 is made possible by a pair of special smart contracts called the "messenger" contracts.
-Each layer has its own messenger contract, which serves to abstract away some lower-level communication details, a lot like how HTTP libraries abstract away physical network connections.
+## レイヤー間の通信の基本
 
-We won't get into *too* much detail about these contracts here.
-The most important thing that you need to know is that each messenger contract has a `sendMessage` function that allows you to send a message to a contract on the other layer.
+高レベルでは、L1とL2間でデータを送信するプロセスは、いくつかの注意点を除いて、Ethereum上の2つのコントラクト間でデータを送信するプロセスと非常に似ています。
+L1とL2間の通信は、「メッセンジャー」コントラクトと呼ばれる特別なスマートコントラクトのペアによって実現されます。
+各レイヤーには独自のメッセンジャーコントラクトがあり、物理的なネットワーク接続を抽象化するHTTPライブラリのように、低レベルの通信の詳細を抽象化します。
+
+ここではこれらのコントラクトについてあまり詳細には触れませんが、最も重要なことは、各メッセンジャーコントラクトに`sendMessage`関数があり、他のレイヤー上のコントラクトにメッセージを送信できるということです。
 
 ```solidity
 function sendMessage(
@@ -74,23 +74,23 @@ function sendMessage(
 ) public;
 ```
 
-The `sendMessage` function has three parameters:
+`sendMessage`関数には3つのパラメータがあります：
 
-1.  The `address _target` of the contract to call on the other layer.
-2.  The `bytes memory _message` calldata to send to the contract on the other layer.
-3.  The `uint32 _minGasLimit` minimum gas limit that can be used when executing the message on the other layer.
+1. 他のレイヤー上のコントラクトを呼び出す`address _target`。
+2. 他のレイヤー上のコントラクトに送信する`bytes memory _message` calldata。
+3. 他のレイヤー上でメッセージを実行する際に使用できる最小ガス限度`uint32 _minGasLimit`。
 
-This is basically equivalent to:
+これは基本的に以下と同等です：
 
 ```solidity
 address(_target).call{gas: _gasLimit}(_message);
 ```
 
-Except, of course, that you're calling a contract on a completely different network.
+ただし、完全に異なるネットワーク上のコントラクトを呼び出している点を除きます。
 
-This is glossing over a lot of the technical details that make this whole thing work under the hood, but this should be enough to get you started.
-Want to call a contract on OP Mainnet from a contract on Ethereum?
-It's dead simple:
+この仕組みがどのように動作するかについての技術的な詳細は省略しますが、これで始めるには十分でしょう。
+EthereumのコントラクトからOP Mainnetのコントラクトを呼び出したいですか？
+それは非常に簡単です：
 
 ```solidity
 // Pretend this is on L2
@@ -118,54 +118,54 @@ contract MyContract {
 ```
 
 <Callout type="info">
-  You can find the addresses of the `L1CrossDomainMessenger` and the `L2CrossDomainMessenger` contracts on OP Mainnet and OP Sepolia on the [Contract Addresses](/chain/addresses) page.
+  OP MainnetおよびOP Sepolia上の`L1CrossDomainMessenger`および`L2CrossDomainMessenger`コントラクトのアドレスは、[Contract Addresses](/chain/addresses)ページで確認できます。
 </Callout>
 
-## Communication Speed
+## 通信速度
 
-Unlike calls between contracts on the same blockchain, calls between Ethereum and OP Mainnet are *not* instantaneous.
-The speed of a cross-chain transaction depends on the direction in which the transaction is sent.
+同じブロックチェーン上のコントラクト間の呼び出しとは異なり、EthereumとOP Mainnet間の呼び出しは*瞬時には行われません*。
+クロスチェーントランザクションの速度は、トランザクションが送信される方向に依存します。
 
-### For L1 to L2 Transactions
+### L1からL2へのトランザクションの場合
 
-Transactions sent from L1 to L2 take **approximately 1-3 minutes** to get from Ethereum to OP Mainnet, or from Sepolia to OP Sepolia.
-This is because the Sequencer waits for a certain number of L1 blocks to be created before including L1 to L2 transactions to avoid potentially annoying [reorgs](https://www.alchemy.com/overviews/what-is-a-reorg).
+L1からL2へのトランザクションは、EthereumからOP Mainnetへの転送に**約1〜3分**かかります。または、SepoliaからOP Sepoliaへの転送も同様です。
+これは、リオーグ（[reorgs](https://www.alchemy.com/overviews/what-is-a-reorg)）を回避するために、SequencerがL1ブロックの一定数を作成するまで待機するためです。
 
-### For L2 to L1 Transactions
+### L2からL1へのトランザクションの場合
 
-Transactions sent from L2 to L1 take **approximately 7 days** to get from OP Mainnet to Ethereum, or from OP Sepolia to Sepolia.
-This is because the bridge contract on L1 must wait for the L2 state to be *proven* to the L1 chain before it can relay the message.
+L2からL1へのトランザクションは、OP MainnetからEthereumへの転送に**約7日**かかります。または、OP SepoliaからSepoliaへの転送も同様です。
+これは、L1のブリッジコントラクトがL2の状態がL1チェーンに証明されるまで待機する必要があるためです。
 
-The process of sending transactions from L2 to L1 involves four distinct steps:
+L2からL1へのトランザクションの送信プロセスは、4つの異なるステップで構成されます：
 
-1.  The L2 transaction that sends a message to L1 is sent to the Sequencer.
-    This is just like any other L2 transaction and takes just a few seconds to be confirmed by the Sequencer.
+1. L1にメッセージを送信するL2トランザクションがSequencerに送信されます。
+    これは他のL2トランザクションと同様で、Sequencerによって確認されるまで数秒しかかかりません。
 
-2.  The block containing the L2 transaction is proposed to the L1.
-    This typically takes approximately 20 minutes.
+2. L2トランザクションを含むブロックがL1に提案されます。
+    これには通常約20分かかります。
 
-3.  A proof of the transaction is submitted to the [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209) contract on L1.
-    This can be done any time after step 2 is complete.
+3. トランザクションの証明がL1の[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209)コントラクトに提出されます。
+    これはステップ2が完了した後、いつでも行うことができます。
 
-4.  The transaction is finalized on L1.
-    This can *only* be done after the [fault challenge period](#understanding-the-challenge-period) has elapsed.
-    This period is 7 days on Ethereum and a few seconds on Sepolia.
-    This waiting period is a core part of the security model of the OP Stack and cannot be circumvented.
+4. トランザクションがL1で確定されます。
+    これは、[フォルトチャレンジ期間](#understanding-the-challenge-period)が経過した後にのみ行うことができます。
+    この期間は、Ethereumでは7日間、Sepoliaでは数秒です。
+    この待機期間は、OPスタックのセキュリティモデルの核心部分であり、回避することはできません。
 
-## Accessing `msg.sender`
+## `msg.sender`のアクセス
 
-Contracts frequently make use of `msg.sender` to make decisions based on the calling address.
-For example, many contracts will use the [Ownable](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol) pattern to selectively restrict access to certain functions.
-Because messages are essentially shuttled between L1 and L2 by the messenger contracts, **the `msg.sender` you'll see when receiving one of these messages will be the messenger contract** corresponding to the layer you're on.
+コントラクトは、呼び出し元アドレスに基づいて決定を行うために`msg.sender`を頻繁に使用します。
+例えば、多くのコントラクトは[Ownable](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol)パターンを使用して特定の関数へのアクセスを制限します。
+メッセージは本質的にメッセンジャーコントラクトによってL1とL2の間で転送されるため、**これらのメッセージを受信した際に`msg.sender`として表示されるのは、対応するレイヤーのメッセンジャーコントラクト**です。
 
-In order to get around this, you can find a `xDomainMessageSender` function to each messenger:
+これを回避するために、各メッセンジャーには`xDomainMessageSender`関数を見つけることができます：
 
 ```solidity
 function xDomainMessageSender() public returns (address);
 ```
 
-If your contract has been called by one of the messenger contracts, you can use this function to see who's *actually* sending this message.
-Here's how you might implement an `onlyOwner` modifier on L2:
+あなたのコントラクトがメッセンジャーコントラクトの1つによって呼び出された場合、この関数を使用して、*実際に*誰がこのメッセージを送信しているのかを確認できます。
+L2で`onlyOwner`修飾子を実装する方法は次のとおりです：
 
 ```solidity
 modifier onlyOwner() {
@@ -177,57 +177,57 @@ modifier onlyOwner() {
 }
 ```
 
-## Fees For Sending Data Between L1 and L2
+## L1とL2間でデータを送信する際の手数料
 
-### For L1 to L2 Transactions
+### L1からL2へのトランザクション
 
-The majority of the cost of an L1 to L2 transaction comes from the smart contract execution on L1.
-When sending an L1 to L2 transaction, you send to the [`L1CrossDomainMessenger`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol) contract, which then sends a call to the [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol) contract.
-This involves some execution on L1, which costs gas.
-The total cost is ultimately determined by gas prices on Ethereum when you're sending the cross-chain transaction.
+L1からL2へのトランザクションのコストの大部分は、L1上でのスマートコントラクト実行によるものです。
+L1からL2へのトランザクションを送信する際には、[`L1CrossDomainMessenger`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol)コントラクトに送信し、そこから[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol)コントラクトへの呼び出しが行われます。
+これにはL1上での実行が含まれ、ガスがかかります。
+総コストは、クロスチェーントランザクションを送信する際のEthereumのガス価格によって最終的に決まります。
 
-L1 to L2 execution also triggers contract execution on L2.
-The `OptimismPortal` contract charges you for this L2 execution by burning a dynamic amount of L1 gas during your L1 to L2 transaction, depending on the gas limit you requested on L2.
-The amount of L1 gas charged increases when more people are sending L1 to L2 transactions (and decreases when fewer people are sending L1 to L2 transactions).
+L1からL2への実行はL2上でのコントラクト実行も引き起こします。
+`OptimismPortal`コントラクトは、L2でのガス限度に応じて、L1からL2へのトランザクション中にL1ガスの動的な量を燃焼させることで、このL2での実行に対して料金を請求します。
+L1ガスの請求量は、L1からL2へのトランザクションを送信する人が増えると増加し、減少すると減少します。
 
 <Callout>
-  Since the gas amount charged is dynamic, the gas burn can change from block to block.
-  You should always add a buffer of at least 20% to the gas limit for your L1 to L2 transaction to avoid running out of gas.
+  ガスの請求量は動的であるため、ガスの燃焼はブロックごとに変動する可能性があります。
+  ガス切れを避けるために、L1からL2へのトランザクションのガス限度には常に少なくとも20％のバッファを追加することをお勧めします。
 </Callout>
 
-### For L2 to L1 Transactions
+### L2からL1へのトランザクション
 
-Each message from L2 to L1 requires three transactions:
+L2からL1への各メッセージには3つのトランザクションが必要です：
 
-1.  An L2 transaction that *initiates* the transaction, which is priced the same as any other transaction made on OP Mainnet.
+1. トランザクションを*開始*するL2トランザクション。これはOP Mainnet上の他のトランザクションと同じ価格です。
 
-2.  An L1 transaction that *proves* the transaction.
-    This transaction can only be submitted after L2 block, including your L2 transaction, is proposed on L1.
-    This transaction is expensive because it includes verifying a [Merkle trie](/connect/resources/glossary#merkle-patricia-trie) inclusion proof on L1.
+2. トランザクションを*証明*するL1トランザクション。
+    このトランザクションは、L2ブロックがL1に提案された後にのみ提出できます。
+    このトランザクションは、L1上で[Merkle trie](/connect/resources/glossary#merkle-patricia-trie)の包含証明を検証するため、高価です。
 
-3.  An L1 transaction that *finalizes* the transaction.
-    This transaction can only be submitted after the transaction challenge period (7 days on mainnet) has passed.
+3. トランザクションを*確定*するL1トランザクション。
+    このトランザクションは、メインネットでのトランザクションチャレンジ期間（7日間）が経過した後にのみ提出できます。
 
-The total cost of an L2 to L1 transaction is therefore the combined cost of the L2 initialization transaction and the two L1 transactions.
-The L1 proof and finalization transactions are typically significantly more expensive than the L2 initialization transaction.
+したがって、L2からL1へのトランザクションの総コストは、L2初期化トランザクションと2つのL1トランザクションの合計コストです。
+L1の証明および確定トランザクションは通常、L2初期化トランザクションよりもかなり高価です。
 
-## Understanding the Challenge Period
+## チャレンジ期間の理解
 
-One of the most important things to understand about L1 ⇔ L2 interaction is that **mainnet messages sent from Layer 2 to Layer 1 cannot be relayed for at least 7 days**.
-This means that any messages you send from Layer 2 will only be received on Layer 1 after this one week period has elapsed.
-We call this period of time the "challenge period" because it is the time during which a transaction can be challenged with a [fault proof](/stack/protocol/overview#fault-proofs).
+L1⇔L2の相互作用について理解する最も重要なことの一つは、**Layer 2からLayer 1に送信されたメインネットメッセージは少なくとも7日間中継できない**ということです。
+これは、Layer 2から送信されたメッセージがこの1週間の期間が経過した後にのみLayer 1で受信されることを意味します。
+この期間を「チャレンジ期間」と呼び、これはトランザクションが[fault proof](/stack/protocol/overview#fault-proofs)でチャレンジされる可能性のある期間です。
 
-Optimistic Rollups are "optimistic" because they're based around the idea of publishing the *result* of a transaction to Ethereum without actually executing the transaction on Ethereum.
-In the "optimistic" case, this transaction result is correct and one can completely avoid the need to perform complicated (and expensive) logic on Ethereum.
+Optimistic Rollupsは、「楽観的」にトランザクションの*結果*をEthereumに公開するというアイデアに基づいていますが、実際にトランザクションをEthereumで実行するわけではありません。
+「楽観的」な場合、このトランザクション結果は正しく、Ethereumで複雑な（そして高価な）ロジックを実行する必要を完全に回避できます。
 
-However, one still needs some way to prevent incorrect transaction results from being published in place of correct ones.
-Here's where the "fault proof" comes into play.
-Whenever a transaction result is published, it's considered "pending" for a period of time known as the challenge period.
-During this period of time, anyone may re-execute the transaction *on Ethereum* in an attempt to demonstrate that the published result was incorrect.
+しかし、不正確なトランザクション結果が正しいものの代わりに公開されるのを防ぐ方法が必要です。
+ここで「フォルトプルーフ」が登場します。
+トランザクション結果が公開されるたびに、それはチャレンジ期間として知られる期間の間「保留中」と見なされます。
+この期間中、誰でもトランザクションを*Ethereum上で*再実行し、公開された結果が不正確であることを証明しようとすることができます。
 
-If someone can prove that a transaction result is faulty, then the result is scrubbed from existence and anyone can publish another result in its place (hopefully the correct one this time, financial punishments make faulty results *very* costly for their publishers).
-Once the window for a given transaction result has fully passed without a challenge, the result can be considered fully valid (or else someone would've challenged it).
+誰かがトランザクション結果が誤っていることを証明できれば、その結果は存在から抹消され、誰でも別の結果を公開することができます（今回は正しい結果であることを願います。不正な結果を公開することは、その公開者にとって*非常に*高価になります）。
+指定されたトランザクション結果のウィンドウがチャレンジなしに完全に経過した場合、その結果は完全に有効と見なされます（そうでなければ誰かがチャレンジしたでしょう）。
 
-Anyway, the point here is that **you don't want to be making decisions about Layer 2 transaction results from inside a smart contract on Layer 1 until this challenge period has elapsed**.
-Otherwise you might be making decisions based on an invalid transaction result.
-As a result, L2 ⇒ L1 messages sent using the standard messenger contracts cannot be relayed until they've waited out the full challenge period.
+とにかく、ここでのポイントは、**このチャレンジ期間が経過するまで、Layer 1のスマートコントラクト内でLayer 2のトランザクション結果について決定を下したくない**ということです。
+そうしないと、無効なトランザクション結果に基づいて決定を下す可能性があります。
+その結果、標準のメッセンジャーコントラクトを使用して送信されたL2⇒L1メッセージは、完全なチャレンジ期間が経過するまで中継できません。
