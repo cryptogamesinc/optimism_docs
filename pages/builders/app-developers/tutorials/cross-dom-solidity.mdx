@@ -26,7 +26,7 @@ OP MainnetとEthereum間でトークンをブリッジしたいだけですか�
 OP Mainnetは`CrossDomainMessenger`と呼ばれるスマートコントラクトを使用して、OP MainnetとEthereum間でメッセージを送信します。
 両チェーンにはこのコントラクトのバージョン（`L1CrossDomainMessenger`と`L2CrossDomainMessenger`）が存在します。
 EthereumからOP Mainnetへのメッセージは裏で自動的に中継されます。
-OP MainnetからEthereumへのメッセージは、Ethereum上で2回目のトランザクションを明示的に中継する必要があります。
+OP MainnetからEthereumへのメッセージは、Ethereum上で2回目のトランザクションを明示的に中継する必要があります。（TODO: どういう意味？）
 メッセージパッシングについては、[L1とL2間でデータを送信する](/builders/app-developers/bridging/messaging)ガイドを読んでください。
 
 ## 依存関係
@@ -188,32 +188,27 @@ node
 
 {<h3>Optimism SDKをインポートする</h3>}
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L3 hash=26b2fdb17dd6c8326a54ec51f0769528
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L3 hash=26b2fdb17dd6c8326a54ec51f0769528
 ```
 
 {<h3>ethers.jsをインポートする</h3>}
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L4 hash=69a65ef97862612e4978b8563e6dbe3a
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L4 hash=69a65ef97862612e4978b8563e6dbe3a
 ```
 
 {<h3>プライベートキーを読み込む</h3>}
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L6 hash=755b77a7ffc7dfdc186f36c37d3d847a
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L6 hash=755b77a7ffc7dfdc186f36c37d3d847a
 ```
 
 {<h3>トランザクションハッシュを読み込む</h3>}
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L8 hash=320cd4f397d7bed8d914d4be0c99f8dc
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L8 hash=320cd4f397d7bed8d914d4be0c99f8dc
 ```
 
 {<h3>RPCプロバイダとウォレットを作成する</h3>}
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L10-L13 hash=9afdce50665ae93bce602068071ffaa1
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L10-L13 hash=9afdce50665ae93bce602068071ffaa1
 ```
 
 {<h3>CrossChainMessengerインスタンスを作成する</h3>}
@@ -222,8 +217,7 @@ Optimism SDKは、クロスチェーンメッセージを証明して中継す�
 
 `CrossChainMessenger`クラスのインスタンスを作成します：
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L15-L20 hash=997b9c4cdd5fb1f9d4e0882a683ae016
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L15-L20 hash=997b9c4cdd5fb1f9d4e0882a683ae016
 ```
 
 {<h3>メッセージが証明する準備ができるまで待つ</h3>}
@@ -231,8 +225,7 @@ file=<rootDir>/public/tutorials/cross-dom-solidity.js#L15-L20 hash=997b9c4cdd5fb
 L2からL1へのメッセージを送る第二のステップは、L2でメッセージが送信されたことを証明することです。
 まず、メッセージが証明する準備ができるまで待つ必要があります。
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L23 hash=25a072666b6147f8d8983d8223f045b8
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L23 hash=25a072666b6147f8d8983d8223f045b8
 ```
 
 <Callout type="info">
@@ -244,8 +237,7 @@ file=<rootDir>/public/tutorials/cross-dom-solidity.js#L23 hash=25a072666b6147f8d
 
 メッセージが証明する準備ができたら、L2でメッセージが送信されたことを証明するためにL1トランザクションを送信します。
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L26 hash=17922abea43b3d379404fedd87422dde
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L26 hash=17922abea43b3d379404fedd87422dde
 ```
 
 {<h3>メッセージが中継する準備ができるまで待つ</h3>}
@@ -255,24 +247,21 @@ L2からL1へのメッセージを送る最終ステップは、L1でメッセ�
 OP Sepoliaでは、これは数秒です。
 OP Mainnetでは、これに7日かかります。
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L29 hash=45d995aab47ec29afee4bb4577ae9303
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L29 hash=45d995aab47ec29afee4bb4577ae9303
 ```
 
 {<h3>L1でメッセージを中継する</h3>}
 
 引き出しが中継する準備ができたら、メッセージ送信プロセスを完了できます。
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L32 hash=b5515811ffcf8b9ada15dea8ae666e44
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L32 hash=b5515811ffcf8b9ada15dea8ae666e44
 ```
 
 {<h3>メッセージが中継されるのを待つ</h3>}
 
 これで、メッセージが中継されるのを待つだけです。
 
-```js
-file=<rootDir>/public/tutorials/cross-dom-solidity.js#L35 hash=d6e7f89e929eea0ac3217a6751b7e578
+```js file=<rootDir>/public/tutorials/cross-dom-solidity.js#L35 hash=d6e7f89e929eea0ac3217a6751b7e578
 ```
 
 {<h3>L1 Greeterを確認する</h3>}
@@ -296,8 +285,7 @@ L1からL2、そしてL2からL1へのメッセージを成功させました。
 `Greeter`コントラクトには、現在のチェーン上の`CrossDomainMessenger`コントラクトを追跡する`MESSENGER`変数があります。
 使用するネットワーク上の`CrossDomainMessenger`コントラクトのアドレスを確認するには、[Contract Addresses page](/chain/addresses)をチェックしてください。
 
-```solidity
-file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L14 hash=ce8be857d4b4e1992cd3c16b8f2864b9
+```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L14 hash=ce8be857d4b4e1992cd3c16b8f2864b9
 ```
 
 ### 他のGreeter変数
@@ -305,8 +293,7 @@ file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L14 hash=ce8be857d4b4e199
 `Greeter`コントラクトには、他のチェーン上の`Greeter`コントラクトを追跡する`OTHER_GREETER`変数もあります。
 L1では、この変数はL2の`Greeter`コントラクトのアドレスに設定され、その逆も同様です。
 
-```solidity
-file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L15 hash=eedd8c3050a83e56f37f367c6faa6f5d
+```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L15 hash=eedd8c3050a83e56f37f367c6faa6f5d
 ```
 
 ### 挨拶マッピング
@@ -314,16 +301,14 @@ file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L15 hash=eedd8c3050a83e56
 `Greeter`コントラクトは、異なるユーザーから送られた異なる挨拶を`greetings`マッピング内で追跡します。
 マッピングを使用することで、このコントラクトは同時に異なるユーザーの挨拶を追跡することができます。
 
-```solidity
-file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L16 hash=832732d9d5aface44c16c1ae9ecde7b2
+```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L16 hash=832732d9d5aface44c16c1ae9ecde7b2
 ```
 
 ### コンストラクタ
 
 `Greeter`にはシンプルなコンストラクタがあり、`MESSENGER`および`OTHER_GREETER`変数を設定します。
 
-```solidity
-file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L18-L24 hash=718f3dc498975548eec30da99e47adf2
+```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L18-L24 hash=718f3dc498975548eec30da99e47adf2
 ```
 
 ### 挨拶を送る関数
@@ -336,8 +321,7 @@ file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L18-L24 hash=718f3dc49897
 2番目のパラメータは`setMessage`関数へのABIエンコードされた関数呼び出しです。
 最後のパラメータは、他の側でメッセージが中継されるときに使用されるガスリミットです。
 
-```solidity
-file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L26-L38 hash=3104a6775fe3a505cf2f84b71b078aee
+```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L26-L38 hash=3104a6775fe3a505cf2f84b71b078aee
 ```
 
 ### 挨拶を設定する関数
@@ -348,8 +332,7 @@ file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L26-L38 hash=3104a6775fe3
 また、`CrossChainMessenger`が他のチェーンの`Greeter`コントラクトからメッセージが来たと言っていることを確認します。
 最後に、`greetings`マッピングに挨拶を設定します。
 
-```solidity
-file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L40-L52 hash=f50a94e77ecb2f76b9fe278b058a79e4
+```solidity file=<rootDir>/public/tutorials/cross-dom-solidity.sol#L40-L52 hash=f50a94e77ecb2f76b9fe278b058a79e4
 ```
 
 <Callout>
