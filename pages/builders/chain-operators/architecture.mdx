@@ -1,100 +1,71 @@
 ---
-title: Chain Architecture
-lang: en-US
-description: Learn about the OP chain architecture.
+title: チェーンアーキテクチャ
+lang: ja-JP
+description: OPチェーンアーキテクチャについて学びましょう。
 ---
 
 import Image from 'next/image'
 
-# Chain Architecture
+# チェーンアーキテクチャ
 
-This page contains information about the components of the rollup protocol and
-how they work together to build the layer 2 blockchain from the Chain Operator's
-perspective. The OP Stack is built in such a way that it is as similar to
-Ethereum as possible. Like Ethereum, the OP Stack has execution and consensus
-clients. The OP Stack also has some privileged roles that produce L2 blocks.
-If you want a more detailed view of the OP Stack protocol, check out the
-[OP Stack section](/stack/getting-started) of our documentation.
+このページでは、ロールアッププロトコルのコンポーネントと、それらがどのように連携してLayer 2ブロックチェーンを構築するかについて、チェーンオペレーターの視点から説明します。OPスタックはEthereumに可能な限り似せて構築されています。Ethereumと同様に、OPスタックには実行クライアントとコンセンサスクライアントがあります。また、OPスタックにはL2ブロックを生成する特権的な役割もあります。OPスタックプロトコルの詳細な概要については、[OPスタックセクション](/stack/getting-started)をご覧ください。
 
-## Permissioned Components
+## パーミッションドコンポーネント
 
-These clients and services work together to enable the block production on the L2 network.
-Sequencer nodes (`op-geth` + `op-node`) gather proposed transactions from users.
-The batcher submits batch data to L1 which controls the safe blocks and ultimately
-controls the canonical chain. The proposer submits output roots to L1 which control
-L2 to L1 messaging.
+これらのクライアントとサービスは、L2ネットワーク上でのブロック生成を可能にするために連携しています。シーケンサーノード（`op-geth` + `op-node`）は、ユーザーから提案されたトランザクションを収集します。バッチャーはL1にバッチデータを送信し、これが安全なブロックを制御し、最終的に正規のチェーンを制御します。プロポーザーは出力ルートをL1に送信し、これがL2からL1へのメッセージングを制御します。
 
-<Image src="/img/builders/chain-operators/sequencer-diagram.png" alt="Sequencer Component Diagram" width={400} height={400} />
+<Image src="/img/builders/chain-operators/sequencer-diagram.png" alt="シーケンサコンポーネントの図" width={400} height={400} />
 
 ### op-geth
 
-`op-geth` implements the layer 2 execution layer, with [minimal changes](https://op-geth.optimism.io/)
-for a secure Ethereum-equivalent application environment.
+`op-geth`は、[最小限の変更](https://op-geth.optimism.io/)で安全なEthereum相当のアプリケーション環境を提供するLayer 2の実行レイヤーを実装します。
 
 ### op-node
 
-`op-node` implements most rollup-specific functionality as the layer 2
-consensus layer, similar to a layer 1 beacon-node. The `op-node` is stateless and gets
-its view of the world from `op-geth`.
+`op-node`は、Layer 2のコンセンサスレイヤーとして、ほとんどのロールアップ特有の機能を実装します。これはLayer 1のビーコンノードに似ています。`op-node`はステートレスであり、その世界観を`op-geth`から取得します。
 
 ### op-batcher
 
-`op-batcher` is the service that submits the L2 Sequencer data to L1, to make it available
-for verifiers. To reduce the cost of writing to the L1, it only posts the minimal
-amount of data required to reproduce L2 blocks.
+`op-batcher`は、L2シーケンサーデータをL1に送信し、検証者が利用できるようにするサービスです。L1への書き込みコストを削減するために、L2ブロックを再現するために必要な最小限のデータのみを投稿します。
 
 ### op-proposer
 
-`op-proposer` is the service that submits the output roots to the L1. This is to enable
-trustless execution of L2-to-L1 messaging and creates the view into the L2 state from
-the L1's perspective.
+`op-proposer`は、出力ルートをL1に送信するサービスです。これはL2からL1へのメッセージングの信頼性のある実行を可能にし、L1から見たL2の状態のビューを作成します。
 
-## Ingress Traffic
+## インバウンドトラフィック
 
-It is important to setup a robust chain architecture to handle large volumes of RPC
-requests from your users. The Sequencer node has the important job of working with
-the batcher to handle block creation. To allow the Sequencer to focus on that job,
-you can peer replica nodes to handle the rest of the work.
+ユーザーからの大量のRPCリクエストを処理するためには、堅牢なチェーンアーキテクチャを設定することが重要です。シーケンサーノードはブロック生成を担当するため、バッチャーと連携してその仕事を行います。シーケンサーがその仕事に集中できるように、レプリカノードをピアリングして他の作業を処理させることができます。
 
-An example of this would be to configure [proxyd](https://github.com/ethereum-optimism/optimism/tree/develop/proxyd)
-to route RPC methods, retry failed requests, load balance, etc. Users sending
-`eth_sendRawTransaction` requests can have their requests forwarded directly to the
-Sequencer. All other RPC requests can be forwarded to replica nodes.
+その一例として、[proxyd](https://github.com/ethereum-optimism/optimism/tree/develop/proxyd)を設定してRPCメソッドをルーティングし、失敗したリクエストを再試行し、ロードバランシングなどを行うことができます。`eth_sendRawTransaction`リクエストを送信するユーザーのリクエストはシーケンサーに直接転送されます。他のRPCリクエストはレプリカノードに転送されます。
 
-<Image src="/img/builders/chain-operators/ingress-traffic-diagram.png" alt="Ingress Traffic Diagram" width={400} height={400} />
+<Image src="/img/builders/chain-operators/ingress-traffic-diagram.png" alt="インバウンドトラフィックの図" width={400} height={400} />
 
 ### proxyd
 
-This tool is a RPC request router and proxy. It does the following things:
+このツールはRPCリクエストルーターおよびプロキシです。以下の機能があります。
 
-1.  Whitelists RPC methods.
-2.  Routes RPC methods to groups of backend services.
-3.  Automatically retries failed backend requests.
-4.  Track backend consensus (latest, safe, finalized blocks), peer count and sync state.
-5.  Re-write requests and responses to enforce consensus.
-6.  Load balance requests across backend services.
-7.  Cache immutable responses from backends.
-8.  Provides metrics to measure request latency, error rates, and the like.
+1.  RPCメソッドのホワイトリスト作成。
+2.  RPCメソッドをバックエンドサービスのグループにルーティング。
+3.  失敗したバックエンドリクエストを自動的に再試行。
+4.  バックエンドのコンセンサス（最新、安全、確定ブロック）、ピア数、同期状態を追跡。
+5.  コンセンサスを強制するためにリクエストとレスポンスを再書き込み。
+6.  バックエンドサービス間でリクエストをロードバランシング。
+7.  バックエンドからの不変のレスポンスをキャッシュ。
+8.  リクエストのレイテンシ、エラーレートなどを測定するメトリクスを提供。
 
-### Sequencer
+### シーケンサー
 
-The Sequencer node works with the batcher and proposer to create new blocks. So it should
-handle the state changing RPC request `eth_sendRawTransaction`. It can be peered with
-replica nodes to gossip new `unsafe` blocks to the rest of the network.
+シーケンサーノードは、バッチャーおよびプロポーザーと連携して新しいブロックを作成します。したがって、状態変更RPCリクエストである`eth_sendRawTransaction`を処理する必要があります。シーケンサーは、レプリカノードとピアリングして新しい`unsafe`ブロックをネットワークの残りの部分に伝播させることができます。
 
-<Image src="/img/builders/chain-operators/sequencer-node.png" alt="Sequencer Node Diagram" width={400} height={400} />
+<Image src="/img/builders/chain-operators/sequencer-node.png" alt="シーケンサーノードの図" width={400} height={400} />
 
-### Replica node
+### レプリカノード
 
-The replica nodes are additional nodes on the network. They can be peered to the Sequencer,
-which might not be connected to the rest of the internet, and other replicas. Additional
-replicas can help horizontally scale RPC requests.
+レプリカノードはネットワーク上の追加ノードです。これらはシーケンサー（インターネットに接続されていない可能性がある）および他のレプリカとピアリングできます。追加のレプリカは、RPCリクエストの水平スケーリングを支援します。
 
-<Image src="/img/builders/chain-operators/replica-node.png" alt="Replica Node Diagram" width={200} height={200} />
+<Image src="/img/builders/chain-operators/replica-node.png" alt="レプリカノードの図" width={200} height={200} />
 
-## Next Steps
+## 次のステップ
 
-*   Find out how you can support [snap sync](/builders/chain-operators/management/snap-sync)
-on your chain.
-*   Find out how you can utilize [blob space](/builders/chain-operators/management/blobs)
-to reduce the transaction fee cost on your chain.
+*   チェーン上で[snap sync](/builders/chain-operators/management/snap-sync)をサポートする方法を見つけましょう。
+*   トランザクション手数料コストを削減するために[blob space](/builders/chain-operators/management/blobs)を利用する方法を見つけましょう。

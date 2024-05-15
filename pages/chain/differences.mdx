@@ -1,77 +1,77 @@
 ---
-title: Differences between Ethereum and OP Mainnet
-lang: en-US
-description: Learn the minor differences between the behavior of OP Mainnet and Ethereum.
+title: EthereumとOPメインネットの違い
+lang: ja-JP
+description: OPメインネットとEthereumの動作の細かな違いについて学びます。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Differences between Ethereum and OP Mainnet
+# EthereumとOPメインネットの違い
 
-OP Mainnet is designed to be [EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306) and introduces as few changes as possible to the Ethereum protocol.
-However, there are some minor differences between the behavior of Ethereum and OP Mainnet that developers should be aware of.
+OPメインネットは[EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306)として設計されており、Ethereumプロトコルにできるだけ少ない変更を加えることを目指しています。
+しかし、開発者が認識すべきEthereumとOPメインネットの間のいくつかの小さな違いがあります。
 
-## Opcodes
+## オペコード
 
-| Opcode       | Solidity Equivalent | Behavior                                                                                                                                                                                                                                                |
-| ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `COINBASE`   | `block.coinbase`    | Returns the address of the current Sequencer's fee wallet. Effectively the same as Ethereum with the caveat the value typically does not change from block to block.                                                                                    |
-| `PREVRANDAO` | `block.prevrandao`  | Set **pseudorandomly** for each block by the Sequencer as opposed to the stronger guarantees provided by [RANDAO](https://eips.ethereum.org/EIPS/eip-4399) on Ethereum.                                                                                 |
-| `ORIGIN`     | `tx.origin`         | If the transaction is an L1 ⇒ L2 transaction triggered by a smart contract on L1, then `tx.origin` is set to the [aliased address](#address-aliasing) of the address that triggered the L1 ⇒ L2 transaction. Otherwise, this opcode behaves normally.   |
-| `CALLER`     | `msg.sender`        | If the transaction is an L1 ⇒ L2 transaction triggered by a smart contract on L1, and this is the first call frame (rather than an internal transaction from one contract to another), the same [address aliasing](#address-aliasing) behavior applies. |
+| オペコード     | Solidity相当の記述        | 挙動                                                                                                                                            |
+| -------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `COINBASE`     | `block.coinbase`          | 現在のSequencerの手数料ウォレットのアドレスを返します。Ethereumとほぼ同じですが、ブロックごとに値が変わることはほとんどありません。              |
+| `PREVRANDAO`   | `block.prevrandao`        | Sequencerによりブロックごとに**擬似乱数**で設定され、Ethereumの[RANDAO](https://eips.ethereum.org/EIPS/eip-4399)による強い保証とは異なります。 |
+| `ORIGIN`       | `tx.origin`               | トランザクションがL1からL2へのトリガーとなるスマートコントラクトによって開始された場合、`tx.origin`はそのL1からL2へのトリガーを引き起こしたアドレスの[エイリアスアドレス](#address-aliasing)に設定されます。それ以外の場合は、このオペコードは通常通りに動作します。 |
+| `CALLER`       | `msg.sender`              | トランザクションがL1からL2へのトリガーとなるスマートコントラクトによって開始され、これが最初のコールフレーム（他のコントラクト間の内部トランザクションではない）の場合、同じ[アドレスエイリアシング](#address-aliasing)の挙動が適用されます。 |
 
-### Address Aliasing
+### アドレスエイリアシング
 
 <Callout>
-  Address aliasing is an important security feature that impacts the behavior of transactions sent from L1 to L2 by smart contracts.
-  Make sure to read this section carefully if you are working with cross-chain transactions.
-  Note that the `CrossChainMessenger` contracts will handle address aliasing internally on your behalf.
+  アドレスエイリアシングは、スマートコントラクトによってL1からL2に送信されるトランザクションの挙動に影響を与える重要なセキュリティ機能です。
+  クロスチェーントランザクションを扱う場合、このセクションを注意深く読むことが重要です。
+  なお、`CrossChainMessenger`コントラクトは、アドレスエイリアシングを内部で処理します。
 </Callout>
 
-When transactions are sent from L1 to L2 by an Externally Owned Account, the address of the sender of the transaction on L2 will be set to the address of the sender of the transaction on L1.
-**However, the address of the sender of a transaction on L2 will be different if the transaction was triggered by a smart contract on L1**.
+L1からL2に外部所有アカウントによって送信されるトランザクションの場合、L2でのトランザクションの送信者のアドレスはL1でのトランザクションの送信者のアドレスに設定されます。
+**ただし、トランザクションがL1のスマートコントラクトによってトリガーされた場合、L2でのトランザクションの送信者のアドレスは異なります。**
 
-Because of the behavior of the `CREATE` opcode, it is possible to create a contract on both L1 and on L2 that share the same address but have different bytecode.
-Even though these contracts share the same address, they are fundamentally two different smart contracts and cannot be treated as the same contract.
-As a result, the sender of a transaction sent from L1 to L2 by a smart contract cannot be the address of the smart contract on L1 or the smart contract on L1 could act as if it were the smart contract on L2 (because the two contracts share the same address).
+`CREATE`オペコードの挙動により、L1とL2の両方で同じアドレスを共有するが異なるバイトコードを持つコントラクトを作成することが可能です。
+これらのコントラクトは同じアドレスを共有していますが、根本的に異なるスマートコントラクトであり、同一のコントラクトとして扱うことはできません。
+その結果、L1のスマートコントラクトによってL2に送信されるトランザクションの送信者は、L1のスマートコントラクトのアドレスではなくなります。
 
-To prevent this sort of impersonation, the sender of a transaction is slightly modified when a transaction is sent from L1 to L2 by a smart contract.
-Instead of appearing to be sent from the actual L1 contract address, the L2 transaction appears to be sent from an "aliased" version of the L1 contract address.
-This aliased address is a constant offset from the actual L1 contract address such that the aliased address will never conflict with any other address on L2 and the original L1 address can easily be recovered from the aliased address.
+このような偽装を防ぐため、L1のスマートコントラクトによってL2に送信されるトランザクションの送信者は若干変更されます。
+実際のL1のコントラクトアドレスから送信されたように見えるのではなく、L1のコントラクトアドレスの「エイリアス」バージョンから送信されたように見えます。
+このエイリアスアドレスは実際のL1コントラクトアドレスから一定のオフセットを持つもので、L2上で他のアドレスと衝突することはなく、エイリアスアドレスから元のL1アドレスを容易に復元することができます。
 
-This change in sender address is only applied to L2 transactions sent by L1 smart contracts.
-In all other cases, the transaction sender address is set according to the same rules used by Ethereum.
+この送信者アドレスの変更は、L1のスマートコントラクトによって送られるL2トランザクションにのみ適用されます。
+他のすべてのケースでは、トランザクションの送信者アドレスはEthereumと同じルールに従って設定されます。
 
-| Transaction Source                                      | Sender Address                                                     |
-| ------------------------------------------------------- | ------------------------------------------------------------------ |
-| L2 user (Externally Owned Account)                      | The user's address (same as in Ethereum)                           |
-| L1 user (Externally Owned Account)                      | The user's address (same as in Ethereum)                           |
-| L1 contract (using `OptimismPortal.depositTransaction`) | `L1_contract_address + 0x1111000000000000000000000000000000001111` |
+| トランザクションの出所                                      | 送信者アドレス                                                 |
+| ----------------------------------------------------------- | ------------------------------------------------------------ |
+| L2ユーザー（外部所有アカウント）                             | ユーザーのアドレス（Ethereumと同じ）                           |
+| L1ユーザー（外部所有アカウント）                             | ユーザーのアドレス（Ethereumと同じ）                           |
+| L1コントラクト（`OptimismPortal.depositTransaction`を使用） | `L1_contract_address + 0x1111000000000000000000000000000000001111` |
 
-## Transactions
+## トランザクション
 
-### Transaction Fees
+### トランザクション手数料
 
-Transactions OP Mainnet must pay for an [L1 data fee](/stack/transactions/fees#the-l1-data-fee) on top of the standard [execution gas fee](/stack/transactions/fees#execution-gas-fee) you would expect on Ethereum.
-Refer to the guide on [OP Mainnet Transaction Fees](/stack/transactions/fees) for more information.
+OPメインネットのトランザクションは、Ethereumで期待される標準の[実行ガス手数料](/stack/transactions/fees#execution-gas-fee)に加えて、[L1データ料金](/stack/transactions/fees#the-l1-data-fee)を支払う必要があります。
+詳細については、[OPメインネットトランザクション手数料](/stack/transactions/fees)ガイドを参照してください。
 
-### EIP-1559 Parameters
+### EIP-1559パラメータ
 
-The base fee on OP Mainnet is, like Ethereum, computed via the [EIP-1559](https://notes.ethereum.org/@vbuterin/eip-1559-faq) mechanism.
-The EIP-1559 parameters used by OP Mainnet differ from those used by Ethereum as follows.
+OPメインネットの基本料金は、Ethereumと同様に、[EIP-1559](https://notes.ethereum.org/@vbuterin/eip-1559-faq)メカニズムを通じて計算されます。
+OPメインネットで使用されるEIP-1559のパラメータは、Ethereumで使用されるものと以下のように異なります。
 
-| Parameter                             | OP Mainnet value | Ethereum value (for reference) |
-| ------------------------------------- | ---------------: | -----------------------------: |
-| Block gas limit                       |   30,000,000 gas |                 30,000,000 gas |
-| Block gas target                      |    5,000,000 gas |                 15,000,000 gas |
-| EIP-1559 elasticity multiplier        |                6 |                              2 |
-| EIP-1559 denominator                  |              250 |                              8 |
-| Maximum base fee increase (per block) |              10% |                          12.5% |
-| Maximum base fee decrease (per block) |               2% |                          12.5% |
-| Block time in seconds                 |                2 |                             12 |
+| パラメータ                             | OPメインネットの値 | Ethereumの値（参考） |
+| ------------------------------------- | ----------------: | --------------------: |
+| ブロックガスリミット                   |   30,000,000ガス  |          30,000,000ガス |
+| ブロックガスターゲット                 |    5,000,000ガス  |          15,000,000ガス |
+| EIP-1559弾力性乗数                     |                6  |                     2 |
+| EIP-1559分母                           |              250  |                     8 |
+| 最大基本料金増加（ブロックごと）       |              10%  |                 12.5% |
+| 最大基本料金減少（ブロックごと）       |               2%  |                 12.5% |
+| ブロック時間（秒）                     |                2  |                    12 |
 
-### Mempool Rules
+### Mempoolのルール
 
-Unlike Ethereum, OP Mainnet does not have a large public mempool.
-The OP Mainnet Sequencer mempool is currently only visible to the Sequencer.
-The Sequencer executes transactions from the mempool in priority fee order (highest fee first).
+Ethereumとは異なり、OPメインネットには大きな公開メンプールがありません。
+OPメインネットのシーケンサーメンプールは現在、シーケンサーにのみ表示されます。
+シーケンサーはメンプールのトランザクションを優先料金順（最も高い料金から）で実行します。

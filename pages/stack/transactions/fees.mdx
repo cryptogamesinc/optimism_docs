@@ -1,119 +1,111 @@
 ---
-title: Transaction Fees on OP Mainnet
-lang: en-US
-description: Learn how transaction fees work on OP Mainnet.
+title: OP Mainnet上の取引手数料
+lang: ja-JP
+description: OP Mainnetでの取引手数料の仕組みについて学びます。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Transaction Fees on OP Mainnet
+# OP Mainnet上の取引手数料
 
-OP Mainnet is designed to be [EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306), which means it reuses the same Ethereum code you're already familiar with and behaves as much like Ethereum as possible.
-However, transaction fees on all Layer 2 systems need to diverge from Ethereum to some extent for a number of reasons.
-This page provides a detailed look at exactly how transaction fees work on OP Mainnet so you can properly account for them in your application.
+OP Mainnetは[EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306)に設計されており、これは既に馴染みのあるEthereumのコードを再利用し、可能な限りEthereumと同じように動作することを意味します。
+しかし、全てのLayer 2システムにおいて、取引手数料は様々な理由でEthereumからある程度異なる必要があります。
+このページでは、OP Mainnet上の取引手数料がどのように機能するかについて詳しく説明しますので、アプリケーションに適切に考慮することができます。
 
-OP Mainnet transaction fees are composed of an [Execution Gas Fee](#execution-gas-fee) and an [L1 Data Fee](#l1-data-fee).
-The total cost of a transaction is the sum of these two fees.
-Continue reading to learn more about exactly how each of these fee components are charged.
+OP Mainnetの取引手数料は、[Execution Gas Fee](#execution-gas-fee)と[L1 Data Fee](#l1-data-fee)で構成されています。
+取引の総コストはこれら二つの手数料の合計です。
+続けて読むことで、これらの手数料コンポーネントのそれぞれがどのように課金されるかについて詳しく学びます。
 
 ## Execution Gas Fee
 
-A transaction's execution gas fee is exactly the same fee that you would pay for the same transaction on Ethereum.
-This fee is equal to the amount of gas used by the transaction multiplied by the gas price attached to the transaction.
-Like Ethereum, OP Mainnet uses the [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559) mechanism to set the [base fee](https://ethereum.org/en/developers/docs/gas/#base-fee) for transactions.
-The total price per unit gas that a transaction pays is the sum of the [base fee](https://ethereum.org/en/developers/docs/gas/#base-fee) and the optional additional [priority fee](https://ethereum.org/en/developers/docs/gas/#priority-fee).
+取引のExecution Gas Feeは、Ethereumで同じ取引に対して支払うのと全く同じ手数料です。
+この手数料は、取引で使用されたガス量に取引に付随するガス価格を掛けたものに等しいです。
+Ethereumと同様に、OP Mainnetは取引の[base fee](https://ethereum.org/en/developers/docs/gas/#base-fee)を設定するために[EIP-1559](https://eips.ethereum.org/EIPS/eip-1559)メカニズムを使用します。
+取引が支払う1単位ガスあたりの総価格は、[base fee](https://ethereum.org/en/developers/docs/gas/#base-fee)とオプションの追加[priority fee](https://ethereum.org/en/developers/docs/gas/#priority-fee)の合計です。
 
-Because OP Mainnet is EVM equivalent, **the gas used by a transaction on OP Mainnet is exactly the same as the gas used by the same transaction on Ethereum**.
-If a transaction costs 100,000 gas on Ethereum, it will cost 100,000 gas on OP Mainnet.
-The only difference is that the gas price on OP Mainnet is much lower than the gas price on Ethereum so you'll end up paying much less in ETH.
+OP MainnetはEVM equivalentであるため、**OP Mainnet上の取引で使用されるガスはEthereum上の同じ取引で使用されるガスと全く同じです**。
+もしEthereumでの取引が100,000ガスを要するなら、OP Mainnetでも100,000ガスを要します。
+唯一の違いは、OP Mainnet上のガス価格がEthereum上のガス価格よりもはるかに低いため、ETHでの支払いがはるかに少なくて済むことです。
 
-For this component of the fee, you can estimate the total cost of a transaction using the same tools you would use to estimate the cost of a transaction on Ethereum.
-You can read more about how Ethereum's gas fees work over on [Ethereum.org](https://ethereum.org/en/developers/docs/gas/).
+この手数料コンポーネントに関しては、Ethereumでの取引コストを推定するために使用するのと同じツールを使用して、取引の総コストを推定できます。
+Ethereumのガス手数料の仕組みについては、[Ethereum.org](https://ethereum.org/en/developers/docs/gas/)で詳しく読むことができます。
 
 ### Base Fee
 
-The [base fee](https://ethereum.org/en/developers/docs/gas/#base-fee) is the minimum price per unit of gas that a transaction must pay to be included in a block.
-Transactions must specify a maximum base fee higher than the block base fee to be included.
-The actual fee charged is the block base fee, even if the transaction specifies a higher maximum base fee.
+[base fee](https://ethereum.org/en/developers/docs/gas/#base-fee)は、取引がブロックに含まれるために支払わなければならないガスの1単位あたりの最低価格です。
+取引は、ブロックのbase feeよりも高い最大base feeを指定する必要があります。
+実際に課金される手数料は、取引がより高い最大base feeを指定していたとしても、ブロックのbase feeです。
 
-The OP Mainnet base fee behaves exactly like the Ethereum base fee with a few small parameter changes to account for the much shorter block times on OP Mainnet.
-None of these parameters should significantly impact your application, but you can read more about each of these parameters on the [OP Mainnet differences](/chain/differences#eip-1559) page.
-Read more about the base fee in the [Ethereum.org documentation](https://ethereum.org/en/developers/docs/gas/#base-fee).
+OP Mainnetのbase feeは、短いブロック時間を考慮したいくつかの小さなパラメータ変更を除いて、Ethereumのbase feeと全く同じように動作します。
+これらのパラメータのいずれもアプリケーションに大きな影響を与えるべきではありませんが、各パラメータについての詳細は[OP Mainnetの違い](/chain/differences#eip-1559)ページで読むことができます。
+base feeについての詳細は[Ethereum.orgのドキュメント](https://ethereum.org/en/developers/docs/gas/#base-fee)で読むことができます。
 
 ### Priority Fee
 
-Just like on Ethereum, OP Mainnet transactions can specify a **priority fee**.
-This priority fee is a price per unit of gas that is paid on top of the base fee.
-For example, if the block base fee is 1 gwei and the transaction specifies a priority fee of 1 gwei, the total price per unit of gas is 2 gwei.
-The priority fee is an optional component of the execution gas fee and can be set to 0.
+Ethereumと同様に、OP Mainnetの取引も**priority fee**を指定することができます。
+このpriority feeは、base feeに加えて支払われるガスの1単位あたりの価格です。
+例えば、ブロックのbase feeが1 gweiで、取引が1 gweiのpriority feeを指定した場合、ガス1単位あたりの総価格は2 gweiです。
+priority feeは、execution gas feeのオプションコンポーネントであり、0に設定することができます。
 
-**The OP Mainnet sequencer will prioritize transactions with a higher priority fee** and execute them before any transactions with a lower priority fee.
-If transaction speed is important to your application, you may want to set a higher priority fee to ensure that your transaction is included more quickly.
-The [`eth_maxPriorityFeePerGas`](https://docs.alchemy.com/reference/eth-maxpriorityfeepergas) RPC method can be used to estimate a priority fee that will get your transaction included quickly.
+**OP Mainnetのシーケンサーは、より高いpriority feeを持つ取引を優先し**、より低いpriority feeを持つ取引よりも先に実行します。
+取引速度がアプリケーションにとって重要である場合、取引がより迅速に含まれることを確実にするために、より高いpriority feeを設定することを検討するかもしれません。
+[`eth_maxPriorityFeePerGas`](https://docs.alchemy.com/reference/eth-maxpriorityfeepergas) RPCメソッドを使用して、取引が迅速に含まれるためのpriority feeを推定することができます。
 
 ## L1 Data Fee
 
-The L1 Data Fee is the only part of the OP Mainnet transaction fee that differs from the Ethereum transaction fee.
-This fee arises from the fact that the transaction data for all OP Mainnet transactions is published to Ethereum.
-This guarantees that the transaction data is available for nodes to download and execute.
-The L1 Data Fee accounts for the cost to publish an OP Mainnet transaction to Ethereum and is primarily determined
-by the current base fee on Ethereum. After the Ecotone upgrade, OP Stack chains will have the option of posting
-transactions using [`blobs`](https://www.eip4844.com/). For blob-enabled chains, the current Ethereum blob data
-gas price will largely determine the L1 data fee.
+L1 Data Feeは、OP Mainnetの取引手数料の中でEthereumの取引手数料と異なる唯一の部分です。
+この手数料は、すべてのOP Mainnet取引の取引データがEthereumに公開されるという事実から生じます。
+これにより、取引データがノードによってダウンロードおよび実行可能な状態に保たれます。
+L1 Data Feeは、OP Mainnetの取引をEthereumに公開するコストを考慮したもので、主に現在のEthereumのbase feeによって決定されます。Ecotoneアップグレード後、OP Stackチェーンは[`blobs`](https://www.eip4844.com/)を使用して取引を投稿するオプションを持ちます。blob対応のチェーンでは、現在のEthereumのblobデータガス価格がL1データ手数料を大きく決定します。
 
-### Mechanism
+### メカニズム
 
-The L1 Data Fee is automatically charged for any transaction that is included in an OP Mainnet block.
-This fee is deducted directly from the address that sent the transaction.
-The exact amount paid depends on the estimated size of the transaction in bytes after compression,
-the current Ethereum gas price and/or blob gas price, and several small parameters.
+L1 Data Feeは、OP Mainnetのブロックに含まれるすべての取引に対して自動的に課金されます。
+この手数料は、取引を送信したアドレスから直接差し引かれます。
+支払われる正確な金額は、圧縮後の取引のバイト数の推定サイズ、現在のEthereumのガス価格および/またはblobガス価格、およびいくつかの小さなパラメータによって決まります。
 
-The L1 Data Fee is most heavily influenced by the Ethereum base fee that is continuously and trustlessly relayed from Ethereum to
-OP Mainnet.  With the Ecotone upgrade, the Ethereum blob base fee also gets relayed to OP Mainnet, and will become the most
-important factor in for chains configured to use blobs instead of base fee.  The base fee and blob base fee is updated on OP
-Mainnet for every Ethereum block, and each fluctuates at most by 12.5% between updates.  As a result, short-term fluctuations of
-the L1 Data Fee are generally quite small and should not impact the average transaction.
+L1 Data Feeは、主にEthereumから継続的かつ信頼性を持ってリレーされるEthereumのbase feeによって影響を受けます。Ecotoneアップグレードにより、Ethereumのblob base feeもOP Mainnetにリレーされ、base feeの代わりにblobを使用するように構成されたチェーンにとって最も重要な要素となります。base feeとblob base feeはEthereumの各ブロックごとにOP Mainnet上で更新され、それぞれの更新間で最大12.5％変動します。その結果、L1 Data Feeの短期的な変動は一般的に非常に小さく、平均的な取引には影響を与えないはずです。
 
 <Callout>
-  The L1 Data Fee is charged automatically.
-  **It is currently not possible to limit the maximum L1 Data Fee that a transaction is willing to pay.**
-  This is the result of limitations in existing Ethereum transaction formats and tradeoffs that the OP Stack makes to retain better EVM equivalence.
-  Work is underway to improve this situation with the introduction of a new standardized transaction type.
-  For now, you should be aware that the L1 Data Fee can fluctuate with the Ethereum gas price.
+  L1 Data Feeは自動的に課金されます。
+  **取引が支払う最大のL1 Data Feeを制限することは現在できません。**
+  これは、既存のEthereumの取引フォーマットの制限およびEVMの互換性を保つためにOP Stackが行うトレードオフの結果です。
+  新しい標準化された取引タイプの導入によってこの状況を改善するための作業が進行中です。
+  現時点では、L1 Data FeeはEthereumのガス価格によって変動する可能性があることを認識しておく必要があります。
 </Callout>
 
-### Formula
+### 式
 
 #### Bedrock
 
 <Callout>
-The L1 Data Fee formula would change with the proposed Ecotone upgrade.
-Ecotone has not yet been approved by Optimism Governance.
-Refer to the [Network Upgrade Overview](/builders/node-operators/network-upgrades/overview) to check when the Ecotone upgrade is scheduled to activate on OP Sepolia and OP Mainnet.
+Ecotoneアップグレードが提案された場合、L1 Data Feeの計算式は変更されます。
+EcotoneはまだOptimism Governanceによって承認されていません。
+EcotoneアップグレードがOP SepoliaおよびOP Mainnetで有効になる予定を確認するには、[Network Upgrade Overview](/builders/node-operators/network-upgrades/overview)をご覧ください。
 </Callout>
 
-Prior to the Ecotone upgrade, the L1 Data Fee is calculated based on the following parameters:
+Ecotoneアップグレード前は、L1 Data Feeは以下のパラメータに基づいて計算されます：
 
-*   The **signed** transaction serialized according to [the standard Ethereum transaction RLP encoding](https://github.com/ethereum-optimism/op-geth/blob/11a890f1ee0348a17687149abc72f394f9faa5ce/core/types/transaction.go#L131-L141).
-*   The current Ethereum base fee  (trustlessly relayed from Ethereum).
-*   A fixed overhead cost for publishing a transaction (currently set to 188 gas).
-*   A dynamic overhead cost which scales with the size of the transaction (currently set to 0.684).
+*   標準的なEthereum取引RLPエンコーディングに従ってシリアル化された**署名済み**取引 [the standard Ethereum transaction RLP encoding](https://github.com/ethereum-optimism/op-geth/blob/11a890f1ee0348a17687149abc72f394f9faa5ce/core/types/transaction.go#L131-L141)。
+*   現在のEthereumのbase fee（Ethereumから信頼性を持ってリレーされる）。
+*   取引を公開するための固定オーバーヘッドコスト（現在は188ガスに設定）。
+*   取引のサイズに応じてスケールする動的オーバーヘッドコスト（現在は0.684に設定）。
 
-The L1 Data Fee calculation first begins with counting the number of zero bytes and non-zero bytes in the transaction data.
-Each zero byte costs 4 gas and each non-zero byte costs 16 gas.
-This is the same way that Ethereum calculates the gas cost of transaction data.
+L1 Data Feeの計算は、取引データ内のゼロバイトと非ゼロバイトの数を数えることから始まります。
+各ゼロバイトは4ガス、各非ゼロバイトは16ガスを要します。
+これはEthereumが取引データのガスコストを計算する方法と同じです。
 
 ```python
 tx_data_gas = count_zero_bytes(tx_data) * 4 + count_non_zero_bytes(tx_data) * 16
 ```
 
-After calculating the gas cost of the transaction data, the fixed and dynamic overhead values are applied.
+取引データのガスコストを計算した後、固定および動的オーバーヘッド値が適用されます。
 
 ```python
 tx_total_gas = (tx_data_gas + fixed_overhead) * dynamic_overhead
 ```
 
-Finally, the total L1 Data Fee is calculated by multiplying the total gas cost by the current Ethereum base fee.
+最後に、総L1 Data Feeは、現在のEthereumのbase feeに総ガスコストを掛けることで計算されます。
 
 ```python
 l1_data_fee = tx_total_gas * ethereum_base_fee
@@ -122,47 +114,40 @@ l1_data_fee = tx_total_gas * ethereum_base_fee
 #### Ecotone
 
 <Callout>
-The L1 Data Fee formula would change with the proposed Ecotone upgrade.
-Ecotone has not yet been approved by Optimism Governance.
-Refer to the [Network Upgrade Overview](/builders/node-operators/network-upgrades/overview) to check when the Ecotone upgrade is scheduled to activate on OP Sepolia and OP Mainnet.
+Ecotoneアップグレードが提案された場合、L1 Data Feeの計算式は変更されます。
+EcotoneはまだOptimism Governanceによって承認されていません。
+EcotoneアップグレードがOP SepoliaおよびOP Mainnetで有効になる予定を確認するには、[Network Upgrade Overview](/builders/node-operators/network-upgrades/overview)をご覧ください。
 </Callout>
 
-The pricing function changes with the proposed Ecotone upgrade because of the introduction of the option to
-post transaction batches to the L1 using blobs instead of through L1 calldata. This updated
-function uses the following parameters:
+Ecotoneアップグレードにより、L1のcalldataを通じて取引バッチを投稿する代わりにblobsを使用するオプションの導入により、価格設定関数が変更されます。この更新された関数は、次のパラメータを使用します：
 
-*   The **signed** transaction serialized according to [the standard Ethereum transaction RLP encoding](https://github.com/ethereum-optimism/op-geth/blob/11a890f1ee0348a17687149abc72f394f9faa5ce/core/types/transaction.go#L131-L141).
-*   The current Ethereum base fee and/or blob base fee (trustlessly relayed from Ethereum).
-*   Two new scalar parameters that independently scale the base fee blob base fee.
+*   標準的なEthereum取引RLPエンコーディングに従ってシリアル化された**署名済み**取引 [the standard Ethereum transaction RLP encoding](https://github.com/ethereum-optimism/op-geth/blob/11a890f1ee0348a17687149abc72f394f9faa5ce/core/types/transaction.go#L131-L141)。
+*   現在のEthereumのbase feeおよび/またはblob base fee（Ethereumから信頼性を持ってリレーされる）。
+*   base fee blob base feeを独立してスケールする2つの新しいスカラー パラメータ。
 
-At the exact point of the Ecotone upgrade, the dynamic overhead parameter value is used to
-initialize the Ecotone base fee scalar, and blob base fee is set to 0. The overhead parameter from
-the previous function becomes ignored.
+Ecotoneアップグレードの正確なポイントで、動的オーバーヘッド パラメータ値がEcotone base feeスカラーの初期値として使用され、blob base feeは0に設定されます。
+前の関数からのオーバーヘッド パラメータは無視されます。
 
-The Ecotone L1 Data Fee calculation begins with counting the number of zero bytes and non-zero
-bytes in the transaction data.  Each zero byte costs 4 gas and each non-zero byte costs 16
-gas. This value, when divided by 16, can be thought of as a rough estimate of the size of the
-transaction data after compression.
+Ecotone L1 Data Feeの計算は、取引データ内のゼロバイトと非ゼロバイトの数を数えることから始まります。
+各ゼロバイトは4ガス、各非ゼロバイトは16ガスを要します。
+この値を16で割ると、圧縮後の取引データのサイズのおおよその見積もりとして考えることができます。
 
 ```python
 tx_compressed_size = [(count_zero_bytes(tx_data)*4 + count_non_zero_bytes(tx_data)*16)] / 16
 ```
 
-Next, the two scalars are applied to the base fee and blob base fee parameters to compute a weighted
-gas price multiplier.
+次に、2つのスカラーがbase feeおよびblob base feeパラメータに適用され、重み付けされたガス価格乗数が計算されます。
 
 ```python
 weighted_gas_price = 16*base_fee_scalar*base_fee + blob_base_fee_scalar*blob_base_fee
 ```
 
-The l1 data fee is then:
+L1 Data Feeは次のようになります：
 
 ```python
 l1_data_fee = tx_compressed_size * weighted_gas_price
 ```
 
-Recall that base_fee_scalar is set to dynamic_overhead and blob_base_fee_scalar is 0 immediately
-following the upgrade. Because the old overhead parameter becomes ignored, new L1 data prices will
-be (slightly, since overhead is typically a very small) lower than before the fork.  Chain
-operators will likely want to retune the parameters appropriately after the fork, particularly if
-they plan on enabling blobs.
+アップグレード直後にbase_fee_scalarが動的オーバーヘッドに設定され、blob_base_fee_scalarが0になることを思い出してください。
+古いオーバーヘッド パラメータが無視されるため、新しいL1データ価格はフォーク前よりも（わずかに、オーバーヘッドが通常非常に小さいため）低くなります。
+チェーン オペレーターは、特にblobを有効にする予定がある場合は、フォーク後にパラメータを適切に再調整することをお勧めします。
