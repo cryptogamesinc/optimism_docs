@@ -1,40 +1,49 @@
 ---
-title: Fault Proof VM - Cannon
+title: フォルトプルーフVM - Cannon
 lang: en-US
-description: Learn about Cannon and its default operation as part of Optimism's Fault Proof Virtual Machine.
+description: Optimismのフォルトプルーフ仮想マシンの一部としてのCannonとそのデフォルトの動作について学びます。
 ---
 
 import Image from 'next/image'
 import { Callout } from 'nextra/components'
 
-# Fault Proof VM: Cannon
+# フォルトプルーフVM: Cannon
 
-Cannon is an instance of a Fault Proof Virtual Machine (FPVM) that can be used as part of the Dispute Game for any OP Stack Blockchain.
-The Dispute Game itself is modular, allowing for any FPVM to be used in a dispute.
-However, Cannon is Optimism's default Fault Proof Virtual Machine (FPVM). Cannon has two main components:
+Cannonは、任意のOPスタックブロックチェーンの紛争ゲームの一部として使用できるフォルトプルーフ仮想マシン（FPVM）の一例です。
+紛争ゲーム自体はモジュール式であり、任意のFPVMを紛争に使用することができます。
+しかし、CannonはOptimismのデフォルトのフォルトプルーフ仮想マシン（FPVM）です。Cannonには2つの主要なコンポーネントがあります：
 
-*   Onchain `MIPS.sol`: EVM implementation to verify execution of a single MIPS instruction.
-*   Offchain `mipsevm`: Go implementation to produce a proof for any MIPS instruction to verify onchain.
+* オンチェーンの`MIPS.sol`：単一のMIPS命令の実行を検証するためのEVM実装。
+* オフチェーンの`mipsevm`：オンチェーンで検証するためのMIPS命令の証明を生成するGo実装。
 
-Note that Cannon is just one example of a FPVM that can be used to resolve disputes.
+Cannonは紛争を解決するために使用できるFPVMの一例に過ぎないことに注意してください。
 
-This documentation will go into detail about the subcomponents that make up the offchain Cannon implementation as a whole.
-Additionally, we will explore the differences between Cannon and the onchain `MIPS.sol`. For more information about the onchain
-implementation, please refer to [MIPS reference](mips).
-Now for simplicity, when referring to Cannon in this documentation, we are referring to the offchain implementation.
+このドキュメントでは、オフチェーンCannon実装を構成するサブコンポーネントの詳細について説明します。
+さらに、Cannonとオンチェーンの`MIPS.sol`の違いについても探ります。オンチェーン実装の詳細については、[MIPSリファレンス](mips)を参照してください。
+簡単のために、このドキュメントではCannonをオフチェーン実装として言及します。
 
 ## Control Flow
 
 ![Fault Proof Control Flow.](/img/op-stack/protocol/fault-proof-control-flow.svg)
 
-In the above diagram, recreated from the [OP Fault Proof System video](https://www.youtube.com/watch?v=nIN5sNc6nQM) by Clabby, we can see
-that Cannon interacts with OP-Challenger and OP-Program. However, this diagram is a simplification of the relationship between
-OP-Challenger \<> Cannon, and OP-Program \<> Cannon. In general, Cannon will not be run until an active fault dispute reaches the
-execution trace portion of the bisection game. This does not occur until the participants in the active fault dispute game reach a
-single L2 block state transition that they disagree on.
+上記の図は、Clabbyによる[OPフォルトプルーフシステムのビデオ](https://www.youtube.com/watch?v=nIN5sNc6nQM)から
+再現されたもので、CannonがOP-ChallengerおよびOP-Programとどのように相互作用するかを示しています。
+しかし、この図はOP-ChallengerとCannon、OP-ProgramとCannonの関係を簡略化したものです。
+一般的に、Cannonはアクティブなフォルト紛争が二分探索ゲームの実行トレース部分に達するまで実行されません。
+これは、アクティブなフォルト紛争ゲームの参加者が意見の一致しない単一のL2ブロック状態遷移に到達するまで発生しません。
 
 ### OP-Challenger \<> Cannon
 
+アクティブなフォルト紛争ゲームが攻撃/防御のL2ブロック状態遷移の深さを超えると、
+OP-ChallengerはCannonを実行してFPVM内でMIPS命令の処理を開始します。
+MIPS命令の処理の一環として、CannonはFPVM内でのMIPS命令の計算結果に対するコミットメントである状態証人ハッシュを生成します。
+二分探索ゲームでは、OP-Challengerは生成されたハッシュを提供し続け、
+アクティブな紛争の参加者間で意見の一致しない単一のMIPS命令が特定されるまで続けます。
+その後、CannonはMIPS命令をオンチェーンで実行するために必要なすべての情報を含む証人証明を生成します。
+この単一のMIPS命令をオンチェーンで`MIPS.sol`内で実行することで、正しい後状態を決定的に証明し、
+その後、フォルト紛争ゲームを解決するために使用されます。
+
+#### 原文
 Once an active fault dispute game reaches a depth below attacking / defending L2 block state transitions, OP-Challenger will run
 Cannon to begin processing MIPS instructions within the FPVM. As part of processing MIPS instructions, Cannon will generate state
 witness hashes, which are the commitment to the results of the MIPS instructions' computation within the FPVM. Now, in the bisection game, OP-Challenger will provide the generated hashes
@@ -43,8 +52,29 @@ generate the witness proof, which contains all the information required to run t
 instruction onchain in `MIPS.sol` will be used to definitively prove the correct post state, which will then be used to resolve the fault
 dispute game.
 
+#### 解説
+1. フォルト紛争ゲームの深さ:
+- フォルト紛争ゲームが特定の深さ（攻撃/防御のL2ブロック状態遷移の深さ）に達すると、OP-ChallengerはCannonを実行します。
+2. MIPS命令の処理:
+- CannonはFPVM内でMIPS命令の処理を開始します
+- MIPS命令の処理の一環として、Cannonは計算結果に対するコミットメントである「状態証人ハッシュ」を生成します。
+3. 二分探索ゲーム:
+- 二分探索ゲームでは、OP-Challengerは生成されたハッシュを提供し続けます。
+- これは、紛争の参加者間で意見の一致しない単一のMIPS命令が特定されるまで続きます。
+4. 証人証明の生成:
+- 意見の一致しない単一のMIPS命令が特定された後、Cannonはその命令をオンチェーンで実行するために必要なすべての情報を含む「証人証明」を生成します。
+5. オンチェーンでの実行:
+- この単一のMIPS命令をオンチェーンでMIPS.sol内で実行することで、正しい後状態を決定的に証明します。
+- これにより、フォルト紛争ゲームを解決するために使用されます。
+
 ### OP-Program \<> Cannon
 
+実行トレースの二分探索が始まり、Cannonが実行されると、実行可能リンク形式（ELF）バイナリがCannon内で読み込まれ、実行されます。
+Cannon内には、MIPS R3000、32ビット命令セットアーキテクチャ（ISA）を処理するために構築された`mipsevm`があります。ELFファイルにはMIPS命令が含まれており、MIPS命令にコンパイルされたコードがOP-Programです。
+
+OP-Programは、MIPS命令にコンパイルされ、Cannon FPVM内で実行されるGolangコードです。OP-Programは、スタンドアロンのGolangコードとして実行される場合でも、Cannon内で実行される場合でも、L2の状態を導出するために使用されるすべての必要なデータを取得します。同じ入力が与えられた場合、同じ出力だけでなく、同じ実行トレースも生成されるように設計されています。これにより、フォルト紛争ゲームのすべての参加者が、同じL2出力ルート状態遷移を基にして、同じ実行トレースを生成できます。これにより、オンチェーンで実行される正確なMIPS命令に対して同じ証人証明が生成されます。
+
+#### 原文
 Once the execution trace bisection begins and Cannon is run, an Executable and Linkable Format (ELF) binary will be loaded and run within Cannon.
 Within Cannon is the `mipsevm` that is built to handle the MIPS R3000, 32-bit Instruction Set Architecture (ISA). The ELF file contains MIPS instructions,
 where the code that has been compiled into MIPS instructions is OP-Program.
@@ -55,40 +85,66 @@ same inputs will produce not only the same outputs, but the same execution trace
 OP-Program such that, given the same L2 output root state transition, can generate the same execution traces. This in turn generates the same
 witness proof for the exact same MIPS instruction that will be run onchain.
 
+#### 解説
+1. 実行トレースの二分探索:
+- フォルト紛争ゲームの実行トレースの二分探索が始まると、Cannonが実行されます。
+2. ELFバイナリの読み込み:
+- Cannonは、実行可能リンク形式（ELF）バイナリを読み込み、実行します。
+- このELFファイルには、MIPS命令が含まれています。
+3. mipsevmの役割:
+- Cannon内には、MIPS R3000、32ビット命令セットアーキテクチャ（ISA）を処理するために構築されたmipsevmがあります。
+4. OP-Programの役割:
+- OP-Programは、MIPS命令にコンパイルされたGolangコードです。
+- OP-Programは、スタンドアロンのGolangコードとして実行される場合でも、Cannon内で実行される場合でも、L2の状態を導出するために必要なすべてのデータを取得します。
+5. 決定論的な実行:
+- OP-Programは、同じ入力が与えられた場合、同じ出力だけでなく、同じ実行トレースも生成するように設計されています。
+- これにより、フォルト紛争ゲームのすべての参加者が同じ実行トレースを生成できます。
+6. 証人証明の生成:
+- 同じ実行トレースを生成することで、オンチェーンで実行される正確なMIPS命令に対して同じ証人証明が生成されます。
+
+#### ポイント
+- ELFバイナリ: 実行可能リンク形式のバイナリファイルで、MIPS命令が含まれています。
+- mipsevm: MIPS命令を処理する仮想マシン。
+- OP-Program: MIPS命令にコンパイルされたGolangコードで、L2の状態を導出するために必要なデータを取得します。
+- 決定論的な実行: 同じ入力で同じ出力と実行トレースを生成する設計。
+- 証人証明: オンチェーンで実行されるMIPS命令に対する証明。
+- このプロセスにより、フォルト紛争ゲームの正確性と信頼性が確保されます。
+
 ## Overview of Offchain Cannon components
 
-Now, we will go over each major component that makes up Cannon. Components are grouped by what functionality is being performed for
-Cannon, and may be correlated to one or more Go files. For brevity, each Go file will be explained at a high level, with the
-most important features / considerations highlighted.
+次に、Cannonを構成する各主要コンポーネントについて説明します。コンポーネントはCannonの機能ごとにグループ化されており、1つ以上のGoファイルに関連付けられている場合があります。簡潔にするために、各Goファイルは高レベルで説明され、最も重要な機能や考慮事項が強調されます。
 
 ![Cannon Components Overview.](/img/op-stack/protocol/cannon-internal-overview.svg)
 
 ### `mipsevm` State and Memory
 
-As mentioned previously, the `mipsevm` is 32-bit, which means the full addressable address range is `[0, 2^32-1]`. The memory layout
-uses the typical monolithic memory structure, and the VM operates as though it were interacting directly with physical memory.
+前述の通り、`mipsevm`は32ビットであり、アドレス可能なアドレス範囲は`[0, 2^32-1]`です。メモリレイアウトは典型的なモノリシックメモリ構造を使用しており、VMは物理メモリと直接やり取りしているかのように動作します。
 
-For the `mipsevm`, how memory is stored isn't important, as it can hold the entire monolithic memory within the Go runtime.
-In this way, how memory is represented is abstracted away from the VM itself. However, it is important for memory to be represented
-such that only small portions are needed in order to run a MIPS instruction onchain. This is because it is infeasible to represent the
-entire 32-bit memory space onchain due to cost. Therefore, memory is stored in a binary Merkle tree data structure, with the implementation
-spread across [`memory.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/memory.go) and
-[`page.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/page.go).
-The tree has a fixed-depth of 27 levels, with leaf values of 32 bytes each. This spans the full 32-bit address space: `2**27 * 32 = 2**32`.
-Each leaf contains the memory for that part of the tree.
+`mipsevm`にとって、メモリがどのように保存されるかは重要ではありません。
+なぜなら、Goランタイム内で全体のモノリシックメモリを保持できるからです。
+このようにして、メモリの表現方法はVM自体から抽象化されています。
+しかし、オンチェーンでMIPS命令を実行するためには、メモリが小さな部分だけで表現されることが重要です。
+これは、コストのために32ビットのメモリ空間全体をオンチェーンで表現することが不可能だからです。
+そのため、メモリはバイナリMerkleツリーデータ構造に保存されており、
+実装は[`memory.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/memory.go)と
+[`page.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/page.go)に分かれています。
+このツリーは27レベルの固定深度を持ち、各リーフの値は32バイトです。これにより、32ビットのアドレス空間全体をカバーします：`2**27 * 32 = 2**32`。各リーフには、その部分のメモリが含まれています。
 
-`memory.go` defines the data structure, `Memory`, which holds pointers to `nodes` and `pages`. A memory `node` holds the calculated Merkle
-root of its parent node within the memory binary Merkle tree, where the 'location' of the node is determined by its generalized index.
-The index calculated for a Merkle root in the nodes mapping follows the
-[generalized Merkle tree index specification](https://github.com/ethereum/consensus-specs/blob/dev/ssz/merkle-proofs.md#generalized-merkle-tree-index).
+`memory.go`はデータ構造`Memory`を定義しており、
+これは`nodes`
+へのポインタを保持します。メモリの`node`は、メモリのバイナリMerkleツリー内の親ノードの計算されたMerkleルートを保持し、
+ノードの「位置」はその一般化されたインデックスによって決定されます。
+ノードマッピング内のMerkleルートのインデックスは、
+[一般化されたMerkleツリーインデックス仕様](https://github.com/ethereum/consensus-specs/blob/dev/ssz/merkle-proofs.md#generalized-merkle-tree-index)に従います。
 
-`page.go`, as the name implies, defines memory pages. Each `Page` is 4096 bytes, which is also specified as the minimum page allocation
-size for the Go runtime. A `Page` represents the lowest depths of the memory binary Merkle tree, and `page.go` performs a similar role
-to `memory.go`, calculating Merkle roots for each level of the tree.
+`page.go`はその名の通り、メモリページを定義します。
+各`Page`は4096バイトであり、これはGoランタイムの最小ページ割り当てサイズとしても指定されています。
+PageはメモリバイナリMerkleツリーの最下層を表します。`page.go`は`memory.go
+と同様の役割を果たし、ツリーの各レベルのMerkleルートを計算します。
 
-Nodes in this memory tree are combined as: `out = keccak256(left ++ right)`, where `++` is concatenation,
-and `left` and `right` are the 32-byte outputs of the respective subtrees or the leaf values themselves.
-Individual leaf nodes are not hashed.
+このメモリツリーのノードは次のように結合されます：
+`out = keccak256(left ++ right)`、ここで`++`は連結を意味し、
+`left` `right`はそれぞれのサブツリーの32バイトの出力またはリーフ値自体です。個々のリーフノードはハッシュ化されません。
 
 In both `memory.go` and `page.go`, there are a few optimizations designed to reduce the computationally expensive Merkle root calculations.
 One such optimization is that the Merkle root of zeroed-out regions of memory are calculated for each depth. This means the tree is efficiently allocated,
