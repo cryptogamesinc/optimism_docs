@@ -1,67 +1,67 @@
 ---
-title: Differences between Ethereum and OP Stack Chains
-lang: en-US
-description: Learn the minor differences between the behavior of Ethereum and OP Stack chains.
+title: EthereumとOP Stackチェーンの違い
+lang: ja-JP
+description: EthereumとOP Stackチェーンの動作の違いについて学びましょう。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Differences between Ethereum and OP Stack Chains
+# EthereumとOP Stackチェーンの違い
 
-OP Stack chains are designed to be [EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306) and introduces as few changes as possible to the Ethereum protocol.
-However, there are some minor differences between the behavior of Ethereum and OP Stack chains that developers should be aware of.
+OP Stackチェーンは[EVM equivalent](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306)を目指して設計されており、Ethereumプロトコルへの変更を最小限に抑えています。
+しかし、EthereumとOP Stackチェーンの動作には開発者が注意すべきいくつかの小さな違いがあります。
 
 ## Opcodes
 
-| Opcode       | Solidity Equivalent | Behavior                                                                                                                                                                                                                                                |
-| ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `COINBASE`   | `block.coinbase`    | Returns the address of the current Sequencer's fee wallet. Effectively the same as Ethereum with the caveat that the value typically does not change from block to block.                                                                               |
-| `PREVRANDAO` | `block.prevrandao`  | Set **pseudorandomly** for each block by the Sequencer as opposed to the stronger guarantees provided by [RANDAO](https://eips.ethereum.org/EIPS/eip-4399) on Ethereum.                                                                                 |
-| `ORIGIN`     | `tx.origin`         | If the transaction is an L1 ⇒ L2 transaction triggered by a smart contract on L1, then `tx.origin` is set to the [aliased address](#address-aliasing) of the address that triggered the L1 ⇒ L2 transaction. Otherwise, this opcode behaves normally.   |
-| `CALLER`     | `msg.sender`        | If the transaction is an L1 ⇒ L2 transaction triggered by a smart contract on L1, and this is the first call frame (rather than an internal transaction from one contract to another), the same [address aliasing](#address-aliasing) behavior applies. |
+| Opcode       | Solidity Equivalent | 動作                                                                                                                                                               |
+| ------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `COINBASE`   | `block.coinbase`    | 現在のSequencerの手数料ウォレットのアドレスを返します。ブロックごとに値が通常変わらない点を除いて、Ethereumと実質的に同じです。                                                                                         |
+| `PREVRANDAO` | `block.prevrandao`  | Ethereum上の[RANDAO](https://eips.ethereum.org/EIPS/eip-4399)が提供する強力な保証とは対照的に、Sequencerによって各ブロックごとに**擬似ランダム**に設定されます。                                              |
+| `ORIGIN`     | `tx.origin`         | トランザクションがL1 ⇒ L2トランザクションであり、L1上のスマートコントラクトによってトリガーされた場合、`tx.origin`はL1 ⇒ L2トランザクションをトリガーしたアドレスの[エイリアスアドレス](#address-aliasing)に設定されます。それ以外の場合、このopcodeは通常通り動作します。 |
+| `CALLER`     | `msg.sender`        | トランザクションがL1 ⇒ L2トランザクションであり、これは最初のコールフレーム（スマートコントラクト間の内部トランザクションではない）場合、同じ[アドレスエイリアシング](#address-aliasing)動作が適用されます。                                             |
 
-### Address Aliasing
+### アドレスエイリアシング
 
 <Callout>
-  Address aliasing is an important security feature that impacts the behavior of transactions sent from L1 to L2 by smart contracts.
-  Make sure to read this section carefully if you are working with cross-chain transactions.
-  Note that the `CrossChainMessenger` contracts will handle address aliasing internally on your behalf.
+  アドレスエイリアシングは、L1からL2にスマートコントラクトによって送信されるトランザクションの動作に影響を与える重要なセキュリティ機能です。
+  クロスチェーントランザクションに取り組んでいる場合は、このセクションを注意深く読んでください。
+  `CrossChainMessenger`コントラクトは、内部でアドレスエイリアシングを処理します。
 </Callout>
 
-When transactions are sent from L1 to L2 by an Externally Owned Account, the address of the sender of the transaction on L2 will be set to the address of the sender of the transaction on L1.
-**However, the address of the sender of a transaction on L2 will be different if the transaction was triggered by a smart contract on L1**.
+Externally Owned AccountからL1からL2にトランザクションが送信される場合、L2でのトランザクションの送信者のアドレスはL1でのトランザクションの送信者のアドレスに設定されます。
+**しかし、L2でのトランザクションの送信者のアドレスは、L1上のスマートコントラクトによってトリガーされた場合、異なるものになります**。
 
-Because of the behavior of the `CREATE` opcode, it is possible to create a contract on both L1 and on L2 that share the same address but have different bytecode.
-Even though these contracts share the same address, they are fundamentally two different smart contracts and cannot be treated as the same contract.
-As a result, the sender of a transaction sent from L1 to L2 by a smart contract cannot be the address of the smart contract on L1 or the smart contract on L1 could act as if it were the smart contract on L2 (because the two contracts share the same address).
+`CREATE` opcodeの動作により、同じアドレスを共有するがバイトコードが異なる契約をL1とL2の両方で作成することが可能です。
+これらの契約は同じアドレスを共有していますが、基本的に2つの異なるスマートコントラクトであり、同じ契約として扱うことはできません。
+その結果、L1からL2にスマートコントラクトによって送信されたトランザクションの送信者は、L1のスマートコントラクトのアドレスではなく、L1のスマートコントラクトがL2のスマートコントラクトとして振る舞うことができるように、L2トランザクションが送信者のアドレスをわずかに変更します。
 
-To prevent this sort of impersonation, the sender of a transaction is slightly modified when a transaction is sent from L1 to L2 by a smart contract.
-Instead of appearing to be sent from the actual L1 contract address, the L2 transaction appears to be sent from an "aliased" version of the L1 contract address.
-This aliased address is a constant offset from the actual L1 contract address such that the aliased address will never conflict with any other address on L2 and the original L1 address can easily be recovered from the aliased address.
+このような偽装を防ぐために、トランザクションがスマートコントラクトによってL1からL2に送信された場合、送信者のアドレスはわずかに変更されます。
+実際のL1コントラクトアドレスから送信されたように見える代わりに、L2トランザクションはL1コントラクトアドレスの「エイリアス」バージョンから送信されたように見えます。
+このエイリアスアドレスは、元のL1アドレスが簡単に復元できるように、L1コントラクトアドレスから一定のオフセットを持つ定数です。
 
-This change in sender address is only applied to L2 transactions sent by L1 smart contracts.
-In all other cases, the transaction sender address is set according to the same rules used by Ethereum.
+この送信者アドレスの変更は、L1スマートコントラクトによって送信されたL2トランザクションにのみ適用されます。
+他のすべての場合、トランザクション送信者アドレスはEthereumで使用される同じルールに従って設定されます。
 
-| Transaction Source                                      | Sender Address                                                     |
-| ------------------------------------------------------- | ------------------------------------------------------------------ |
-| L2 user (Externally Owned Account)                      | The user's address (same as in Ethereum)                           |
-| L1 user (Externally Owned Account)                      | The user's address (same as in Ethereum)                           |
-| L1 contract (using `OptimismPortal.depositTransaction`) | `L1_contract_address + 0x1111000000000000000000000000000000001111` |
+| トランザクションの送信元                                     | 送信者アドレス                                                            |
+| ------------------------------------------------ | ------------------------------------------------------------------ |
+| L2ユーザー（Externally Owned Account）                 | ユーザーのアドレス（Ethereumと同じ）                                             |
+| L1ユーザー（Externally Owned Account）                 | ユーザーのアドレス（Ethereumと同じ）                                             |
+| L1コントラクト（`OptimismPortal.depositTransaction`を使用） | `L1_contract_address + 0x1111000000000000000000000000000000001111` |
 
-## Transactions
+## トランザクション
 
-### Transaction Fees
+### トランザクション手数料
 
-Transactions OP Stack chains must pay for an [L1 data fee](/stack/transactions/fees#the-l1-data-fee) on top of the standard [execution gas fee](/stack/transactions/fees#execution-gas-fee) you would expect on Ethereum.
-Refer to the guide on [OP Stack Transaction Fees](/stack/transactions/fees) for more information.
+OP Stackチェーンのトランザクションは、標準的な[execution gas fee](/stack/transactions/fees#execution-gas-fee)に加えて[L1 data fee](/stack/transactions/fees#the-l1-data-fee)を支払う必要があります。
+詳細については、[OP Stack Transaction Fees](/stack/transactions/fees)ガイドを参照してください。
 
-### EIP-1559 Parameters
+### EIP-1559パラメータ
 
-The base fee on OP Stack is, like Ethereum, computed via the [EIP-1559](https://notes.ethereum.org/@vbuterin/eip-1559-faq) mechanism.
-The EIP-1559 parameters used by OP Stack differ per chain.
+OP Stackのベース手数料は、Ethereumと同様に[EIP-1559](https://notes.ethereum.org/@vbuterin/eip-1559-faq)メカニズムを介して計算されます。
+OP Stackで使用されるEIP-1559パラメータはチェーンごとに異なります。
 
-### Mempool Rules
+### Mempoolのルール
 
-By default, OP Stack chains do not have a large public mempool like Ethereum.
-OP Stack mempools are typically only visible to the Sequencer of the given chain and transactions are generally executed in priority fee order (highest fee first).
-This is not a required behavior and certain chains may choose to have a public mempool.
+デフォルトでは、OP StackチェーンにはEthereumのような大きな公開mempoolはありません。
+OP Stackのmempoolは通常、特定のチェーンのSequencerのみに見えるようになっており、トランザクションは一般的に優先手数料順（最も高い手数料が最初）に実行されます。
+これは必須の動作ではなく、特定のチェーンが公開mempoolを持つことを選択することもあります。
