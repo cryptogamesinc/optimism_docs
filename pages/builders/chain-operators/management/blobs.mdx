@@ -99,7 +99,8 @@ import { Tabs } from 'nextra/components'
 </Steps>
 
 ## Calldataの使用に切り替える
-
+TODO: ここで言及されているCalldataは、solidityのcalldataと同じなのかどうか確認。
+TODO: Blobの保存期間について確認。
 チェーンオペレーターとして、`blobBaseFee`が非常に高く、設定されたバッチャーの`OP_BATCHER_MAX_CHANNEL_DURATION`内に十分にBlobを埋めるトランザクションを処理していない場合は、データをcalldataに戻すことを検討するかもしれません。[料金パラメータ計算機](https://docs.google.com/spreadsheets/d/12VIiXHaVECG2RUunDSVJpn67IQp9NHFJqUsma2PndpE/edit)を利用して、トランザクションをBlobで送信するか、calldataで送信するかが安価になるかどうかを確認してください。チェーンは以下の手順に従ってBlobからcalldataの使用に戻すことができます。
 
 <Steps>
