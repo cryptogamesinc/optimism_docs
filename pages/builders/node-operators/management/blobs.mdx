@@ -1,104 +1,91 @@
 ---
-title: Using Blobs
-lang: en-US
-description: Learn how to handle blobs for your node.
+title: Blobの使用
+lang: ja-JP
+description: ノードのためにBlobを処理する方法を学びます。
 ---
 
 import { Callout, Steps } from 'nextra/components'
 import { Tabs } from 'nextra/components'
 
-# Using Blobs
+# Blobの使用
 
-The proposed Ecotone upgrade impacts node operators because of the new Beacon 
-endpoint for `op-node`. Soon after the Ecotone activation, batch transactions 
-will be sent as 4844 blobs, and blobs can only be retrieved from Beacon nodes. 
-This means node operators will need access to a beacon node/consensus client 
-(i.e. Lighthouse, Lodestar, Nimbus, Prysm, Teku, etc.).
+提案されたエコトーンアップグレードは、新しいビーコンエンドポイントのためにノードオペレーターに影響を与えます。エコトーンのアクティベーション後すぐに、バッチトランザクションが4844Blobとして送信され、Blobはビーコンノードからのみ取得できます。これにより、ノードオペレーターはビーコンノード/コンセンサスクライアント（例：Lighthouse, Lodestar, Nimbus, Prysm, Tekuなど）へのアクセスが必要になります。
 
-## Preparing Your Node
+## ノードの準備
 
-These steps are necessary for EVERY node operator:
+すべてのノードオペレーターに必要な手順は次のとおりです：
 
 <Steps>
-### Update to the latest release
+### 最新のリリースにアップデートする
 
-See the [Software Releases](/builders/node-operators/releases) page for the minimum release version.
+最低限必要なリリースバージョンについては、[ソフトウェアリリース](/builders/node-operators/releases)ページを参照してください。
 
-### Configure the Ecotone Activation Date
+### エコトーンのアクティベーション日を設定する
 
-*   If you are operating a node for an OP Chain that has an entry in the [`superchain-registry`](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/configs/chainids.json), 
-the Ecotone activation date is part of the `op-node` and `op-geth` nodes. So, 
-no action is needed for the sequencer after upgrading to the latest release.
-*   For node operators of custom chains not included in the [`superchain-registry`](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/configs/chainids.json), 
-the activation dates can be set in the `rollup.json` (set `ecotone_time`) or 
-set the activation time via overrides (CLI) in both `op-node` and `op-geth`. 
-These will need to be set on `op-node` and `op-geth` for the sequencer and all other nodes.
+*   OPチェーンのノードを運用している場合、`superchain-registry`にエントリーがある場合、エコトーンのアクティベーション日は`op-node`と`op-geth`ノードの一部です。したがって、最新のリリースにアップグレードした後、シーケンサーには特にアクションは必要ありません。
+*   `superchain-registry`に含まれていないカスタムチェーンのノードオペレーターの場合、アクティベーション日を`rollup.json`（`ecotone_time`を設定）またはオーバーライド（CLI）で`op-node`と`op-geth`の両方に設定する必要があります。これらは、シーケンサーおよび他のすべてのノードのために`op-node`と`op-geth`の両方に設定する必要があります。
 
 <Callout type="warning">
-  Even if the ecotone activation is configured via the `rollup.json`, it still 
-  needs to be configured separately on `op-geth` via command line flag.
+  `rollup.json`でエコトーンのアクティベーションが設定されている場合でも、`op-geth`でコマンドラインフラグを使用して別々に設定する必要があります。
 </Callout>
 
 <Tabs items={['op-node', 'op-geth']}>
   <Tabs.Tab>
-    ```shell
-    --override.ecotone value            (default: 0)                       ($OP_NODE_OVERRIDE_ECOTONE)
-              Manually specify the Ecotone fork timestamp, overriding the bundled setting
-    ```
+```shell
+--override.ecotone value            (default: 0)                       ($OP_NODE_OVERRIDE_ECOTONE)
+          バンドルされた設定をオーバーライドして、エコトーンフォークのタイムスタンプを手動で指定
+```
   </Tabs.Tab>
 
   <Tabs.Tab>
-    ```shell
-    --override.ecotone value            (default: 0)                       ($GETH_OVERRIDE_ECOTONE)
-              Manually specify the Optimism Ecotone fork timestamp, overriding the bundled
-              setting
-    ```
+```shell
+--override.ecotone value            (default: 0)                       ($GETH_OVERRIDE_ECOTONE)
+          バンドルされた設定をオーバーライドして、Optimismエコトーンフォークのタイムスタンプを手動で指定
+```
   </Tabs.Tab>
 </Tabs>
 
-### Prepare for Activation
+### アクティベーションの準備
 
-*   All node operators must set an L1 beacon value in your `op-node` as soon as you update to the latest release.
+*   すべてのノードオペレーターは、最新のリリースにアップデートした直後に`op-node`にL1ビーコン値を設定する必要があります。
 
 ```shell
 --l1.beacon value                                                      ($OP_NODE_L1_BEACON)
-          HTTP endpoint Address of L1 Beacon-node.
+          L1ビーコンノードのHTTPエンドポイントアドレス。
 ```
 
-*   Either run your own L1 beacon node like [Lighthouse](https://lighthouse-book.sigmaprime.io/run_a_node.html) or use a third-party beacon node RPC service, like [Quicknode](https://www.quicknode.com/docs/ethereum/eth-v1-beacon-genesis).
+*   自分のL1ビーコンノードを運用するか、[Quicknode](https://www.quicknode.com/docs/ethereum/eth-v1-beacon-genesis)のようなサードパーティのビーコンノードRPCサービスを使用してください。
 
 </Steps>
 
-## Configure a Blob Archiver (Archive Nodes)
+## Blobアーカイバー（アーカイブノード）の設定
 
-There is a configurable `beacon-archiver` that will allow nodes to sync blob data that is older than 18 days - after blobs are 18 days old, normal beacon nodes will  "prune" or remove them. If your node is already in sync with the head of the chain, you won't need to use a `beacon-archiver`.
+18日以上経過したBlobデータを同期するために、構成可能な`beacon-archiver`があります。18日を過ぎたBlobは通常のビーコンノードによって「プルーニング」または削除されます。チェーンのヘッドと同期している場合、`beacon-archiver`は必要ありません。
 
-*   If you're spinning up a new node, if you load it from a snapshot that's within 18 days (the amount of time until blobs are pruned) you will not need to use a `beacon-archiver`  at all as long as your node does not fall offline for more than 18 days.
-*   If you're running a new node that is syncing more than 18 days (the amount of time until blobs are pruned) after Ecotone launch, then you will need to configure a `beacon-archiver` on the `op-node`.
+*   新しいノードを立ち上げる場合、スナップショットから18日以内にロードする場合は、`beacon-archiver`は必要ありません。ノードが18日以上オフラインにならない限り。
+*   エコトーンのローンチ後18日以上経過してから同期する新しいノードを実行する場合、`op-node`で`beacon-archiver`を設定する必要があります。
 
 ```shell
 --l1.beacon-archiver value                                                      ($OP_NODE_L1_BEACON)
-          HTTP Endpoint of a Blob Archiver or an L1 Beacon-node that does not prune blobs 
+          BlobアーカイバーまたはBlobをプルーニングしないL1ビーコンノードのHTTPエンドポイント
 ```
 
-Choose one of the following options to access a beacon archiver endpoint:
+ビーコンアーカイバーエンドポイントにアクセスするためのオプションを選択します：
 
-*   **Option 1:** Run a beacon node with blobs pruning disabled. For example, you can run your own L1 beacon node like [Lighthouse](https://lighthouse-book.sigmaprime.io/run_a_node.html) and configure it to retain all blobs and use that endpoint here.
+*   **オプション1:** Blobのプルーニングを無効にしたビーコンノードを実行します。たとえば、[Lighthouse](https://lighthouse-book.sigmaprime.io/run_a_node.html)のように、自分のL1ビーコンノードを実行し、すべてのBlobを保持するように構成し、そのエンドポイントをここで使用します。
 
 ```shell
 # lighthouse
 --prune-blobs=false
 ```
 
-*   **Option 2:**  Run a `blob-archiver` and configure `op-node` to use the `blob-archiver` API service with `--l1.beacon-archiver`.
-    Running a `blob-archiver` is lighter weight than running a beacon node that does not prune blobs: [https://github.com/base-org/blob-archiver](https://github.com/base-org/blob-archiver). There is a configurable `beacon-archiver` that will allow nodes to sync blob data that is older than 18 days - after blobs are 18 days old, normal beacon nodes will  "prune" or remove them. If your node is already in sync with the head of the chain, you won't need to use a `beacon-archiver`.
-    *   If you're spinning up a new node, if you load it from a snapshot that's within 18 days (the amount of time until blobs are pruned) you will not need to use a `beacon-archiver`  at all as long as your node does not fall offline for more than 18 days.
-    *   If you're running a new node that is syncing more than 18 days (the amount of time until blobs are pruned) after Ecotone launch, then you will need to configure a `beacon-archiver` on the `op-node`.
+*   **オプション2:** `blob-archiver`を実行し、`op-node`を`blob-archiver` APIサービスを使用するように構成します。`blob-archiver`を実行することは、Blobをプルーニングしないビーコンノードを実行するよりも軽量です：[https://github.com/base-org/blob-archiver](https://github.com/base-org/blob-archiver)。構成可能な`beacon-archiver`があり、18日以上経過したBlobデータを同期することができます。18日以上経過したBlobは通常のビーコンノードによって「プルーニング」または削除されます。チェーンのヘッドと同期している場合、`beacon-archiver`は必要ありません。
+    *   新しいノードを立ち上げる場合、スナップショットから18日以内にロードする場合は、`beacon-archiver`は必要ありません。ノードが18日以上オフラインにならない限り。
+    *   エコトーンのローンチ後18日以上経過してから同期する新しいノードを実行する場合、`op-node`で`beacon-archiver`を設定する必要があります。
 
 ```shell
 --l1.beacon-archiver value                                                      ($OP_NODE_L1_BEACON)
-          HTTP Endpoint of a Blob Archiver or an L1 Beacon-node that does not prune blobs 
+          BlobアーカイバーまたはBlobをプルーニングしないL1ビーコンノードのHTTPエンドポイント
 ```
 
-*   **Option 3:** If you don't want to operate any Beacon infrastructure, you can use an external service that provides access to pruned Blobs.
-
+*   **オプション3:** ビーコンインフラストラクチャを運用したくない場合、プルーニングされたBlobにアクセスできる外部サービスを使用できます。

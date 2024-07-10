@@ -1,50 +1,47 @@
 ---
 title: Using Blobs
-lang: en-US
-description: Learn how to switch to using blobs for your chain.
+lang: ja-JP
+description: チェーンでBlobを使用する方法を学びます。
 ---
 
 import { Callout, Steps } from 'nextra/components'
 import { Tabs } from 'nextra/components'
 
-# Using Blobs
+# Blobの使用
 
-This guide walks you through how to switch to using blobs for your chain after Ecotone is activated.
+このガイドは、エコトーンがアクティベートされた後にチェーンでBlobを使用する方法を説明します。
 
 <Callout type="info">
-  This guide is intended for chains already upgraded to Ecotone. Please see the [Ecotone Upgrade Notice](/builders/notices/ecotone-changes) before continuing.
+  このガイドは、既にエコトーンにアップグレードされたチェーン向けです。続行する前に、[エコトーン変更のお知らせ](/builders/notices/ecotone-changes)をご覧ください。
 </Callout>
 
-## Switch to Using Blobs
+## Blobの使用に切り替える
 
 <Steps>
-  ### Determine Scalar Values for Using Blobs
+  ### Blobを使用するためのスカラー値を決定する
 
-  The first step to switching to submit data with Blobs is to calculate the
-  scalar values you wish to set for the formula to charge users fees.
-  To determine the scalar values to use for your chain, you can utilize this [fee parameter calculator](https://docs.google.com/spreadsheets/d/12VIiXHaVECG2RUunDSVJpn67IQp9NHFJqUsma2PndpE/edit)
-  to get a better estimate for scalar values on your chain. Input the average transaction per day your chain is processing, the types of transactions that occur on your chain, the [`OP_BATCHER_MAX_CHANNEL_DURATION`](https://docs.optimism.io/builders/chain-operators/management/configuration#setting-your--op_batcher_max_channel_duration) you have parameterized on your `op-batcher`, and the target margin you wish to charge users on top of your L1 costs. The following
-  information is tuned to a network like OP Mainnet.
-  For more details on fee scalar, see [Transaction Fees, Ecotone section](/stack/transactions/fees#ecotone).
+  Blobを使用してデータを送信するための最初のステップは、ユーザーに料金を請求するためのスカラー値を計算することです。
+  チェーンで使用するスカラー値を決定するには、この[料金パラメータ計算機](https://docs.google.com/spreadsheets/d/12VIiXHaVECG2RUunDSVJpn67IQp9NHFJqUsma2PndpE/edit)を利用して、チェーン上のスカラー値の見積もりを行います。入力するのは、チェーンが1日に処理する平均トランザクション数、チェーン上で発生するトランザクションの種類、`op-batcher`で設定された[`OP_BATCHER_MAX_CHANNEL_DURATION`](https://docs.optimism.io/builders/chain-operators/management/configuration#setting-your--op_batcher_max_channel_duration)、およびL1コストに対してユーザーに請求するターゲットマージンです。以下の情報はOP Mainnetのようなネットワークに調整されています。
+  料金スカラーの詳細については、[トランザクション料金、エコトーンセクション](/stack/transactions/fees#ecotone)を参照してください。
 
-  #### Adjust Fees to Change Margins
+  #### マージン変更のための料金調整
 
-  As a chain operator, you may want to scale your scalar values up or down either because the throughput of your chain has changed and you are either filling significantly more or less of blobs, or because you wish to simply increase your margin to cover operational expenses.
-  So, to increase or decrease your margin on L1 data costs, you would simply scale both the `l1baseFeeScalar` and the `l1blobBaseFeeScalar` by the same multiple.
+  チェーンオペレーターとして、チェーンのスループットが変化し、Blobを大幅に多くまたは少なく充填するため、または運用費用をカバーするためにマージンを単純に増加させたい場合には、スカラー値をスケールアップまたはダウンしたい場合があります。
+  L1データコストに対するマージンを増減させるには、`l1baseFeeScalar`および`l1blobBaseFeeScalar`の両方を同じ倍率でスケーリングするだけです。
 
-  For example, if you wished to increase your margin on L1 data costs by \~10%, you would do:
+  例えば、L1データコストのマージンを約10％増加させたい場合は、以下のようにします。
 
   ```
-  newBaseFeeScalar= prevBaseFeeScalar * 1.1
+  newBaseFeeScalar = prevBaseFeeScalar * 1.1
   newBlobBaseFeeScalar = prevBlobBaseFeeScalar * 1.1
   ```
 
-  ### Update Your Scalar Values for Blobs
+  ### Blobのスカラー値を更新する
 
-  Once you have determined your ideal `BaseFeeScalar` and `BlobBaseFeeScalar`, you will need to apply those values for your chain. The first step is to encode both values into a single value to be set in your L1 Config:
+  理想的な`BaseFeeScalar`および`BlobBaseFeeScalar`を決定したら、その値をチェーンに適用する必要があります。最初のステップは、両方の値を単一の値にエンコードし、L1設定に設定することです。
 
-  The [ecotone-scalar utility](https://github.com/ethereum-optimism/optimism/tree/develop/op-chain-ops/cmd/ecotone-scalar) converts a desired `BaseFeeScalar` and `BlobBaseFeeScalar` into a single value that can be provided to the L1 `SystemConfigProxy.setGasConfig` method through its "scalar" argument.
-  Here is an example of what you might see when using the utility:
+  [ecotone-scalarユーティリティ](https://github.com/ethereum-optimism/optimism/tree/develop/op-chain-ops/cmd/ecotone-scalar)は、望ましい`BaseFeeScalar`および`BlobBaseFeeScalar`をL1`SystemConfigProxy.setGasConfig`メソッドの「スカラー」引数に提供できる単一の値に変換します。
+  ユーティリティを使用する際に表示される例は次のとおりです。
 
   ```js
   ./bin/ecotone-scalar --scalar=1100 --blob-scalar=655000
@@ -55,22 +52,22 @@ This guide walks you through how to switch to using blobs for your chain after E
   452312848583266388373324160190187140051835877600158453279134000734489543756
   ```
 
-  You will get a value that looks something like: `0x0100000000000000000000000000000000000000000000000009fe980000044c`
-  Note that the `0x01` byte at the start indicates the version of the scalar, and the hex value at the end are the encoded scalars.
-  Depending on the tool used, you may have to input the uint representation or the hex version, but both Foundry's `cast` and Gnosis's Safe UI accept the hex value.
+  このような値が得られます: `0x0100000000000000000000000000000000000000000000000009fe980000044c`
+  最初の`0x01`バイトはスカラーのバージョンを示し、末尾の16進数値はエンコードされたスカラーです。
+  使用するツールによっては、uint表現を入力する必要がある場合や、16進数バージョンを入力する必要がある場合がありますが、Foundryの`cast`およびGnosisのSafe UIの両方が16進数値を受け入れます。
 
-  This value has to be set on Layer 1 by the `owner` of the `SystemConfigProxy` L1 Contract. Note that when calling `setGasConfig(uint256,uint256)`, the first parameter is a deprecated value that can just be set to `0` and the second parameter is where you will paste your encoded scalar value.
+  この値は、`SystemConfigProxy`のL1コントラクトの`owner`によってレイヤー1に設定される必要があります。`setGasConfig(uint256,uint256)`を呼び出す際、最初のパラメータは廃止された値であり、`0`に設定でき、2番目のパラメータにエンコードされたスカラー値を貼り付けます。
 
-  An exemplary way to create the calldata for your update transaction to the SystemConfigProxy is:
+  `SystemConfigProxy`への更新トランザクションのcalldataを作成するための例は次のとおりです。
 
   ```shell
-  cast calldata 'setGasConfig(uint256,uint256)' 0 0x0100000000000000000000000000000000000000000000000009fe980000044c`
+  cast calldata 'setGasConfig(uint256,uint256)' 0 0x0100000000000000000000000000000000000000000000000009fe980000044c
   ```
 
-  Check that the gas price oracle on L2 returns the expected values for `baseFeeScalar` and `blobBaseFeeScalar` (wait \~1 minute):
+  L2のガス価格オラクルが期待される`baseFeeScalar`および`blobBaseFeeScalar`の値を返すか確認します（約1分待ちます）：
 
   <Callout type="info">
-    This is checked on L2, so ensure you are using an RPC URL for your chain. You'll also need to provide a `gas-price` to geth when making this call.
+    これはL2で確認されるため、チェーンのRPC URLを使用していることを確認してください。この呼び出しを行う際には、gethに`gas-price`を提供する必要があります。
   </Callout>
 
   <Tabs items={['baseFeeScalar', 'blobBaseFeeScalar']}>
@@ -87,63 +84,55 @@ This guide walks you through how to switch to using blobs for your chain after E
     </Tabs.Tab>
   </Tabs>
 
-  ### Update Your Batcher to Post Blobs
+  ### バッチャーを更新してBlobを投稿する
 
-  Now that the fee config has been updated, you should immediately configure your batcher!
+  料金設定が更新されたので、すぐにバッチャーを構成する必要があります！
 
   <Callout type="warning">
-    Your chain may be undercharging users during the time between updating the scalar values and updating the Batcher, so aim to do this immediately after.
+    スカラー値の更新とバッチャーの更新の間の期間にユーザーに対する料金が不足する可能性があるため、この操作はすぐに行ってください。
   </Callout>
 
-  Steps to configure the batcher:
+  バッチャーを構成する手順：
 
-  *   Configure `OP_BATCHER_DATA_AVAILABILITY_TYPE=blobs`. The batcher will have to be restarted for it to take effect.
-  *   Ensure your `OP_BATCHER_MAX_CHANNEL_DURATION` is properly set to maximize your fee savings. For more info, see the [Chain Configuration](/builders/chain-operators/management/configuration#op-batcher-configuration) guide.
+  * `OP_BATCHER_DATA_AVAILABILITY_TYPE=blobs`を設定します。バッチャーを再起動する必要があります。
+  * `OP_BATCHER_MAX_CHANNEL_DURATION`が料金節約を最大化するように適切に設定されていることを確認します。詳細については、[チェーン設定](/builders/chain-operators/management/configuration#op-batcher-configuration)ガイドを参照してください。
 </Steps>
 
-## Switch Back to Using Calldata
+## Calldataの使用に切り替える
 
-As a chain operator, if the `blobBaseFee` is expensive enough and your chain is
-not processing enough transactions to meaningfully fill blobs within your
-configured batcher `OP_BATCHER_MAX_CHANNEL_DURATION`, you may wish to switch
-back to posting data to calldata. Utilize the [fee parameter calculator](https://docs.google.com/spreadsheets/d/12VIiXHaVECG2RUunDSVJpn67IQp9NHFJqUsma2PndpE/edit) to inform whether your transactions will be cheaper if submitting blobs or if submitting calldata. Chains can follow these steps to switch from
-blobs back to using calldata.
+チェーンオペレーターとして、`blobBaseFee`が非常に高く、設定されたバッチャーの`OP_BATCHER_MAX_CHANNEL_DURATION`内に十分にBlobを埋めるトランザクションを処理していない場合は、データをcalldataに戻すことを検討するかもしれません。[料金パラメータ計算機](https://docs.google.com/spreadsheets/d/12VIiXHaVECG2RUunDSVJpn67IQp9NHFJqUsma2PndpE/edit)を利用して、トランザクションをBlobで送信するか、calldataで送信するかが安価になるかどうかを確認してください。チェーンは以下の手順に従ってBlobからcalldataの使用に戻すことができます。
 
 <Steps>
-  ### Determine Your Scalar Values for Using Calldata
+  ### Calldataを使用するためのスカラー値を決定する
 
-  If you are using calldata, then you can set your `BaseFeeScalar` similarly to
-  how you would have set "scalar" prior to Ecotone, though with a 5-10% bump to
-  compensate for the removal of the "overhead" component.
-  You can utilize this [fee parameter calculator](https://docs.google.com/spreadsheets/d/12VIiXHaVECG2RUunDSVJpn67IQp9NHFJqUsma2PndpE/edit)
-  to get a better estimate for scalar values on your chain. The following
-  information is tuned to a network like OP Mainnet.
+  calldataを使用する場合、エコトーン以前に「スカラー」を設定していた方法と同様に`BaseFeeScalar`を設定できますが、「オーバーヘッド」コンポーネントが削除されたため、5〜10％のバンプを追加する必要があります。
+  この[料金パラメータ計算機](https://docs.google.com/spreadsheets/d/12VIiXHaVECG2RUunDSVJpn67IQp9NHFJqUsma2PndpE/edit)を利用して、チェーン上のスカラー値の見積もりを行います。以下の情報はOP Mainnetのようなネットワークに調整されています。
 
-  Chains can update their fees to increase or decrease their margin. If using calldata, then `BaseFeeScalar` should be scaled to achieve the desired margin.
-  For example, to increase your L1 Fee margin by 10%:
+  チェーンは料金を更新してマージンを増減することができます。calldataを使用する場合、`BaseFeeScalar`をスケールして望ましいマージンを達成します。
+  例えば、L1料金のマージンを10％増やす場合：
 
   ```
   BaseFeeScalar = BaseFeeScalar * 1.1
   BlobBaseFeeScalar = 0
   ```
 
-  ### Update Your Scalar Values for Using Calldata
+  ### Calldataを使用するためのスカラー値を更新する
 
-  To set your scalar values, follow the same process as laid out in [Update your Scalar values for Blobs](#update-your-scalar-values-for-blobs).
+  スカラー値を設定するには、[Blobのスカラー値を更新する](#update-your-scalar-values-for-blobs)で説明されている手順に従います。
 
-  ### Update Your Batcher to Post Calldata
+  ### バッチャーを更新してCalldataを投稿する
 
-  Now that the fee config has been updated, you will want to immediately configure your batcher.
+  料金設定が更新されたので、すぐにバッチャーを構成する必要があります。
 
   <Callout>
-    Reminder, that your chain may be undercharging users during the time between updating the scalar values and updating the Batcher, so aim to do this immediately after.
+    スカラー値の更新とバッチャーの更新の間の期間にユーザーに対する料金が不足する可能性があるため、この操作はすぐに行ってください。
   </Callout>
 
-  *   Configure `OP_BATCHER_DATA_AVAILABILITY_TYPE=calldata`. The batcher will have to be restarted for it to take effect.
-  *   Ensure your `OP_BATCHER_MAX_CHANNEL_DURATION` is properly set to maximize savings. **NOTE:** While setting a high value here will lower costs, it will be less meaningful than for low throughput chains using blobs. See [Chain Operator Configuration](/builders/chain-operators/management/configuration#op-batcher-configuration) for more details.
+  * `OP_BATCHER_DATA_AVAILABILITY_TYPE=calldata`を設定します。バッチャーを再起動する必要があります。
+  * `OP_BATCHER_MAX_CHANNEL_DURATION`が節約を最大化するように適切に設定されていることを確認してください。**注意:** 高い値を設定するとコストが削減されますが、Blobを使用する低スループットチェーンほど意味がないかもしれません。[チェーンオペレーターの設定](/builders/chain-operators/management/configuration#op-batcher-configuration)を参照してください。
 </Steps>
 
-## Other Considerations
+## その他の考慮事項
 
-*   For general information on Ecotone changes, visit the [Ecotone notice page](/builders/notices/ecotone-changes).
-*   If you want to enable archive nodes, you will need to access a blob archiver service. You can use [Optimism's](/builders/node-operators/management/snapshots#op-mainnet-archive-node) or [run your own](/builders/chain-operators/tools/explorer#create-an-archive-node).
+* エコトーンの変更に関する一般情報については、[エコトーンのお知らせページ](/builders/notices/ecotone-changes)をご覧ください。
+* アーカイブノードを有効にしたい場合、Blobアーカイバサービスにアクセスする必要があります。[Optimismのサービスを利用する](/builders/node-operators/management/snapshots#op-mainnet-archive-node)か、[自分で実行する](/builders/chain-operators/tools/explorer#create-an-archive-node)ことができます。

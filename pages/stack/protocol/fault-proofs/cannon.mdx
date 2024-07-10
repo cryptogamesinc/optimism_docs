@@ -146,29 +146,51 @@ PageはメモリバイナリMerkleツリーの最下層を表します。`page.g
 `out = keccak256(left ++ right)`、ここで`++`は連結を意味し、
 `left` `right`はそれぞれのサブツリーの32バイトの出力またはリーフ値自体です。個々のリーフノードはハッシュ化されません。
 
-In both `memory.go` and `page.go`, there are a few optimizations designed to reduce the computationally expensive Merkle root calculations.
-One such optimization is that the Merkle root of zeroed-out regions of memory are calculated for each depth. This means the tree is efficiently allocated,
-since the root of fully zeroed subtrees can be computed without actually creating the full-subtree:
-`zero_hash[d] = hash(zero_hash[d-1], zero_hash[d-1])`, until the base-case of `zero_hash[0] == bytes32(0)`.
-So, pre-calculating zeroed Merkle roots initially allows unused memory regions to be cached. Additionally, non-zero Merkle roots
-are cached in both `memory.go` and `page.go`, and used so long as the memory region the Merkle root covers has not been written to.
-Otherwise, the cache is invalidated, which requires the Merkle root to be calculated over its entire subtree. Another optimization
-specifically in `memory.go` is caching the last two pages that have been used. Two pages are cached because the `mipsevm` uses up
-to two memory addresses per instruction: one address is the `PC`, which contains the instruction to run, and the other address may be the
-target of a load or store instruction.
+`memory.go`と`page.go`の両方には、計算コストの高いMerkleルート計算を削減するためのいくつかの最適化が施されています。
+その一つの最適化は、メモリのゼロクリアされた領域のMerkleルートを各深さで計算することです。
+これにより、完全なサブツリーを作成せずにゼロクリアされたサブツリーのルートを計算できるため、ツリーが効率的に割り当てられます：
+`zero_hash[d] = hash(zero_hash[d-1], zero_hash[d-1])`、ベースケースの`zero_hash[0] == bytes32(0)`まで。
+したがって、ゼロクリアされたMerkleルートを事前に計算することで、未使用のメモリ領域をキャッシュすることができます。
+さらに、非ゼロのMerkleルートも`memory.go`と`page.go`の両方でキャッシュされ、
+Merkleルートがカバーするメモリ領域が書き込まれていない限り使用されます。
+そうでない場合、キャッシュは無効化され、Merkleルートはその全サブツリーに対して再計算される必要があります。
+特に`memory.go`でのもう一つの最適化は、最後に使用された2つのページをキャッシュすることです。
+2つのページがキャッシュされるのは、`mipsevm`が命令ごとに最大2つのメモリアドレスを使用するためです：1つのアドレスは実行する命令を含む`PC`であり、
+もう1つのアドレスはロードまたはストア命令のターゲットとなる可能性があります。
 
-Another important implementation detail is that the endianness of the `mipsevm`, which is the ordering of bytes in a word, is Big-Endian.
-The assumption of Cannon is that it is operating on a Little-Endian machine, and as such all reads / writes have the endianness swapped
-so that the internal `mipsevm` always handles Big-Endian words and the machine running Cannon always handles Little-Endian words.
-Endianness is also an important factor for the onchain `MIPS.sol`, where the EVM itself is Big-Endian. Therefore, `MIPS.sol` does not have to
-do any endianness swapping and can assume all data uses Big-Endian ordering. This reduces complexity within the smart contract itself.
+#### 解説
+- ゼロクリアされた領域のMerkleルート計算
+- 非ゼロのMerkleルートのキャッシュ
+- 最後に使用された2つのページのキャッシュ
 
-The last major component is located in [`state.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/state.go).
-The `State` struct in `state.go` holds all the execution state that is required for the `mipsevm`.
-The information stored is largely identical to the [VM execution state](mips#packed-vm-execution-state) for `MIPS.sol`. The key differences are:
+もう一つの重要な実装の詳細は、`mipsevm`のエンディアンネス（ワード内のバイトの順序）がビッグエンディアンであることです。
+Cannonはリトルエンディアンマシン上で動作していると仮定しているため、すべての読み書き操作でエンディアンネスが入れ替わります。
+これにより、内部の`mipsevm`は常にビッグエンディアンのワードを処理し、Cannonを実行しているマシンは常にリトルエンディアンのワードを処理します。
+エンディアンネスはオンチェーンの`MIPS.sol`にとっても重要な要素であり、EVM自体がビッグエンディアンです。
+したがって、`MIPS.sol`はエンディアンネスの入れ替えを行う必要がなく、すべてのデータがビッグエンディアンの順序を使用すると仮定できます。
+これにより、スマートコントラクト自体の複雑さが軽減されます。
 
-*   Instead of storing just the memory Merkle root, there is a `Memory` Struct pointer for the binary Merkle tree representation of the entire 32-bit memory space.
-*   There is an optional `LastHint` bytes variable, which can be used to communicate a Pre-image hint to avoid having to load in multiple prior Pre-images.
+#### エンディアンネスとは
+エンディアンネス（Endianness）は、コンピュータシステムがメモリにデータを格納する際のバイト順序を指します。主に以下の2種類があります：
+
+1. **ビッグエンディアン（Big-Endian）**:
+   - 最上位バイト（最も重要なバイト）がメモリの最小アドレスに格納されます。
+   - 例: 16進数の値`0x12345678`は、メモリに`12 34 56 78`の順で格納されます。
+
+2. **リトルエンディアン（Little-Endian）**:
+   - 最下位バイト（最も重要でないバイト）がメモリの最小アドレスに格納されます。
+   - 例: 16進数の値`0x12345678`は、メモリに`78 56 34 12`の順で格納されます。
+
+エンディアンネスは、異なるシステム間でデータをやり取りする際に重要な要素となります。エンディアンネスが異なるシステム間でデータを正しく解釈するためには、エンディアンネスの変換が必要です。
+
+最後の主要なコンポーネントは[`state.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/state.go)にあります。
+`state.go`の`State`構造体は、`mipsevm`に必要なすべての実行状態を保持します。
+保存される情報は、`MIPS.sol`の[VM実行状態](mips#packed-vm-execution-state)とほぼ同じです。主な違いは次のとおりです：
+
+* メモリのMerkleルートだけでなく、32ビットメモリ空間全体のバイナリMerkleツリーを表す`Memory`構造体のポインタが含まれています。
+* オプションの`LastHint`バイト変数があり、複数の事前イメージをロードする必要を避けるために事前イメージのヒントを伝えるために使用できます。
+
+
 
 #### Generating the Witness Proof
 
