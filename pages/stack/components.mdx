@@ -1,111 +1,111 @@
 ---
-title: OP Stack Components
-lang: en-US
-description: Learn about OP Stack components including the different layers and modules available for development.
+title: OP Stackのコンポーネント
+lang: ja-JP
+description: OP Stackのコンポーネントについて、異なるレイヤーと開発に利用できるモジュールを学びましょう。
 ---
 
 import { Callout } from 'nextra/components'
 
-# OP Stack Components
+# OP Stackのコンポーネント
 
-**The OP Stack is a common development stack for building L2 blockchain ecosystems, built by the Optimism Collective to power Optimism.**
+**OP Stackは、Optimismを支えるためにOptimism Collectiveによって構築されたL2ブロックチェーンエコシステムを構築するための共通開発スタックです。**
 
-The OP Stack is best thought of as a collection of software components maintained by the Optimism Collective that either help to define new layers of the stack or fit in as modules within the stack.
+OP Stackは、新しいレイヤーを定義するのに役立つ、またはスタック内のモジュールとして機能するソフトウェアコンポーネントのコレクションと考えるのが最適です。
 
-Because the OP Stack is a work in progress, the different layers and modules are still evolving.
-This page sketches out the different conceptual layers of the stack as they exist today and introduces some of the modules that fit into those layers.
-This doesn't include all of the modules or layers that may exist in the future, but it gives a good overview of the major OP Stack components.
+OP Stackは進行中の作業であるため、異なるレイヤーとモジュールはまだ進化中です。
+このページでは、今日存在するスタックの異なる概念的なレイヤーの概要を示し、これらのレイヤーにフィットするいくつかのモジュールを紹介します。
+これは、将来存在する可能性のあるすべてのモジュールやレイヤーを含むものではありませんが、主要なOP Stackコンポーネントの概要を提供します。
 
 <Callout type="warning">
-  Please note that not all of the modules described on this page already exist in a production state — these are explicitly marked as either "**in development**"or "**proposed**."
+  このページで説明されているモジュールのすべてがまだプロダクション状態で存在しているわけではないことに注意してください。これらは明示的に「**開発中**」または「**提案中**」とマークされています。
 </Callout>
 
-## Major Components
+## 主要なコンポーネント
 
-![The OP Stack components.](/img/op-stack/protocol/components.png)
+![OP Stackのコンポーネント。](/img/op-stack/protocol/components.png)
 
-## Layers
+## レイヤー
 
-### Data Availability
+### データアベイラビリティ
 
-The Data Availability Layer defines where the raw inputs to an OP Stack based chain are published. An OP Stack chain can use one or more Data Availability module to source its input data. Because an OP Stack chain is derived from the Data Availability Layer, the Data Availability module(s) used have a significant impact on the security model of a system. For example, if a certain piece of data can no longer be retrieved from the Data Availability Layer, it may not be possible to sync the chain.
+データアベイラビリティレイヤーは、OP Stackベースのチェーンの生データが公開される場所を定義します。OP Stackチェーンは、入力データを取得するために1つ以上のデータアベイラビリティモジュールを使用できます。OP Stackチェーンはデータアベイラビリティレイヤーから派生しているため、使用されるデータアベイラビリティモジュールはシステムのセキュリティモデルに大きな影響を与えます。例えば、特定のデータがデータアベイラビリティレイヤーから取得できなくなると、チェーンを同期できなくなる可能性があります。
 
 #### Ethereum DA
 
-Ethereum DA is currently the most widely used Data Availability module for the OP Stack. When using the Ethereum DA module, source data can be derived from any piece of information accessible on the Ethereum blockchain. This includes Ethereum calldata, events, and 4844 data blobs.
+Ethereum DAは現在、OP Stackで最も広く使用されているデータアベイラビリティモジュールです。Ethereum DAモジュールを使用する場合、ソースデータはEthereumブロックチェーン上でアクセス可能な任意の情報から取得できます。これには、Ethereum calldata、イベント、および4844データブロブが含まれます。
 
-*   [Specifications](https://specs.optimism.io/protocol/derivation.html#batch-submission-wire-format)
-*   [Source code](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-batcher)
+*   [仕様](https://specs.optimism.io/protocol/derivation.html#batch-submission-wire-format)
+*   [ソースコード](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-batcher)
 
-### Sequencing
+### シーケンシング
 
-The Sequencing Layer determines how user transactions on an OP Stack chain are collected and published to the Data Availability Layer module(s) in use. In the default Rollup configuration of the OP Stack, Sequencing is typically handled by a single dedicated Sequencer. Rules defined in the Derivation Layer generally restrict the Sequencer's ability to withhold transactions for more than a specific period of time. In the proposed future, Sequencing will be modular such that chains can easily select and change the mechanism that controls their current Sequencer.
+シーケンシングレイヤーは、OP Stackチェーン上のユーザートランザクションがどのように収集され、使用中のデータアベイラビリティレイヤーモジュールに公開されるかを決定します。OP Stackのデフォルトのロールアップ構成では、シーケンシングは通常、専用のシーケンサーによって処理されます。導出レイヤーで定義されたルールは、シーケンサーがトランザクションを特定の期間以上保持する能力を制限します。将来的には、シーケンシングがモジュラー化され、チェーンが現在のシーケンサーを制御するメカニズムを簡単に選択および変更できるようになることが提案されています。
 
-#### Single Sequencer
+#### シングルシーケンサー
 
-The default Sequencer module for the OP Stack is the Single Sequencer module in which a dedicated actor is given the ability to act as the Sequencer. The Single Sequencer module allows a governance mechanism to determine who may act as the Sequencer at any given time.
+OP Stackのデフォルトのシーケンサーモジュールは、専用のアクターがシーケンサーとして機能する能力を与えられるシングルシーケンサーモジュールです。シングルシーケンサーモジュールでは、ガバナンスメカニズムが特定の時点で誰がシーケンサーとして機能するかを決定することができます。
 
-#### Multiple Sequencer (proposed)
+#### マルチプルシーケンサー（提案中）
 
-A simple modification to the Single Sequencer module is the Multiple Sequencer module in which the Sequencer at any given time is selected from a pre-defined set of possible actors. Individual OP Stack based chains would be able to determine the exact mechanism that defines the set of possible Sequencers and the mechanism that selects a Sequencer from the set.
+シングルシーケンサーモジュールの単純な修正は、特定の時点でシーケンサーが事前定義された可能なアクターのセットから選択されるマルチプルシーケンサーモジュールです。個々のOP Stackベースのチェーンは、可能なシーケンサーのセットを定義するメカニズムとセットからシーケンサーを選択するメカニズムを正確に決定することができます。
 
-### Derivation
+### 導出
 
-The Derivation Layer defines how the raw data in the Data Availability Layer is processed to form the processed inputs that are sent to the Execution Layer via the standard [Ethereum Engine API](https://github.com/ethereum/execution-apis/blob/94164851c1630ff0a9c31d8d7d3d4fb886e196c0/src/engine/README.md). The Derivation Layer may also use the current system state, as defined by the Execution Layer, to inform the parsing of raw input data. The Derivation Layer can be modified to derive Engine API inputs from many different data sources. The Derivation Layer is typically tied closely to the Data Availability Layer because it must understand how to parse any raw input data.
+導出レイヤーは、データアベイラビリティレイヤーの生データが処理され、標準の[Ethereum Engine API](https://github.com/ethereum/execution-apis/blob/94164851c1630ff0a9c31d8d7d3d4fb886e196c0/src/engine/README.md)を介して実行レイヤーに送信される処理済み入力が形成される方法を定義します。導出レイヤーは、実行レイヤーによって定義された現在のシステム状態を使用して、生データの解析を支援することもあります。導出レイヤーは、さまざまなデータソースからEngine API入力を導出するように変更できます。導出レイヤーは通常、任意の生データを解析する方法を理解する必要があるため、データアベイラビリティレイヤーと密接に関連しています。
 
-#### Rollup
+#### ロールアップ
 
-The Rollup module derives Engine API inputs from Ethereum block data, Sequencer transaction batches, Deposited transaction events, and more.
+ロールアップモジュールは、Ethereumブロックデータ、シーケンサートランザクションバッチ、預託トランザクションイベントなどからEngine API入力を導出します。
 
-*   [Specifications](https://specs.optimism.io/protocol/derivation.html#l2-chain-derivation-pipeline)
-*   [Source code](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-node)
+*   [仕様](https://specs.optimism.io/protocol/derivation.html#l2-chain-derivation-pipeline)
+*   [ソースコード](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-node)
 
-#### Indexer (proposed)
+#### インデクサー（提案中）
 
-The Indexer module is a proposed Derivation Layer module that would derive Engine API inputs when transactions are sent to, events are emitted by, or storage is modified in specific smart contracts on a Data Availability Layer module like Ethereum DA.
+インデクサーモジュールは、トランザクションが送信され、イベントが発生し、特定のスマートコントラクトでストレージが変更されたときにEngine API入力を導出する提案された導出レイヤーモジュールです。
 
-### Execution
+### 実行
 
-The Execution Layer defines the structure of state within an OP Stack system and defines the state transition function that mutates this state. State transitions are triggered when inputs are received from the Derivation Layer via the Engine API. The Execution Layer abstraction opens up the door to EVM modifications or different underlying VMs entirely.
+実行レイヤーは、OP Stackシステム内の状態の構造を定義し、この状態を変更する状態遷移関数を定義します。状態遷移は、Engine APIを介して導出レイヤーから入力が受信されるとトリガーされます。実行レイヤーの抽象化により、EVMの変更や完全に異なる基盤のVMが可能になります。
 
 #### EVM
 
-The EVM is an Execution Layer module that uses the same state representation and state transition function as the Ethereum Virtual Machine. The EVM module in the Ethereum Rollup configuration of the OP Stack is a [lightly modified](https://op-geth.optimism.io/) version of the EVM that adds support for L2 transactions initiated on Ethereum and adds an extra L1 Data Fee to each transaction to account for the cost of publishing transactions to Ethereum.
+EVMは、Ethereum Virtual Machineと同じ状態表現と状態遷移関数を使用する実行レイヤーモジュールです。OP StackのEthereum Rollup構成におけるEVMモジュールは、Ethereumで開始されたL2トランザクションのサポートを追加し、トランザクションをEthereumに公開するコストを考慮した追加のL1データ手数料を各トランザクションに追加する[軽く修正された](https://op-geth.optimism.io/)バージョンのEVMです。
 
-*   [Specifications](https://specs.optimism.io/protocol/exec-engine.html) (where it differs from [geth](https://geth.ethereum.org/))
-*   [Source code](https://github.com/ethereum-optimism/op-geth/tree/09ade3df6d1d3a4f8f308553825348be132bc960)
+*   [仕様](https://specs.optimism.io/protocol/exec-engine.html)（[geth](https://geth.ethereum.org/)との相違点）
+*   [ソースコード](https://github.com/ethereum-optimism/op-geth/tree/09ade3df6d1d3a4f8f308553825348be132bc960)
 
-### Settlement Layer
+### セトルメントレイヤー
 
-The Settlement Layer is a mechanism on external blockchains that establish a **view** of the state of an OP Stack chain on those external chains (including other OP Stack chains). For each OP Stack chain, there may be one or more Settlement mechanisms on one or more external chains. Settlement Layer mechanisms are **read-only** and allow parties external to the blockchain to make decisions based on the state of an OP Stack chain.
+セトルメントレイヤーは、OP Stackチェーンの状態の**ビュー**を他の外部チェーン（他のOP Stackチェーンを含む）に確立するためのメカニズムです。各OP Stackチェーンには、1つ以上の外部チェーンに1つ以上のセトルメントメカニズムが存在する場合があります。セトルメントレイヤーメカニズムは**読み取り専用**であり、ブロックチェーン外部の関係者がOP Stackチェーンの状態に基づいて意思決定を行うことを可能にします。
 
-The term "Settlement Layer" has its origins in the fact that Settlement Layer mechanisms are often used to handle withdrawals of ETH and tokens out of a blockchain. This sort of withdrawal system first involves proving the state of the target blockchain to some third-party chain and then processing a withdrawal based on that state. The Settlement Layer, at its core, simply allows a third-party chain to become aware of the state of the target chain.
+「セトルメントレイヤー」という用語は、セトルメントレイヤーメカニズムがしばしばETHやトークンのブロックチェーンからの引き出しを処理するために使用されることに由来します。このような引き出しシステムは、まずターゲットブロックチェーンの状態を第三者のチェーンに証明し、その状態に基づいて引き出しを処理することから始まります。セトルメントレイヤーは、第三者のチェーンがターゲットチェーンの状態を認識できるようにするだけです。
 
-Once a transaction is published and finalized on the corresponding Data Availability layer, the transaction is also finalized on the OP Stack chain. Short of breaking the underlying Data Availability layer, it can no longer be modified or removed. It may not be accepted by the Settlement Layer yet because the Settlement Layer needs to be able to verify transaction *results*, but the transaction itself is already immutable.
+トランザクションが対応するデータアベイラビリティレイヤーに公開および確定されると、そのトランザクションもOP Stackチェーンで確定されます。基盤となるデータアベイラビリティレイヤーを破らない限り、それはもはや変更または削除することはできません。セトルメントレイヤーがトランザクション*結果*を検証できるようになるまで、まだ受け入れられていない場合がありますが、トランザクション自体はすでに不変です。
 
-#### Attestation-based Fault Proof
+#### アテステーションベースのフォールトプルーフ
 
-An Attestation-based Fault Proof mechanism uses an optimistic protocol to establish a view of an OP Stack chain. In optimistic settlement mechanisms generally, **Proposer** entities can propose what they believe to be the current valid state of the OP Stack chain. If these proposals are not invalidated within a certain period of time (the "challenge period"), then the proposals are assumed by the mechanism to be correct. In the Attestation Proof mechanism in particular, a proposal can be invalidated if some threshold of pre-defined parties provide attestations to a valid state that is different than the state in the proposal. This places a trust assumption on the honesty of at least a threshold number of the pre-defined participants.
+アテステーションベースのフォールトプルーフメカニズムは、OP Stackチェーンのビューを確立するためにオプティミスティックプロトコルを使用します。一般的に、オプティミスティックセトルメントメカニズムでは、**プロポーザー**エンティティがOP Stackチェーンの現在の有効な状態であると信じるものを提案できます。これらの提案が特定の期間内（「チャレンジ期間」）に無効化されない場合、メカニズムはそれらの提案が正しいと見なします。特にアテステーションプルーフメカニズムでは、提案と異なる有効な状態を提供する証明が一定の閾値に達した場合、提案が無効化される可能性があります。これは、事前定義された参加者の少なくとも閾値数の正直さに対する信頼仮定を置きます。
 
-*   [Specifications](https://specs.optimism.io/protocol/withdrawals.html) (called [withdrawal transactions](/builders/app-developers/bridging/messaging))
-*   [Source code](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/packages/contracts-bedrock/src)
+*   [仕様](https://specs.optimism.io/protocol/withdrawals.html)（[withdrawal transactions](/builders/app-developers/bridging/messaging)として呼ばれる）
+*   [ソースコード](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/packages/contracts-bedrock/src)
 
-#### Fault Proof Optimistic Settlement (proposed)
+#### フォールトプルーフオプティミスティックセトルメント（提案中）
 
-A Fault Proof Optimistic Settlement mechanism is mostly identical to the Attestation-based Fault Proof mechanism used today but it replaces the MultiSig challenger with a permissionless fault proving process. A correctly constructed fault proof should be able to invalidate any incorrect proposals during the allocated challenge period. This places a trust assumption on the correctness of the fault proof construction. At this time, work on the development of a Fault Proof  mechanism is well underway.
+フォールトプルーフオプティミスティックセトルメントメカニズムは、現在使用されているアテステーションベースのフォールトプルーフメカニズムとほぼ同一ですが、マルチシグチャレンジャーを許可なしのフォールトプルーフプロセスに置き換えます。正しく構築されたフォールトプルーフは、割り当てられたチャレンジ期間内に不正な提案を無効にできるはずです。これは、フォールトプルーフの構築の正確性に対する信頼仮定を置きます。現在、フォールトプルーフメカニズムの開発が進行中です。
 
-#### Validity Proof Settlement (proposed)
+#### バリディティプルーフセトルメント（提案中）
 
-A Validity Proof Settlement mechanism uses a mathematical proof to attest to the correctness of a proposed view. A proposed state will not be accepted without a valid proof. This places a trust assumption on the correctness of the validity proof construction.
+バリディティプルーフセトルメントメカニズムは、提案されたビューの正確性を証明するために数学的証明を使用します。バリッドな証明がなければ、提案された状態は受け入れられません。これは、バリディティプルーフの構築の正確性に対する信頼仮定を置きます。
 
-### Governance
+### ガバナンス
 
-The Governance Layer refers to the general set of tools and processes used to manage system configuration, upgrades, and design decisions. This is a relatively abstract layer that can contain a wide range of mechanisms on a target OP Stack chain and on third-party chains that impact many of the other layers of the OP Stack.
+ガバナンスレイヤーは、システムの設定、アップグレード、および設計決定を管理するために使用される一般的なツールおよびプロセスを指します。これは比較的抽象的なレイヤーであり、ターゲットOP StackチェーンおよびOP Stackの他の多くのレイヤーに影響を与えるサードパーティチェーンにさまざまなメカニズムを含むことができます。
 
-#### MultiSig Contracts
+#### マルチシグコントラクト
 
-MultiSig Contracts are smart contracts that carry out actions when they receive a threshold of signatures from some pre-defined set of participants. These are often used to manage upgrades of components of an OP Stack based system. Currently, this is the mechanism used to manage upgrades of the bridge contracts on OP Mainnet. The security of a MultiSig Contract system depends on many different factors, including the number of participants, the threshold, and the safety procedures of each individual participant.
+マルチシグコントラクトは、事前定義された参加者の署名が閾値に達したときにアクションを実行するスマートコントラクトです。これらは、OP Stackベースのシステムのコンポーネントのアップグレードを管理するためによく使用されます。現在、これはOP Mainnetのブリッジコントラクトのアップグレードを管理するために使用されるメカニズムです。マルチシグコントラクトシステムのセキュリティは、多くの異なる要因に依存します。これには、参加者の数、閾値、および各参加者の安全手順が含まれます。
 
-#### Governance Tokens
+#### ガバナンストークン
 
-Governance Tokens are widely used to decentralize decision making. Although the exact functionality of a Governance Token varies on a case-by-case basis, the most common mechanisms allow token holders to vote on some subset of decisions that a project must make. Voting can either be carried out directly or via delegation.
+ガバナンストークンは、意思決定を分散化するために広く使用されています。ガバナンストークンの正確な機能はケースバイケースで異なりますが、最も一般的なメカニズムは、トークン保有者がプロジェクトが行うべき意思決定の一部に投票できるようにすることです。投票は直接行うことも、委任を通じて行うこともできます。
