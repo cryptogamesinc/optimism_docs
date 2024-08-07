@@ -1,39 +1,39 @@
 ---
-title: Pausing the Bridge
-lang: en-US
-description: Learn how the OP Stack bridge can be paused as backup safety mechanism.
+title: ブリッジの一時停止
+lang: ja-JP
+description: OP Stackブリッジをバックアップ安全機構として一時停止する方法を学びます。
 ---
 
-# Pausing the Bridge
+# ブリッジの一時停止
 
-The [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/OptimismPortal.sol) is the low-level L1 message passing contract present on all standard OP Stack chains.
-This contract handles the L1 side of the communication channel between an OP Stack chain and its L1 parent chain.
+[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/OptimismPortal.sol)は、すべての標準OP Stackチェーンに存在する低レベルのL1メッセージ伝達コントラクトです。
+このコントラクトは、OP StackチェーンとそのL1親チェーンとの間の通信チャネルのL1側を処理します。
 
-As a safety mechanism, the `OptimismPortal` contract can be configured to be pausable by a specific `GUARDIAN` address.
-When paused, the `OptimismPortal` contract will prevent L2-to-L1 transactions from being executed.
-This is a backup safety mechanism that can be used to help mitigate potential active security concerns.
+安全機構として、`OptimismPortal`コントラクトは特定の`GUARDIAN`アドレスによって一時停止可能に構成できます。
+一時停止中は、`OptimismPortal`コントラクトはL2からL1へのトランザクションの実行を防ぎます。
+これは、潜在的なアクティブなセキュリティ問題を軽減するために使用できるバックアップ安全機構です。
 
-Pause functionality and [two-step withdrawals](https://web.archive.org/web/20230608050641/https://blog.oplabs.co/two-step-withdrawals/) were introduced to the OP Stack to mitigate the risk of withdrawal bugs that have led to exploits in other bridging systems.
+一時停止機能と[二段階撤退](https://web.archive.org/web/20230608050641/https://blog.oplabs.co/two-step-withdrawals/)は、他のブリッジシステムでのエクスプロイトにつながった撤退バグのリスクを軽減するために、OP Stackに導入されました。
 
-## Pause Functionality
+## 一時停止機能
 
-The `OptimismPortal` can be configured to allow a `GUARDIAN` address to pause and unpause L2-to-L1 transactions from being executed.
-L2-to-L1 transactions allow users and smart contracts on the OP Stack chain to send messages to the L1 parent chain.
-Pause functionality allows a `GUARDIAN` to halt L2-to-L1 transaction execution for the OP Stack chain in question.
-L1-to-L2 tranasctions are not affected by pause functionality.
+`OptimismPortal`は、`GUARDIAN`アドレスがL2からL1へのトランザクションの実行を一時停止および再開できるように構成できます。
+L2からL1へのトランザクションは、OP Stackチェーン上のユーザーやスマートコントラクトがL1親チェーンにメッセージを送信できるようにします。
+一時停止機能により、`GUARDIAN`は該当するOP StackチェーンのL2からL1へのトランザクションの実行を停止することができます。
+L1からL2へのトランザクションは一時停止機能の影響を受けません。
 
-Pauses by the `GUARDIAN` impact all L2-to-L1 transactions for the OP Stack chain in question and cannot be targeted to specific users, smart contracts, or transactions.
-Pauses are designed to be a backup safety mechanism and are expected to be used only in the event of an active pressing security concern.
+`GUARDIAN`による一時停止は、該当するOP StackチェーンのすべてのL2からL1へのトランザクションに影響し、特定のユーザー、スマートコントラクト、またはトランザクションに対してターゲットを絞ることはできません。
+一時停止はバックアップ安全機構として設計されており、緊急のセキュリティ問題が発生した場合にのみ使用されることが予想されます。
 
-## Pause and Unpause Functions
+## 一時停止と再開の関数
 
-The `GUARDIAN` can pause and unpause L2-to-L1 transactions at any time by calling the [`pause`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L151-L156) and [`unpause`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L158-L163) functions on the `OptimismPortal` contract.
-Additional controls on the `GUARDIAN` address can be implemented by configuring the `GUARDIAN` as a smart contract.
+`GUARDIAN`は、[`pause`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L151-L156)および[`unpause`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L158-L163)関数を`OptimismPortal`コントラクトで呼び出すことにより、いつでもL2からL1へのトランザクションを一時停止および再開できます。
+`GUARDIAN`アドレスに追加の制御を実装するには、`GUARDIAN`をスマートコントラクトとして構成することができます。
 
-## Guardian Address
+## ガーディアンアドレス
 
-The `GUARDIAN` address is initially configured when the OP Stack chain is deployed and can be modified by the network's administrative address or smart contract.
-A chain can choose to remove the `GUARDIAN` role by configuring the `GUARDIAN` to be an inaccessible address such as the [zero address](https://etherscan.io/address/0x0000000000000000000000000000000000000000).
+`GUARDIAN`アドレスは、OP Stackチェーンがデプロイされたときに初期設定され、ネットワークの管理アドレスまたはスマートコントラクトによって変更できます。
+チェーンは、[ゼロアドレス](https://etherscan.io/address/0x0000000000000000000000000000000000000000)などのアクセス不能なアドレスに`GUARDIAN`を設定することで、`GUARDIAN`ロールを削除することができます。
 
-The `GUARDIAN` address is set as an `immutable` variable inside of the `OptimismPortal` contract.
-To change the `GUARDIAN` address, the `OptimismPortal` proxy contract must be upgraded to a new implementation contract that has a different `GUARDIAN` address. 
+`GUARDIAN`アドレスは、`OptimismPortal`コントラクト内の`immutable`変数として設定されています。
+`GUARDIAN`アドレスを変更するには、`OptimismPortal`プロキシコントラクトを異なる`GUARDIAN`アドレスを持つ新しい実装コントラクトにアップグレードする必要があります。
