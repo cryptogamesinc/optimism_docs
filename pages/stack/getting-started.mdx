@@ -1,72 +1,72 @@
 ---
-title: Getting Started with the OP Stack
-lang: en-US
-description: Learn the basics of OP Stack development.
+title: OP Stackの始め方
+lang: ja-JP
+description: OP Stack開発の基本を学びましょう。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Getting Started with the OP Stack
+# OP Stackの始め方
 
-**The OP Stack is the standardized, shared, and open-source development stack that powers Optimism, maintained by the Optimism Collective.**
+**OP Stackは、Optimismを支える標準化された、共有のオープンソース開発スタックであり、Optimism Collectiveによって維持されています。**
 
 <Callout type="info">
-  Stay up to date on the Superchain and the OP Stack by subscribing to the [Optimism Developer Blog](https://blog.oplabs.co/)
+  [Optimism Developer Blog](https://blog.oplabs.co/)に登録して、SuperchainとOP Stackに関する最新情報を入手してください。
 </Callout>
 
-The OP Stack consists of the many different software components managed and maintained by the Optimism Collective that, together, form the backbone of Optimism.
-The OP Stack is built as a public good for the Ethereum and Optimism ecosystems.
-To understand how to operate an OP Stack chain, including roll-up and chain deployment basics, visit [Chain Operator guide](/builders/chain-operators/self-hosted). Check out these guides to get an overview of everything you need to know to properly support OP mainnet within your [exchange](/builders/cex-wallet-developers/cex-support) and [wallet](/builders/cex-wallet-developers/wallet-support).
+OP Stackは、Optimism Collectiveが管理・維持するさまざまなソフトウェアコンポーネントで構成されており、それらが一体となってOptimismの基盤を形成しています。
+OP Stackは、EthereumとOptimismのエコシステムのための公共財として構築されています。
+ロールアップやチェーンのデプロイメントの基本を含め、OP Stackチェーンの操作方法を理解するには、[Chain Operator guide](/builders/chain-operators/self-hosted)を訪れてください。OP mainnetをサポートするために知っておくべきことの概要を得るには、[exchange](/builders/cex-wallet-developers/cex-support)および[wallet](/builders/cex-wallet-developers/wallet-support)のガイドをチェックしてください。
 
-## The OP Stack powers Optimism
+## OP StackがOptimismを支える
 
-The OP Stack is the set of software that powers Optimism — currently in the form of the software behind OP Mainnet and eventually in the form of the Optimism Superchain and its governance.
+OP Stackは、現在のOP Mainnetの背後にあるソフトウェアの形で、将来的にはOptimism Superchainとそのガバナンスの形で、Optimismを支えるソフトウェアセットです。
 
-With the advent of the Superchain concept, it has become increasingly important for Optimism to easily support the secure creation of new chains that can interoperate within the proposed Superchain ecosystem.
-As a result, the OP Stack is primarily focused around the creation of a shared, high-quality, and fully open-source system for creating new L2 blockchains.
-By coordinating on shared standards, the Optimism Collective can avoid rebuilding the same software in silos repeatedly.
+Superchainコンセプトの登場により、提案されたSuperchainエコシステム内で相互運用できる新しいチェーンを安全に作成することが容易になりました。
+その結果、OP Stackは主に、新しいL2ブロックチェーンを作成するための共有された高品質で完全にオープンソースのシステムの作成に焦点を当てています。
+共有標準に基づいて調整することで、Optimism Collectiveは同じソフトウェアを再構築する必要を避けることができます。
 
-Although the OP Stack today significantly simplifies the process of creating L2 blockchains, it's important to note that this does not fundamentally define what the OP Stack **is**.
-The OP Stack is *all* of the software that powers Optimism.
-As Optimism evolves, so will the OP Stack.
+現在のOP Stackは、L2ブロックチェーンの作成プロセスを大幅に簡素化していますが、これはOP Stackの本質を定義するものではありません。
+OP Stackは、Optimismを支えるすべてのソフトウェアです。
+Optimismが進化するにつれて、OP Stackも進化します。
 
-**The OP Stack can be thought of as software components that either help define a specific layer of the Optimism ecosystem or fill a role as a module within an existing layer.**
-Although the current heart of the OP Stack is infrastructure for running L2 blockchains, the OP Stack theoretically extends to layers on top of the underlying blockchain including tools like block explorers, message passing mechanisms, governance systems, and more.
+**OP Stackは、Optimismエコシステムの特定の層を定義するソフトウェアコンポーネントまたは既存の層内のモジュールとしての役割を果たすコンポーネントと見なすことができます。**
+現在のOP Stackの中心はL2ブロックチェーンを運営するためのインフラですが、OP Stackは理論的には、ブロックチェーンの基礎となる層の上にあるツール（ブロックエクスプローラー、メッセージ伝達機構、ガバナンスシステムなど）にまで拡張されます。
 
-Layers are generally more tightly defined towards the bottom of the stack (like the Data Availability Layer) but become more loosely defined towards the top of the stack (like the Governance Layer).
+層は一般的に、スタックの下部（データアベイラビリティレイヤーなど）に向かってより厳密に定義されますが、スタックの上部（ガバナンスレイヤーなど）に向かってより緩やかに定義されます。
 
-## The OP Stack today
+## 今日のOP Stack
 
-Optimism Bedrock is the current iteration of the OP Stack.
-The Bedrock release provides the tools for launching a production-quality Optimistic Rollup blockchain.
-At this point in time, the APIs for the different layers of the OP Stack are still tightly coupled to this Rollup configuration of the stack.
+Optimism Bedrockは、現在のOP Stackのバージョンです。
+Bedrockリリースは、プロダクション品質のOptimistic Rollupブロックチェーンを立ち上げるためのツールを提供します。
+現時点では、OP Stackの異なるレイヤーのAPIはこのRollup構成に密接に結びついています。
 
-The OP Stack of today was built to support [the Optimism Superchain](/stack/explainer), a proposed network of L2s that share security, communication layers, and a common development stack (the OP Stack itself).
-The Bedrock release of the OP Stack makes it easy to spin up an L2 that will be compatible with the Superchain when it launches.
-If you'd like to launch a Superchain-ready L2, check out our guide for running a chain based on the Bedrock release of the OP Stack.
+今日のOP Stackは、共通のセキュリティ、通信レイヤー、および共通の開発スタック（OP Stack自体）を共有するL2の提案ネットワークである[Optimism Superchain](/stack/explainer)をサポートするために構築されました。
+OP StackのBedrockリリースは、Superchainがローンチされたときに互換性のあるL2を簡単に立ち上げることができます。
+Superchain対応のL2を立ち上げたい場合は、OP StackのBedrockリリースに基づくチェーンを運営するためのガイドをチェックしてください。
 
-It is possible to modify components of the OP Stack to build novel L2 systems.
-If you're interested in experimenting with the OP Stack, check out [the OP Stack Hacks section of this site](/builders/chain-operators/hacks/overview).
-Please note that, as of the Bedrock release, the OP Stack is *not* designed to support these modifications and you will very much be *hacking* on the codebase.
-As a result, **you should, for the moment, expect limited (if any) developer support for OP Stack Hacks.**
-OP Stack Hacks will likely make your chain incompatible with the Optimism Superchain.
-Have fun, but at your own risk and **stick to the Bedrock release if you're looking to join the Superchain!**
+OP Stackのコンポーネントを変更して新しいL2システムを構築することは可能です。
+OP Stackでの実験に興味がある場合は、このサイトの[OP Stack Hacksセクション](/builders/chain-operators/hacks/overview)をチェックしてください。
+ただし、Bedrockリリースの時点では、OP Stackはこれらの変更をサポートするようには設計されておらず、コードベースで**ハッキング**することになります。
+そのため、**現時点では、OP Stack Hacksに対する開発者サポートは限定的（あるいは全くない）ことを期待してください。**
+OP Stack Hacksは、Optimism Superchainと互換性のないチェーンを作成する可能性があります。
+楽しんでください、ただし自己責任で行い、**Superchainに参加したい場合はBedrockリリースに固執してください。**
 
-## The OP Stack tomorrow
+## 明日のOP Stack
 
-The OP Stack is an evolving concept.
-As Optimism grows, so will the OP Stack.
-Today, the Bedrock Release of the OP Stack simplifies the process of deploying new L2 Rollups.
-As work on the stack continues, it should become easier to plug in and configure different modules.
-As the [Superchain](explainer) begins to take shape, the OP Stack can evolve alongside it, to include the message-passing infrastructure that allows different chains to interoperate seamlessly.
-At the end of the day, the OP Stack becomes what Optimism needs.
+OP Stackは進化するコンセプトです。
+Optimismが成長するにつれて、OP Stackも成長します。
+今日、OP StackのBedrockリリースは、新しいL2 Rollupのデプロイプロセスを簡素化しています。
+スタックの作業が進むにつれて、異なるモジュールをプラグインして構成することが容易になるはずです。
+[Superchain](explainer)が形作られ始めると、異なるチェーンがシームレスに相互運用できるようにするメッセージパッシングインフラストラクチャを含むように、OP Stackも進化する可能性があります。
+最終的には、OP StackはOptimismが必要とするものになります。
 
-## Dive Deeper into the OP Stack
+## OP Stackをさらに深く掘り下げる
 
-Ready to dive into the world of the OP Stack?
+OP Stackの世界に飛び込む準備はできましたか？
 
-*   If you're interested in learning more about the current release of the OP Stack, check out the Bedrock Release page.
-*   If you're interested in understanding the OP Stack in more depth, start with the [Design Principles](protocol/design-principles) and [Components Overview](components).
-*   If you're excited to join the Superchain, launch your first Superchain-ready L2 with our [Getting Started guide](explainer) or dive directly into the OP Stack codebase to learn more.
+*   現在のOP Stackのリリースについてもっと知りたい場合は、Bedrockリリースのページをチェックしてください。
+*   OP Stackをより深く理解したい場合は、[Design Principles](protocol/design-principles)と[Components Overview](components)から始めてください。
+*   Superchainに参加したい場合は、[Getting Started guide](explainer)を参考にして最初のSuperchain対応のL2を立ち上げるか、OP Stackのコードベースに直接飛び込んで詳細を学んでください。
 
-The OP Stack is the next frontier for Ethereum. You're already here, so what are you waiting for?
+OP StackはEthereumの次のフロンティアです。あなたはすでにここにいるのですから、何を待っているのですか？

@@ -1,327 +1,327 @@
 ---
-title: Superchain Explainer
-lang: en-US
-description: Learn about Optimism Superchain components, features, and roadmap.
+title: Superchainの説明
+lang: ja-JP
+description: Optimism Superchainのコンポーネント、特徴、およびロードマップについて学びましょう。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Superchain Explainer
+# Superchainの説明
 
 <Callout type="info">
-  Stay up to date on the Superchain and the OP Stack by subscribing to the [Optimism Developer Blog](https://blog.oplabs.co/)
+  [Optimism Developer Blog](https://blog.oplabs.co/)に登録して、SuperchainとOP Stackに関する最新情報を入手してください。
 </Callout>
 
-The next major scalability improvement to the OP Stack after Bedrock is to introduce the concept of *a Superchain*: a network of chains that share bridging, decentralized governance, upgrades, a communication layer and more—all built on the OP Stack.
+Bedrockの次の主要なスケーラビリティ改善は、*Superchain*の概念を導入することです。これは、ブリッジング、分散型ガバナンス、アップグレード、通信レイヤーなどを共有するチェーンのネットワークで、すべてがOP Stack上に構築されています。
 
-The launch of the Superchain would merge OP Mainnet and other chains into a single unified network of OP Chains (i.e., chains within the Superchain), and mark a major step towards bringing scalable and decentralized compute to the world. The goal of this document is to describe the scalability vision, the Superchain concept, and some changes to the OP Stack required to make this vision a reality.
+Superchainの立ち上げにより、OP Mainnetと他のチェーンが統一されたOP Chains（Superchain内のチェーン）ネットワークに統合され、スケーラブルで分散型のコンピュートを世界に提供する大きな一歩となります。このドキュメントの目的は、スケーラビリティのビジョン、Superchainの概念、およびこのビジョンを現実にするために必要なOP Stackのいくつかの変更を説明することです。
 
-This is the detailed explanation. [Click here for a less technical introduction](https://app.optimism.io/superchain/).
+これは詳細な説明です。[技術的でない紹介はこちらをクリックしてください](https://app.optimism.io/superchain/)。
 
 <Callout type="info">
-  Today, the Superchain is a concept and in-flight project, not a concrete reality.  This documentation represents our best current guess as to what the Superchain's components, features, and roadmap will be. Ultimately, its actualization will depend on (and change alongside) contributions from across the entire Optimism Collective. We cannot wait to see where it goes.
+  今日、Superchainは概念であり進行中のプロジェクトであり、具体的な現実ではありません。このドキュメントは、Superchainのコンポーネント、特徴、およびロードマップに関する現在の最良の推測を表しています。最終的には、Optimism Collective全体からの貢献によって実現し、それに応じて変更されます。私たちは、その行方を見るのが待ちきれません。
 </Callout>
 
-## The Scalability Vision
+## スケーラビリティのビジョン
 
-### Blockchain tech today is insufficient for the decentralized web
+### 現在のブロックチェーン技術は分散型ウェブに不十分
 
-The unfortunate truth is that the blockchain ecosystem has not realized the potential of creating the decentralized web, a re-architected internet where trusted entities are replaced by permissionless protocols. This is largely due to the fact that a majority of web applications are unable to be run onchain due to scalability constraints inherent to the current state of blockchain technology—a problem which has plagued the industry since its inception.
+残念なことに、ブロックチェーンエコシステムは、許可のないプロトコルによって信頼できるエンティティが置き換えられる再設計されたインターネットである分散型ウェブの可能性を実現していません。これは主に、現在のブロックチェーン技術の状態に内在するスケーラビリティの制約のため、ほとんどのウェブアプリケーションがオンチェーンで実行できないことによるものです。この問題は、業界が始まって以来の課題です。
 
-In fact, in a display of remarkable foresight, the very first response to the Bitcoin whitepaper was:
+実際、驚くべき先見の明を示すものとして、Bitcoinホワイトペーパーへの最初の応答は次のようなものでした：
 
-> **We very, very much need such a system, but the way I understand your proposal, it does not seem to scale to the required size.**
+> **このようなシステムは非常に必要ですが、提案された方法では必要な規模にスケールできないように思われます。**
 
-More than a decade later, this has not changed.
+10年以上経っても、これは変わっていません。
 
-### The value of scalable decentralized compute is immense…
+### スケーラブルな分散型コンピュートの価値は非常に大きい…
 
-Imagine a world where we solved the blockchain scalability problem. Imagine if transacting onchain would be as cheap as interacting with centralized backends. In this world, what would be possible?
+ブロックチェーンのスケーラビリティ問題を解決した世界を想像してください。オンチェーントランザクションが集中型バックエンドと同じくらい安価である世界を想像してみてください。この世界では何が可能でしょうか？
 
-*   Developers wouldn't need to worry about the backend infrastructure their app exists on because the chain guarantees correct execution, uptime, and [horizontal scalability](https://en.wikipedia.org/wiki/Scalability#Horizontal_\(scale_out\)_and_vertical_scaling_\(scale_up\)) of their app.
-*   Due to the shared smart contract execution environment, composability would be supercharged far beyond the capabilities of traditional REST APIs.
-*   With standardized gas markets, developers are not required to front all infrastructure costs for their users. Paying for a viral application would no longer be a barrier to entry for app developers, and more monetization strategies would be unlocked.
+*   開発者は、アプリが存在するバックエンドインフラストラクチャを心配する必要がありません。チェーンがアプリの正しい実行、稼働時間、および[水平スケーラビリティ](https://en.wikipedia.org/wiki/Scalability#Horizontal_\(scale_out\)_and_vertical_scaling_\(scale_up\))を保証します。
+*   共有スマートコントラクト実行環境のおかげで、従来のREST APIをはるかに超えるコンポーザビリティが実現されます。
+*   標準化されたガスマーケットのおかげで、開発者はユーザーのためにすべてのインフラコストを前払いする必要がありません。ウイルス性の高いアプリケーションの支払いがアプリ開発者の参入障壁となることはなくなり、より多くの収益化戦略が解放されます。
 
-The combination of these features would make it possible to program highly scalable web applications without having to touch the traditional backend software stack. Removing the need to worry about backends is a value proposition which extends beyond decentralization enthusiasts into regular application developers who just want to ship a product. With scalability, blockchains can go from a niche interest to becoming a core component of every developer's toolkit.
+これらの特徴の組み合わせにより、伝統的なバックエンドソフトウェアスタックに触れることなく、非常にスケーラブルなウェブアプリケーションをプログラムすることが可能になります。バックエンドの心配を取り除くことは、分散化の愛好家だけでなく、ただ製品を出荷したい通常のアプリケーション開発者にも価値のある提案です。スケーラビリティがあれば、ブロックチェーンはニッチな関心から、すべての開発者のツールキットの中核要素になることができます。
 
-Additionally, in this world where most applications go onchain more data becomes cryptographically verifiable. This cryptographic verifiability enables users to build reputations which transfer across all of their applications. The reputation can then be used for voting, loans, and collateral—facilitating trust on the internet. Plus, there is no risk of losing access because users retain ownership of their data, applications, and reputation.
+さらに、ほとんどのアプリケーションがオンチェーンになる世界では、より多くのデータが暗号的に検証可能になります。この暗号的検証可能性により、ユーザーはすべてのアプリケーションで移行する評判を構築できます。この評判は、投票、ローン、および担保に使用でき、インターネット上での信頼を促進します。さらに、ユーザーはデータ、アプリケーション、および評判の所有権を保持するため、アクセスを失うリスクはありません。
 
-There is no doubt that the promise of blockchains could change the internet as we know it.
+ブロックチェーンの約束がインターネットを変える可能性があることに疑いはありません。
 
-### …and the decentralized web can still be realized
+### …そして分散型ウェブはまだ実現可能
 
-This hypothetical isn't a dream, it's a tangible vision for the future which has motivated many—including Optimism—to dedicate their lives to its pursuit. Due to these collective contributions, every year we learn more about the blockchain technology stack and get closer to realizing the vision.
+この仮説は夢ではなく、Optimismを含む多くの人々がその追求に人生を捧げるための具体的なビジョンです。これらの集団的な貢献のおかげで、毎年私たちはブロックチェーン技術スタックについてさらに学び、このビジョンを実現に近づけています。
 
-With the support of the industry, we think a clear picture for how to architect a truly scalable blockchain is beginning to come into view. We call it the "Superchain". This document lays out the core technical principles underlying the Superchain architecture, as well as a set of tangible projects which, when complete, we believe will finally realize the blockchain scalability vision. It will be a multi-year (if not decade) journey. However, if we know roughly where we're going, we'll get there a little faster.
+業界のサポートを得て、真にスケーラブルなブロックチェーンを構築する方法の明確なビジョンが見え始めていると考えています。私たちはこれを「Superchain」と呼んでいます。このドキュメントでは、Superchainアーキテクチャの基礎となる主要な技術的原則と、完了時にブロックチェーンスケーラビリティビジョンを実現できると信じる具体的なプロジェクトを示しています。これは数年（あるいは数十年）の旅になるでしょう。しかし、おおよその行き先がわかれば、少し早く到達できるでしょう。
 
-## Foundational Superchain Concepts
+## 基本的なSuperchainの概念
 
-### Horizontal scalability requires multiple chains…
+### 水平スケーラビリティには複数のチェーンが必要…
 
-Horizontal blockchain scalability fundamentally requires multiple chains. This is because the hardware requirements to sync a chain increase linearly with the amount of compute the chain performs. Therefore, to achieve horizontal scalability, we must run chains in parallel.
+水平ブロックチェーンスケーラビリティには基本的に複数のチェーンが必要です。これは、チェーンの同期に必要なハードウェア要件がチェーンが実行するコンピュート量に比例して線形に増加するためです。したがって、水平スケーラビリティを達成するためには、チェーンを並行して実行する必要があります。
 
 <Callout type="info">
   Chain
 
-  A state [transition system](https://en.wikipedia.org/wiki/Transition_system)—consisting of an initial state, a state transition function, and a list of inputs (transactions)—which is cryptographically committed to and can be independently replicated with commodity computer hardware and internet connection.
+  初期状態、状態遷移関数、および入力（トランザクション）のリストからなる状態[遷移システム](https://en.wikipedia.org/wiki/Transition_system)であり、暗号的にコミットされ、コモディティコンピュータハードウェアおよびインターネット接続で独立して複製できます。
 </Callout>
 
-### …but traditional multi-chain architectures are insufficient
+### …しかし従来のマルチチェーンアーキテクチャは不十分
 
-Traditional approaches to 'multi-chain' architectures suffer from two fundamental problems:
+従来の「マルチチェーン」アーキテクチャへのアプローチには、2つの基本的な問題があります：
 
-1.  Each chain introduces a new security model, resulting in compounding systemic risk as new chains are introduced into the ecosystem. (related [link](https://twitter.com/VitalikButerin/status/1479501366192132099?s=20))
-2.  New chains are costly to spin up because they require new validator sets & block producers.
+1.  各チェーンは新しいセキュリティモデルを導入し、新しいチェーンがエコシステムに導入されるたびにシステミックリスクが累積します。（関連[リンク](https://twitter.com/VitalikButerin/status/1479501366192132099?s=20)）
+2.  新しいチェーンをスピンアップするには新しいバリデーターセットとブロックプロデューサーが必要なため、コストがかかります。
 
-These issues come from a lack of a single shared blockchain (an "L1"chain) which serves as a shared source of truth for all the chains ("L2"chains) within the multi-chain system. By using the shared source of truth it is possible to: a) enforce standard security models across all chains; and b) remove the requirement that chain deployments require a new set of validators because each L2 chain uses L1 consensus.
+これらの問題は、マルチチェーンシステム内のすべてのチェーン（「L2」チェーン）の共有の真実のソースとして機能する単一の共有ブロックチェーン（「L1」チェーン）の欠如に起因します。共有の真実のソースを使用することで、a）すべてのチェーンに標準的なセキュリティモデルを適用し、b）各L2チェーンがL1コンセンサスを使用するため、新しいチェーンのデプロイメントに新しいバリデーターセットが必要なくなります。
 
-### Not multi-chain, not mono-chain… Superchain
+### マルチチェーンではなく、モノチェーンでもなく… Superchain
 
-By using L2 chains to comprise the multi-chain ecosystem, it becomes possible to begin to treat chains as commodities—interchangeable compute resources. This commodification of chains enables developers to build cross-chain applications without introducing systemic risk and without incurring large overhead as new chains are deployed for their application. The concept of a chain itself can become abstracted, and at this point it will become possible to treat this network of interoperable chains as a single unit: the Superchain.
+L2チェーンを使用してマルチチェーンエコシステムを構成することで、チェーンを商品として扱うことが可能になります。チェーンのこの商品化により、開発者はシステミックリスクを導入することなく、また新しいチェーンをアプリケーションのためにデプロイする際に大きなオーバーヘッドを発生させることなく、クロスチェーンアプリケーションを構築できます。チェーンの概念自体を抽象化することが可能になり、この時点で相互運用可能なチェーンのネットワークを単一の単位として扱うことが可能になります。これがSuperchainです。
 
 <Callout type="info">
   Superchain
 
-  A decentralized blockchain platform which consists of many chains that share security and a technology stack (OP Stack). The interoperability and standardization enables individual chains to be treated identically by tools and wallets.
+  多くのチェーンで構成される分散型ブロックチェーンプラットフォームで、セキュリティとテクノロジースタック（OP Stack）を共有します。相互運用性と標準化により、ツールやウォレットで個々のチェーンを同一に扱うことができます。
 </Callout>
 
-## Superchain Overview
+## Superchainの概要
 
-### The Superchain at a glance
+### 一目でわかるSuperchain
 
-The Superchain is a network of L2 chains, known as OP Chains, which share security, a communication layer, and an open-source technology stack. However, unlike multi-chain designs, these chains are standardized and intended to be used as interchangeable resources. This enables developers to build applications which target the Superchain as a whole, and abstract away the underlying chains the apps are running on.
+Superchainは、セキュリティ、通信レイヤー、およびオープンソースのテクノロジースタックを共有するL2チェーン（OP Chains）ネットワークです。しかし、マルチチェーン設計とは異なり、これらのチェーンは標準化されており、交換可能なリソースとして使用されることを意図しています。これにより、開発者はSuperchain全体をターゲットにしてアプリケーションを構築し、アプリが実行される基盤のチェーンを抽象化することができます。
 
 <Callout type="info">
   OP Chain
 
-  An individual chain within the Optimism Superchain. All chains, regardless of their specific properties are considered OP Chains if they are officially governed by the Optimism Collective, and therefore part of the Superchain.
+  Optimism Superchain内の個々のチェーン。具体的な性質に関係なく、Optimism Collectiveによって正式に統治されているすべてのチェーンはOP Chainsと見なされ、したがってSuperchainの一部です。
 </Callout>
 
-![Superchain Explainer Diagram.](/img/op-stack/protocol/superchain-diag.png)
+![Superchainの説明図。](/img/op-stack/protocol/superchain-diag.png)
 
-### Properties of the Superchain
+### Superchainの特徴
 
-In order for Optimism to upgrade to a Superchain, it must have the following properties:
+OptimismがSuperchainにアップグレードするためには、次の特徴が必要です：
 
-| Property                                     | Purpose                                                                                    |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Shared L1 blockchain                         | Provides a total ordering of transactions across all OP Chains.                            |
-| Shared bridge for all OP Chains              | Enables OP Chains to have standardized security properties.                                |
-| Cheap OP Chain deployment                    | Enables deploying and transacting on OP Chains without the high fees of transacting on L1. |
-| Configuration options for OP Chains          | Enables OP Chains to configure their data availability provider, sequencer address, etc.   |
-| Secure transactions and cross-chain messages | Enables users to safely migrate state between OP Chains.                                   |
+| 特徴                       | 目的                                                      |
+| ------------------------ | ------------------------------------------------------- |
+| 共有L1ブロックチェーン             | すべてのOP Chains間のトランザクションの全体順序を提供します。                     |
+| すべてのOP Chainsの共有ブリッジ     | OP Chainsに標準化されたセキュリティ特性を提供します。                         |
+| 安価なOP Chainデプロイメント       | L1の高額なトランザクション手数料なしでOP Chainsをデプロイおよびトランザクションできるようにします。 |
+| OP Chainsの設定オプション        | OP Chainsがデータアベイラビリティプロバイダー、シーケンサーアドレスなどを設定できるようにします。   |
+| 安全なトランザクションとクロスチェーンメッセージ | ユーザーが安全に状態をOP Chains間で移行できるようにします。                      |
 
-Once Optimism has satisfied these properties, it may be considered a Superchain.
+Optimismがこれらの特性を満たした場合、Superchainと見なすことができます。
 
-## Upgrading Optimism to Become a Superchain
+## OptimismをSuperchainにアップグレードする
 
-We believe the following changes (after the Bedrock release) are required to create a initial Superchain that makes it possible to deploy and upgrade many chains with the same bridge:
+私たちは、Superchainを作成し、同じブリッジを使用して多くのチェーンをデプロイおよびアップグレード可能にするために、次の変更（Bedrockリリース後）が必要であると考えています：
 
-### Upgrade the Bedrock bridge to be a chain factory
+### Bedrockブリッジをチェーンファクトリにアップグレードする
 
-Bedrock introduced the [SystemConfig contract](https://github.com/ethereum-optimism/optimism/blob/74a63c94d881442b4edd4df6492513e0113eb064/packages/contracts-bedrock/contracts/L1/SystemConfig.sol) which began to define the L2 chain directly with L1 smart contracts. This can be extended to put *all information* defining the L2 chain, onchain. Including generating a unique chain ID, key configuration values such as block gas limit, etc.
+Bedrockは、L2チェーンを直接L1スマートコントラクトで定義し始める[SystemConfigコントラクト](https://github.com/ethereum-optimism/optimism/blob/74a63c94d881442b4edd4df6492513e0113eb064/packages/contracts-bedrock/contracts/L1/SystemConfig.sol)を導入しました。これを拡張して、L2チェーンを定義するすべての情報をオンチェーンに置くことができます。これには、ユニークなチェーンIDの生成、ブロックガスリミットなどのキー設定値が含まれます。
 
-Once the chain data is entirely onchain, we can create a factory which deploys the configuration and all other required contracts for each chain. This can be extended further by making the contract addresses deterministic with CREATE2, meaning that given a chain config it is possible to determine all bridge addresses associated with that chain. This also enables chains to be interacted with without having to deploy their bridge contracts, making (counterfactual) chain deployment virtually free, and allowing chains to inherit standard security properties.
+チェーンデータが完全にオンチェーンにある場合、各チェーンの設定およびその他の必要なコントラクトをデプロイするファクトリを作成できます。これをCREATE2でコントラクトアドレスを決定論的にすることでさらに拡張できます。これにより、チェーン構成があれば、そのチェーンに関連するすべてのブリッジアドレスを決定することが可能になります。これにより、ブリッジコントラクトをデプロイすることなくチェーンと対話することが可能になり、（反実仮想的に）チェーンのデプロイメントが実質的に無料になり、チェーンが標準のセキュリティ特性を継承できるようになります。
 
-### Derive OP Chain data using the chain factory
+### チェーンファクトリを使用してOP Chainデータを導出する
 
-Bedrock introduced L2 chain derivation from an L1 chain, where all chain data can be synced based on L1 blocks. With the L1 chain factory extending this to put all configuration onchain, it should become possible for Optimism nodes to sync *any* OP Chain deterministically given a single L1 address plus a connection to L1.
+Bedrockは、L1ブロックに基づいてすべてのチェーンデータを同期できるL2チェーン導出を導入しました。L1チェーンファクトリがこれを拡張してすべての設定をオンチェーンに置くと、単一のL1アドレスとL1への接続を与えられたOptimismノードが*任意の* OP Chainを決定論的に同期できるようになるはずです。
 
 <Callout type="info">
-  When the OP Chain is synced, the chain state is locally computed. This means determining the state of the OP Chain is fully permissionless & secure. No proof system is required for chain derivation because all invalid transactions are simply ignored by the local computation process performed by the node. A proof system is, however, still required to enable Superchain withdrawals.
+  OP Chainが同期されると、チェーン状態はローカルで計算されます。これは、OP Chainの状態を完全に許可なしで安全に決定することを意味します。チェーン導出には証明システムは必要ありません。なぜなら、不正なトランザクションはノードによって実行されるローカル計算プロセスによって単に無視されるからです。しかし、Superchainの引き出しを可能にするためには証明システムが依然として必要です。
 </Callout>
 
-### Permissionless proof system to enable withdrawals
+### 引き出しを可能にするための許可なしの証明システム
 
-In Bedrock, there is a permissioned role (the "proposer" role) that is required for users to submit withdrawals. Additionally, proposers must submit proposals to L1 at a set interval. This introduces linear overhead as the number of chains in the Superchain increases, and even introduces an upper bound on the number of chains due to the limited L1 resources.
+Bedrockでは、ユーザーが引き出しを提出するために必要な許可された役割（「提案者」役割）があります。さらに、提案者は一定の間隔でL1に提案を提出する必要があります。これにより、Superchain内のチェーンの数が増えるとリニアなオーバーヘッドが発生し、L1リソースの制限によりチェーンの数に上限が生じる可能性があります。
 
-In order to address these issues, we can introduce two features:
+これらの問題に対処するために、次の2つの機能を導入できます：
 
-1.  Withdrawal claims (a.k.a. Permissionless proposals) — allow anyone to submit a withdrawal (aka a proposal), not just a designated proposer. This removes the permissioned role from the system, enabling users to submit their own withdrawal messages.
-2.  Remove proposal submission interval — enable withdrawal claims to be made *only* when a user needs to withdraw. This removes the overhead incurred when deploying a new OP Chain.
+1.  引き出しクレーム（許可なしの提案） — 指定された提案者だけでなく、誰でも引き出し（提案）を提出できるようにします。これにより、システムから許可された役割が削除され、ユーザーは自分の引き出しメッセージを提出できるようになります。
+2.  提案提出間隔の削除 — ユーザーが引き出しを必要とする場合にのみ引き出しクレームを行えるようにします。これにより、新しいOP Chainをデプロイする際に発生するオーバーヘッドが削除されます。
 
 <Callout type="info">
-  Withdrawal claims
+  引き出しクレーム
 
-  A claim about the state of one chain made on another chain. For instance, I can claim that in OP Mainnet I have burned my tokens with the intent to withdraw those tokens back to L1.
+  あるチェーンで行われた状態に関するクレーム。例えば、OP Mainnetでトークンを燃焼し、L1にそのトークンを引き出すつもりであると主張することができます。
 </Callout>
 
-We can enable these two features first by introducing a permissionless proof system to the Optimism bridge contracts. With the modular proof design introduced in Bedrock, proofs may come in the form of fault proofs or validity proofs (e.g. zero knowledge proofs). However, until validity proofs are productionized, we assume withdrawals will use a fault proof system.
+これらの2つの機能を導入するために、Optimismブリッジコントラクトに許可なしの証明システムを導入することができます。Bedrockで導入されたモジュラー証明設計により、証明はフォールト証明または有効性証明（例：ゼロ知識証明）の形式で提供される場合があります。しかし、有効性証明が実用化されるまで、引き出しにはフォールト証明システムを使用すると仮定します。
 
-In the envisioned fault proof system, anyone can submit a withdrawal claim, and these withdrawal claims can be submitted at any time. Submitting withdrawal claims can be permissionless when claims come with bonds attached to them, as these bonds act as collateral if the claim is proven to be invalid. If a challenger successfully challenges the claim, the bond is paid out to the challenger for their participation in securing the system, thereby preventing spam even within this permissionless system. Additionally, there is no need to submit them at a regular interval because the fault proof game can efficiently prove the entire history of the chain since genesis.
+想定されるフォールト証明システムでは、誰でも引き出しクレームを提出でき、この引き出しクレームはいつでも提出できます。クレームがボンドと共に提出される場合、このボンドはクレームが無効と証明された場合の担保として機能するため、クレームの提出は許可なしで行うことができます。チャレンジャーがクレームを正常にチャレンジすると、システムのセキュリティに貢献したためにボンドがチャレンジャーに支払われるため、この許可なしのシステム内でもスパムを防止します。さらに、チェーンの履歴全体を効率的に証明できるため、定期的に提出する必要はありません。
 
-The fault proof implementation may initially rely on a trusted set of chain attestors to be the final arbiter of disputes. Challengers must request attestations from a large number of chain attestors and combine these attestations into a single transaction called an attestation proof. The attestation proof is then used to challenge invalid claims.
+フォールト証明の実装は、最初は信頼できるチェーンアテスターのセットに依存して紛争の最終的な仲裁者として機能する場合があります。チャレンジャーは、多数のチェーンアテスターからアテステーションを要求し、これらのアテステーションを単一のトランザクションであるアテステーション証明にまとめる必要があります。アテステーション証明は、その後、無効なクレームをチャレンジするために使用されます。
 
-The attestation-based fault proof should be designed to prefer safety over liveness. That means that if these chain attestors are malicious they cannot alone break the safety of withdrawals. The worst failure they can cause is preventing withdrawals from being processed until the next upgrade—a liveness failure.
+アテステーションベースのフォールト証明は、ライブネスよりも安全性を優先するように設計されるべきです。つまり、これらのチェーンアテスターが悪意を持っていた場合でも、引き出しの安全性を破ることはできません。彼らが引き起こせる最悪の失敗は、次のアップグレードまで引き出しが処理されないこと、つまりライブネスの失敗です。
 
-In the future, the attestation proof will be incrementally phased out and replaced with trust-minimized proofs such as the [Cannon proof system](https://github.com/ethereum-optimism/cannon).
+将来的には、アテステーション証明は段階的に廃止され、[Cannon証明システム](https://github.com/ethereum-optimism/cannon)などの信頼最小化証明に置き換えられます。
 
-### Configurable sequencer per OP Chain
+### 各OP Chainのシーケンサーを設定可能にする
 
-Bedrock introduced the ability to set the sequencer address in the SystemConfig contract. As we introduce multiple chains with their own SystemConfig contracts, we can enable the sequencer address to be configured by the OP Chain deployer. We call this configurable sequencer design modular sequencing. This enables OP Chains to be sequenced by different entities while retaining the standard \[Superchain bridge] security model—a critical step towards sequencer decentralization.
+Bedrockは、SystemConfigコントラクトでシーケンサーアドレスを設定する機能を導入しました。独自のSystemConfigコントラクトを持つ複数のチェーンを導入する際に、OP Chainデプロイヤーがシーケンサーアドレスを設定できるようにすることができます。この設定可能なシーケンサーデザインをモジュラーシーケンシングと呼びます。これにより、異なるエンティティがシーケンスするOP Chainsを標準の\[Superchainブリッジ]セキュリティモデルを維持しながらシーケンスできるようになります。これはシーケンサーの分散化に向けた重要な一歩です。
 
 <Callout type="info">
-  Modular sequencing
+  モジュラーシーケンシング
 
-  The ability to configure the sequencer address during OP Chain deployment. This value can be configured by the OP Chain deployer.
+  OP Chainデプロイメント中にシーケンサーアドレスを設定する機能。この値はOP Chainデプロイヤーによって設定できます。
 </Callout>
 
 <Callout type="info">
-  Superchain bridge
+  Superchainブリッジ
 
-  The L1 bridge contracts which govern all OP Chains in the Superchain. This bridge can be upgraded by the Optimism Collective.
+  Superchain内のすべてのOP Chainsを統治するL1ブリッジコントラクト。このブリッジはOptimism Collectiveによってアップグレードされます。
 </Callout>
 
-Within the Superchain bridge security model, chain safety (i.e. validity) as well as chain liveness (i.e. censorship resistance) is guaranteed. Safety is guaranteed by the proof system, and liveness is guaranteed by the ability to submit transactions directly to L1. The combination of safety and liveness means that if an OP Chain sequencer were to misbehave, users can always submit transactions to L1 that migrates their usage to a new OP Chain with a correctly functioning sequencer.
+Superchainブリッジセキュリティモデル内では、チェーンの安全性（有効性）およびチェーンのライブネス（検閲耐性）が保証されます。安全性は証明システムによって保証され、ライブネスはトランザクションを直接L1に提出する能力によって保証されます。安全性とライブネスの組み合わせにより、OP Chainシーケンサーが不正行為を行った場合、ユーザーは常にトランザクションをL1に提出して正しく機能するシーケンサーを持つ新しいOP Chainに移行することができます。
 
-Modular sequencing also enables permissionless experimentation with different sequencing models. Developers can envision implementing sequencing protocols such as: round robin sequencing, sequencer consensus protocols, PGA ordering, or FIFO ordering. We can expect that over time user friendly sequencing standards will emerge from the competition between competing sequencing protocols.
+モジュラーシーケンシングは、異なるシーケンシングモデルを使用した許可なしの実験も可能にします。開発者は、ラウンドロビンシーケンシング、シーケンサーコンセンサスプロトコル、PGAオーダリング、FIFOオーダリングなどのシーケンシングプロトコルを実装することを想定できます。時間とともに競合するシーケンシングプロトコル間の競争からユーザーフレンドリーなシーケンシング標準が出現することが期待されます。
 
-### One shared upgrade path for all OP Chains
+### すべてのOP Chainsに共通のアップグレードパス
 
-To ship the initial Superchain with high confidence in security and decentralization, a decentralized security council should be introduced to govern upgrades. The security council should be able to update the set of chain attestors, initiate contract upgrades with a delay, and hit an emergency bridge pause button which also cancels pending upgrades.
+セキュリティと分散化に対する高い信頼を持って初期のSuperchainを提供するためには、アップグレードを統治するために分散型セキュリティ評議会を導入する必要があります。セキュリティ評議会は、チェーンアテスターのセットを更新し、遅延を伴うコントラクトアップグレードを開始し、ペンディングアップグレードをキャンセルする緊急ブリッジ一時停止ボタンを押すことができるようにする必要があります。
 
-The ability to pause the bridge in case of emergency means that in the worst case, where the requisite threshold of the security council participants had their private keys leaked, the result would be that withdrawals are indefinitely paused and bridge upgrades would be perpetually canceled. In other words, the L1 bridge would be frozen. This follows the design principle of safety over liveness—the principle that one should always prevent the loss of ETH or tokens (i.e. enforce safety) even if it means the ETh or tokens get locked (i.e. sacrifice liveness).
+最悪の場合、セキュリティ評議会の必要な閾値の参加者がプライベートキーを漏洩した場合、引き出しが無期限に一時停止され、ブリッジアップグレードが永久にキャンセルされることになります。つまり、L1ブリッジが凍結されることになります。これは、ライブネスよりも安全性を優先する設計原則に従います。つまり、ETHやトークンの損失を防ぐ（安全性を強制する）ためにETHやトークンがロックされる（ライブネスを犠牲にする）ことを意味します。
 
-#### Unfreezing the bridge via L1 soft fork
+#### L1ソフトフォークを介してブリッジを解凍する
 
-In order to address the frozen bridge, there is a potential final recovery mechanism which has been discussed by the L2 community, which we call the "L1 Soft Fork Upgrade Recovery"mechanism. This mechanism enables L1 to initiate a bridge upgrade with a soft fork, bypassing all other permissions within the Superchain bridge contracts. This approach may [introduce systemic risk](https://web.archive.org/web/20231102063913/https://vitalik.ca/general/2023/05/21/dont_overload.html) to Ethereum and requires research and community buy-in before implementation. It is not required for implementing the Superchain and is being documented for research completeness. Without further research into the implications and safety, it is not an approach the team currently endorses.
+凍結されたブリッジに対処するために、「L1ソフトフォークアップグレードリカバリ」メカニズムと呼ばれるL2コミュニティで議論された潜在的な最終リカバリメカニズムがあります。このメカニズムは、Superchainブリッジコントラクト内のすべての他の許可をバイパスして、ソフトフォークを使用してブリッジアップグレードを開始するためのL1を有効にします。このアプローチは、Ethereumに[システミックリスク](https://web.archive.org/web/20231102063913/https://vitalik.ca/general/2023/05/21/dont_overload.html)を導入する可能性があり、実装前に調査とコミュニティの同意が必要です。これはSuperchainの実装には必要ありませんが、調査の完全性のために文書化されています。影響と安全性についてさらに調査しない限り、チームが現在推奨するアプローチではありません。
 
-The mechanism is as follows:
+メカニズムは次のとおりです：
 
-*Anyone* may propose an upgrade by submitting a transaction to a special bridge contract, along with a very large bond. This begins a two week challenge period. During this challenge period, anyone may submit a challenge which immediately cancels the upgrade and claims the bond. Under normal circumstances, it is impossible that an upgrade would go uncancelled for the required two weeks, due to the large incentive provided for anyone to cancel the upgrade. However, if the upgrade is accompanied by a modification to Ethereum L1 validator software (the L1 soft fork), which ignores blocks that contain the cancellation transaction, then it may succeed.
+*誰でも* 特別なブリッジコントラクトにトランザクションを提出し、大きなボンドを添えてアップグレードを提案できます。これにより、2週間のチャレンジ期間が始まります。このチャレンジ期間中、誰でもチャレンジを提出してアップグレードを直ちにキャンセルし、ボンドを請求することができます。通常の状況では、アップグレードが必要な2週間の間にキャンセルされないことは不可能です。なぜなら、キャンセルするための大きなインセンティブが提供されているためです。しかし、アップグレードがEthereum L1バリデータソフトウェアの変更（L1ソフトフォーク）を伴う場合、キャンセルトランザクションを含むブロックを無視するようにすると、成功する可能性があります。
 
-While a successful upgrade of this type would represent a soft fork of Ethereum L1, it would not incur long term technical debt to the Ethereum codebase because the soft fork logic can be removed once the upgrade has completed.
+この種類のアップグレードが成功すると、Ethereum L1のソフトフォークを表しますが、アップグレードが完了した後、ソフトフォークロジックを削除できるため、Ethereumコードベースに長期的な技術的負債をもたらしません。
 
-We expect this escape hatch will never be used, but its very existence could deter malicious behavior.
+私たちは、この緊急措置が決して使用されないことを期待していますが、その存在自体が悪意のある行動を抑止する可能性があります。
 
-### The combination of these features results in a system satisfying the core Superchain properties
+### これらの機能の組み合わせにより、基本的なSuperchain特性を満たすシステムが実現される
 
-We believe these upgrades can provide a shared bridge for all OP Chains, cheap OP Chain deployment, important configuration options for the OP Chains, as well as secure transactions and cross-chain messages. Because the Bedrock release already provides the property of a shared L1 blockchain, after these changes we will have achieved all the core properties required for the Superchain.
+これらのアップグレードにより、すべてのOP Chainsに共通のブリッジ、安価なOP Chainデプロイメント、重要なOP Chainsの設定オプション、および安全なトランザクションとクロスチェーンメッセージを提供できると考えています。Bedrockリリースはすでに共有L1ブロックチェーンの特性を提供しているため、これらの変更後、Superchainに必要なすべての基本的な特性が達成されます。
 
-## Extending the Superchain—enhancements to realize the vision
+## Superchainの拡張—ビジョンを実現するための強化
 
-We expect that, if successful, the post-Bedrock Superchain release will mark a major milestone in the scalability and decentralization of Optimism. However, there will still be significant pain points which must be addressed before the full scalable blockchain vision has been realized. Anticipated pain points include:
+成功すれば、ポストBedrock Superchainリリースは、Optimismのスケーラビリティと分散化において重要なマイルストーンとなると期待しています。しかし、スケーラブルなブロックチェーンビジョンが実現される前に対処すべき重要な課題がまだ残っています。予想される課題には次のものがあります：
 
-1.  Withdrawal claims rely on a trusted set of chain attestors.
-2.  Cross-Chain transactions are slow because they require waiting a challenge period.
-3.  Cross-Chain transactions are asynchronous, breaking the ability to perform atomic cross-chain transactions (like flash loans).
-4.  Posting transactions to the Superchain is not-scalable because the transaction data must be submitted to L1 which has limited capacity.
-5.  There are no easy frameworks for building scalable apps which utilize many OP Chains.
-6.  There is no easy wallet for managing tokens and apps across many OP Chains.
+1.  引き出しクレームは信頼されたチェーンアテスターのセットに依存しています。
+2.  クロスチェーントランザクションは、チャレンジ期間を待つ必要があるため遅いです。
+3.  クロスチェーントランザクションは非同期であり、アトミックなクロスチェーントランザクション（フラッシュローンなど）を実行できません。
+4.  Superchainにトランザクションを投稿することはスケーラブルではありません。なぜなら、トランザクションデータをL1に提出する必要があり、L1には限られた容量があるからです。
+5.  多くのOP Chainsを利用するスケーラブルなアプリを構築するための簡単なフレームワークはありません。
+6.  多くのOP Chainsにまたがるトークンとアプリを管理するための簡単なウォレットはありません。
 
-If each one of these pain points were addressed, it could be possible to build decentralized alternatives to even the most complex web2 applications.
+これらの課題のそれぞれに対処できれば、最も複雑なweb2アプリケーションに対する分散型代替を構築することが可能になるかもしれません。
 
-The following is an overview of potential future enhancements, which when combined, addresses each one of these pain points.
+以下は、これらの課題のそれぞれに対処するための潜在的な将来の強化の概要です。
 
-### Multi-Proof Security
+### マルチプルーフセキュリティ
 
-#### Pain Point:
+#### 課題：
 
-1.  Withdrawal claims rely on a trusted set of chain attestors.
+1.  引き出しクレームは信頼されたチェーンアテスターのセットに依存しています。
 
-#### Proposed Solution:
+#### 提案される解決策：
 
-It is possible to replace the trusted set of chain attestors by introducing permissionless proofs—such as Cannon—where dispute resolution is entirely onchain. However, the challenge with entirely onchain proofs is there is no fallback mechanism if they were to break. To ensure that they will never fail, it is possible to introduce a multi-proof system which provides safety through redundancy. For more information on the multi-proof design click [here](https://web.archive.org/web/20230331065342/https://medium.com/ethereum-optimism/our-pragmatic-path-to-decentralization-cb5805ca43c1).
+信頼されたチェーンアテスターのセットを、紛争解決が完全にオンチェーンで行われる許可なしの証明（Cannonなど）に置き換えることが可能です。しかし、完全にオンチェーンの証明には、失敗した場合のバックフォールバックメカニズムがないという課題があります。これらが決して失敗しないようにするために、冗長性を通じて安全性を提供するマルチプルーフシステムを導入することが可能です。マルチプルーフ設計の詳細については[こちら](https://web.archive.org/web/20230331065342/https://medium.com/ethereum-optimism/our-pragmatic-path-to-decentralization-cb5805ca43c1)をクリックしてください。
 
-### Low Latency L2 to L2 Message Passing
+### 低レイテンシーのL2からL2へのメッセージ送信
 
-#### Pain Point:
+#### 課題：
 
-2.  Cross-Chain transactions are slow because they require waiting a challenge period.
+2.  クロスチェーントランザクションは、チャレンジ期間を待つ必要があるため遅いです。
 
-#### Proposed Solution:
+#### 提案される解決策：
 
-Fault proofs introduce a UX burden because they require waiting a challenge period in order to safely finalize. This means that, depending on your challenge period length, users need to wait a long time before their ETH and tokens are migrated from one OP Chain to the next.
+フォールト証明はチャレンジ期間を待つ必要があるため、ユーザーエクスペリエンスに負担をかけます。これにより、チャレンジ期間の長さに応じて、ユーザーはETHやトークンを別のOP Chainに移行する前に長時間待つ必要があります。
 
-On the other hand, validity proofs do not have this problem. Validity proofs don't have a challenge period and therefore provide instant withdrawals from one OP Chain to the next. This is extremely important if users are expected to migrate between chains frequently, even during normal app execution. However, validity proofs are commonly implemented using zero-knowledge proofs (ZKPs), which are expensive and bug-prone. It will likely take years to truly productionize ZKPs enough such that they can be the primary cross-chain communication protocol.
+一方、有効性証明にはこの問題がありません。有効性証明にはチャレンジ期間がないため、OP Chain間の即時引き出しが可能です。これは、ユーザーが通常のアプリ実行中に頻繁にチェーン間を移行することが期待される場合に非常に重要です。しかし、有効性証明は一般的にゼロ知識証明（ZKP）を使用して実装されており、高価でバグが発生しやすいです。ZKPを主なクロスチェーン通信プロトコルとして実用化するには数年かかるでしょう。
 
-However, while ZKPs are being productionized, it is possible to achieve low latency L2 to L2 message passing using the OP Stack's modular proof system. With modular proofs it is possible to use two proof systems for the same chain. This opens up the possibility to provide low latency bridging which trades off security while *also* providing high security high latency bridging.
+しかし、ZKPが実用化されるまで、OP Stackのモジュラー証明システムを使用して低レイテンシーのL2からL2へのメッセージ送信を実現することが可能です。モジュラー証明により、同じチェーンに対して2つの証明システムを使用することができます。これにより、セキュリティと引き換えに低レイテンシーのブリッジングを提供し*つつ*、高セキュリティの高レイテンシーブリッジングも提供する可能性が開かれます。
 
-This heterogeneous bridging system means that developers can build their applications using one of many bridge types, such as:
+この異種ブリッジングシステムにより、開発者は次のようなさまざまなブリッジタイプを使用してアプリケーションを構築することができます：
 
-1.  High security, high latency fault proof (standard high security bridge)
-2.  Low security, low latency fault proof (a short challenge period to achieve low latency)
-3.  Low security, low latency validity proof (using trusted chain attestors in place of a ZKP)
-4.  High security, low latency validity proof (once ZKPs are ready)
+1.  高セキュリティ、高レイテンシーフォールト証明（標準の高セキュリティブリッジ）
+2.  低セキュリティ、低レイテンシーフォールト証明（低レイテンシーを達成するための短いチャレンジ期間）
+3.  低セキュリティ、低レイテンシー有効性証明（ZKPの代わりに信頼されたチェーンアテスターを使用）
+4.  高セキュリティ、低レイテンシー有効性証明（ZKPが準備が整った場合）
 
-Mixing multiple proof systems enables developers to provide low latency bridging for low value state and high latency for high value state. It is even possible to turn low security state which was instantly bridged into high security state by proving the state's validity using a high security high latency bridge. This building block enables developers to make interesting security tradeoffs such as using a high threshold attestation proof with a high security high latency fault proof fallback.
+複数の証明システムを混在させることで、開発者は低価値の状態には低レイテンシーブリッジングを提供し、高価値の状態には高レイテンシーブリッジングを提供することができます。さらに、低セキュリティの状態を即時にブリッジした後、高セキュリティの高レイテンシーブリッジを使用して状態の有効性を証明することで、高セキュリティの状態に変えることができます。この構成要素を使用して、開発者は高セキュリティの高レイテンシーフォールト証明フォールバックを持つ高い閾値のアテステーション証明を使用するなど、興味深いセキュリティトレードオフを行うことができます。
 
-### Synchronous Cross-Chain Transactions
+### 同期クロスチェーントランザクション
 
-#### Pain Point:
+#### 課題：
 
-3.  Cross-Chain transactions are asynchronous, breaking the ability to perform atomic cross-chain transactions (like flash loans).
+3.  クロスチェーントランザクションは非同期であり、アトミックなクロスチェーントランザクション（フラッシュローンなど）を実行できません。
 
-#### Proposed Solution:
+#### 提案される解決策：
 
-Traditional cross-chain messaging is done asynchronously, which means that cross-chain transactions are *not* atomic. For example, if a user would like to execute a cross-chain arbitrage transaction—buying token A on chain A, and selling token B on chain B—there is no guarantee that their transaction executes in its entirety. The user might end up buying token A without having sold token B.
+従来のクロスチェーンメッセージングは非同期で行われるため、クロスチェーントランザクションは*アトミックではありません*。例えば、ユーザーがクロスチェーンアービトラージトランザクションを実行したい場合—チェーンAでトークンAを購入し、チェーンBでトークンBを販売する—そのトランザクションが全体として実行される保証はありません。ユーザーはトークンAを購入し、トークンBを販売しないまま終わる可能性があります。
 
-It is possible to introduce synchronous cross-chain messaging and enable atomic cross-chain interactions by using a shared sequencing protocol on both OP Chains. In our example, the sequencers on chain A and chain B would each receive the arbitrage transaction, come to consensus on when they will include it, and then atomically include each transaction in the linked block. Fees would only be paid if the transaction was indeed included on each chain, meaning the sequencers take the synchronization risk as opposed to the user in our initial example. These shared sequencing protocols can be implemented permissionlessly on top of the modular sequencing layer of the post-Bedrock Superchain.
+共有シーケンシングプロトコルを両方のOP Chainsで使用することで、同期クロスチェーンメッセージングを導入し、アトミックなクロスチェーンインタラクションを可能にすることができます。私たちの例では、チェーンAとチェーンBのシーケンサーがそれぞれアービトラージトランザクションを受け取り、それを含む時期に関して合意に達し、その後リンクされたブロックにそれぞれのトランザクションをアトミックに含めます。トランザクションが各チェーンに実際に含まれた場合にのみ手数料が支払われるため、最初の例のユーザーではなくシーケンサーが同期リスクを負います。これらの共有シーケンシングプロトコルは、ポストBedrock Superchainのモジュラーシーケンシングレイヤーの上に許可なしで実装することができます。
 
-With the combination of low latency L2 to L2 message passing as well as shared sequencing, it is possible to perform complex transactions such as cross-chain flash loans. It is even possible to go further and create an EVM abstraction where individual smart contracts (or even individual storage slots) exist on different chains.
+低レイテンシーのL2からL2へのメッセージ送信と共有シーケンシングの組み合わせにより、クロスチェーンフラッシュローンなどの複雑なトランザクションを実行することが可能になります。さらに進んで、個々のスマートコントラクト（または個々のストレージスロット）が異なるチェーンに存在するEVM抽象化を作成することも可能です。
 
-### Alt-Data Availability Layer — Plasma Protocol
+### 代替データアベイラビリティレイヤー — Plasmaプロトコル
 
-#### Pain Point:
+#### 課題：
 
-4.  Posting transactions to the Superchain is not-scalable because the transaction data must be submitted to L1 which has limited capacity.
+4.  Superchainにトランザクションを投稿することはスケーラブルではありません。なぜなら、トランザクションデータをL1に提出する必要があり、L1には限られた容量があるからです。
 
-#### Proposed Solution:
+#### 提案される解決策：
 
-Today L1 data availability (DA) does not scale nearly enough to be able to support internet-level scale. However, it is possible to extend the amount of data availability accessible to OP Chains by using a Plasma protocol which enables alternative DA providers to supplement the more limited L1 DA.
+今日のL1データアベイラビリティ（DA）は、インターネット規模のスケールをサポートするには全くスケーラブルではありません。しかし、L1 DAを補完するために代替DAプロバイダーを使用するPlasmaプロトコルを使用することで、OP Chainsが利用できるデータアベイラビリティの量を拡張することが可能です。
 
-A generic Plasma protocol is able to scale beyond what is possible on L1 because only the users who are interested in the transaction data will download the Plasma data, whereas on L1 every Ethereum node downloads all of the transaction data on L1. This means that Plasma data is extremely cheap. However, where Plasma has a worse security model than L1—it is possible for Plasma chain data to temporarily become unavailable, meaning users must withdraw from the chain. Note, this security model still guarantees safety of the Plasma chains, just not liveness.
+一般的なPlasmaプロトコルは、トランザクションデータに関心のあるユーザーのみがPlasmaデータをダウンロードするため、L1で可能なものを超えてスケールすることができます。一方、L1ではすべてのEthereumノードがL1のすべてのトランザクションデータをダウンロードします。これは、Plasmaデータが非常に安価であることを意味します。ただし、PlasmaのセキュリティモデルはL1よりも劣っており、Plasmaチェーンデータが一時的に利用不能になる可能性があるため、ユーザーはチェーンから引き出す必要があります。注意すべき点は、このセキュリティモデルはPlasmaチェーンの安全性を保証しますが、ライブネスは保証しないということです。
 
 <Callout type="info">
-  Plasma chain
+  Plasmaチェーン
 
-  A chain where transaction data is committed to on L1 but not supplied to L1 directly, with a data availability challenge fallback.
+  トランザクションデータがL1に直接供給されず、データアベイラビリティチャレンジのフォールバックを持つチェーン。
 </Callout>
 
-**Plasma protocol overview:**
+**Plasmaプロトコルの概要：**
 
-*   Data Availability (DA) Providers receive transaction data from users.
-*   DA Providers then hash the transaction data and submit the hash to the Plasma Contract.
-*   Once the hash has been submitted, the DA Provider sends a proof to the user which proves inclusion of their transaction data in the hash. If the DA Provider is misbehaving, they will withhold the proof, not sending it to the user.
-*   If the DA Provider does not send the proof to the user, the user may submit a DA challenge. This forces the DA Provider to post the transaction data onchain. If the DA Provider does not submit the proof onchain, the hash is deleted. This ensures the user can always (after the challenge period) sync the Plasma chain.
-    *   DA challenge periods may be extended in case of heavy L1 congestion.
-*   The user may also submit an L1 transaction to withdraw from the Plasma chain in order to switch their DA Provider.
-*   Settlement of Plasma chains use a near identical fault proof system to Rollup chains with the only difference being that additional data is derived from the chain using the hashes that are finalized in the Plasma Contract.
+*   データアベイラビリティ（DA）プロバイダーは、ユーザーからトランザクションデータを受け取ります。
+*   DAプロバイダーはトランザクションデータをハッシュ化し、ハッシュをPlasmaコントラクトに提出します。
+*   ハッシュが提出されると、DAプロバイダーはユーザーにハッシュへのトランザクションデータのインクルージョンを証明する証明を送ります。DAプロバイダーが不正行為を行っている場合、証明を差し控え、ユーザーに送信しません。
+*   DAプロバイダーがユーザーに証明を送信しない場合、ユーザーはDAチャレンジを提出できます。これにより、DAプロバイダーはオンチェーンにトランザクションデータを投稿する必要があります。DAプロバイダーがオンチェーンに証明を提出しない場合、ハッシュは削除されます。これにより、ユーザーは常に（チャレンジ期間後）Plasmaチェーンを同期することができます。
+    *   DAチャレンジ期間は、L1の混雑が激しい場合に延長される可能性があります。
+*   ユーザーは、Plasmaチェーンから引き出すためにL1トランザクションを提出し、DAプロバイダーを切り替えることができます。
+*   Plasmaチェーンのセトルメントは、Plasmaコントラクトで最終化されたハッシュを使用してチェーンから追加データを導出することを除いて、Rollupチェーンとほぼ同じフォールト証明システムを使用します。
 
-Because of the ability for hashes to reduce arbitrary size data into a constant size commitment, and the ability to parallelize transaction data hashing, it is possible to achieve near-perfect horizontal scalability of data commitments using Plasma DA. This means that it is possible to put massively scalable applications such as games or social media on Plasma chains.
+ハッシュが任意のサイズのデータを定数サイズのコミットメントに圧縮できる能力と、トランザクションデータのハッシュ化を並行処理できる能力のおかげで、Plasma DAを使用してデータコミットメントのほぼ完全な水平スケーラビリティを達成することが可能です。これにより、ゲームやソーシャルメディアなどの大規模なスケーラブルアプリケーションをPlasmaチェーン上に置くことが可能になります。
 
-### Multi-Chain App Frameworks
+### マルチチェーンアプリフレームワーク
 
-#### Pain Points:
+#### 課題：
 
-5.  There are no easy frameworks for building scalable apps which utilize many OP Chains.
+5.  多くのOP Chainsを利用するスケーラブルなアプリを構築するための簡単なフレームワークはありません。
 
-6.  There is no easy wallet for managing ETH and tokens and apps across many OP Chains.
+6.  多くのOP ChainsにまたがるETHとトークンおよびアプリを管理するための簡単なウォレットはありません。
 
-#### Proposed Solution (Sketch):
+#### 提案される解決策（概要）：
 
-This is not a core protocol change, but instead tooling which can be built on top of the core Superchain protocols. The suggestions here are intended to give rough intuitions for how to build tools which improve the experience of deploying to the Superchain.
+これはコアプロトコルの変更ではなく、コアSuperchainプロトコルの上に構築できるツールです。ここでの提案は、Superchainへのデプロイメントを改善するツールを構築するための大まかな直感を与えることを目的としています。
 
-These are some tools which could make developing on the Superchain a better experience:
+以下は、Superchain上での開発をより良い体験にするためのツールの一部です：
 
-1.  Content-addressable smart contracts — this enables contracts to have the same address on all chains. This way developers can write smart contracts which are counterfactually deployed to all OP Chains at the same address. If a user on an OP Chain would like to use the smart contract that is not yet available on their chain, they can independently deploy the code.
+1.  コンテンツアドレス可能なスマートコントラクト — これにより、コントラクトはすべてのチェーンで同じアドレスを持つことができます。これにより、開発者はすべてのOP Chainsで同じアドレスで反実仮想的にデプロイされるスマートコントラクトを作成できます。ユーザーがOP Chain上でスマートコントラクトを使用したいが、そのチェーン上にまだ利用可能でない場合、独自にコードをデプロイすることができます。
 
-2.  Cross-chain contract state management standards — creating standards for how smart contract state can migrate from one chain to the next enables developers to shard their applications on many chains. Additionally, this logic can be used in wallets to display user state as if it is all on the same chain. For instance, if a user has tokens split across many chains, the wallet can use the cross-chain state management logic to know that it should display the user balance as a sum of all of their token balances across all chains.
+2.  クロスチェーンコントラクト状態管理標準 — スマートコントラクト状態があるチェーンから別のチェーンに移行する方法の標準を作成することで、開発者はアプリケーションを多数のチェーンでシャーディングすることができます。さらに、このロジックは、ウォレットがユーザーの状態を同じチェーン上にあるかのように表示するために使用できます。例えば、ユーザーが多くのチェーンにまたがるトークンを持っている場合、ウォレットはクロスチェーン状態管理ロジックを使用して、すべてのチェーンにまたがるトークン残高の合計としてユーザー残高を表示することができます。
 
     <Callout type="info">
-      For the Ethereum scalability nerds: the state growth problem can be addressed in these frameworks by making it easy to migrate user state from bloated chains into fresh chains. Old bloated chains can be maintained with a low gas limit or deprecated entirely.
+      Ethereumのスケーラビリティオタクのために：状態成長の問題は、ユーザーの状態を膨らんだチェーンから新しいチェーンに移行するのを簡単にすることで、これらのフレームワークで対処できます。古い膨らんだチェーンは低ガスリミットで維持されるか、完全に廃止される可能性があります。
     </Callout>
 
-3.  Superchain RPC endpoint — creating a single RPC endpoint where users can send their Superchain transactions regardless of which OP Chain they are intended to enables users to avoid constantly switching their network.
+3.  Superchain RPCエンドポイント — Superchainトランザクションを送信するために、ユーザーがネットワークを切り替えることなくSuperchainトランザクションを送信できる単一のRPCエンドポイントを作成します。
 
-With robust multi-chain app frameworks, it may become as easy to deploy cross-chain apps as it is to deploy apps which target a single chain.
+堅牢なマルチチェーンアプリフレームワークがあれば、単一のチェーンをターゲットにしたアプリのデプロイと同じくらい簡単にクロスチェーンアプリのデプロイが可能になるかもしれません。
 
-## Get Involved
+## 参加する
 
-We believe scaling blockchains will radically decentralize the internet and make it easy to create horizontally scalable, secure, and decentralized web applications. We think the Superchain release of the OP Stack could mark a major step towards realizing this vision. However, after the release, it will still take an enormous amount of work to realize the scalability vision.
+私たちは、ブロックチェーンをスケールすることがインターネットを大規模に分散化し、水平スケーラブルで安全な分散型ウェブアプリケーションの作成を容易にすることを信じています。私たちは、OP StackのSuperchainリリースがこのビジョンの実現に向けた重要な一歩を示す可能性があると考えています。しかし、リリース後もスケーラビリティビジョンを実現するには膨大な作業が必要です。
 
-However, with great challenge comes great opportunity! The work needed to arrive at the initial Superchain release of the OP stack, as well as the resulting ecosystem should create exciting greenfield opportunities for developers who want to contribute. There will be an enormous amount of low-hanging fruit contributions unlocked. We can't pick it alone! The only way we can hope to achieve it is through open-source contributions from folks like you! And with [retroactive public goods funding](https://web.archive.org/web/20231217000541/https://medium.com/ethereum-optimism/retroactive-public-goods-funding-33c9b7d00f0c) your open source contributions may be rewarded too!
+しかし、大きな挑戦には大きなチャンスが伴います！OP Stackの最初のSuperchainリリースに到達するために必要な作業、およびその結果としてのエコシステムは、貢献したいと考えている開発者にとってエキサイティングなグリーンフィールドの機会を創出するはずです。多くの低いハードルの貢献が解放されるでしょう。私たちは一人ではそれを拾えません！それを達成する唯一の方法は、あなたのような人々からのオープンソースの貢献です！さらに、[retroactive public goods funding](https://web.archive.org/web/20231217000541/https://medium.com/ethereum-optimism/retroactive-public-goods-funding-33c9b7d00f0c)により、オープンソースの貢献が報われる可能性もあります！
 
-Exciting times ahead.
+エキサイティングな時代が待っています。
 
 Stay Optimistic 🔴✨
