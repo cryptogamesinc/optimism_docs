@@ -1,116 +1,116 @@
 ---
-title: Rollup Protocol Overview
-lang: en-US
-description: Learn how Optimistic Rollups work at a high level.
+title: Rollupプロトコル概要
+lang: ja-JP
+description: Optimistic Rollupsがどのように機能するかを高レベルで学びましょう。
 ---
 
-# Rollup Protocol Overview
+# Rollupプロトコル概要
 
-The big idea that makes Optimism possible is the Optimistic Rollup.
-We'll go through a brief explainer of *how* Optimistic Rollups work at a high level.
-Then we'll explain *why* Optimism is built as an Optimistic Rollup and why we believe it's the best option for a system that addresses all of our design goals.
-Check out the [protocol specs](https://specs.optimism.io/), if you want to more detail about the rollup protocol.
+Optimismを可能にする大きなアイデアは、Optimistic Rollupです。
+ここでは、Optimistic Rollupsが*どのように*機能するかを高レベルで簡単に説明します。
+次に、OptimismがなぜOptimistic Rollupとして構築されているのか、そして私たちの設計目標をすべて満たすシステムに最適だと考える理由を説明します。
+Rollupプロトコルの詳細については、[プロトコル仕様](https://specs.optimism.io/)をご覧ください。
 
-## Optimistic Rollups TL;DR
+## Optimistic Rollupsの概要
 
-Optimism is an "Optimistic Rollup," which is basically just a fancy way of describing a blockchain that piggy-backs off of the security of another "parent" blockchain.
-Specifically, Optimistic Rollups leverage the consensus mechanism (like PoW or PoS) of their parent chain instead of providing their own. In OP Mainnet's case, this parent blockchain is Ethereum.
+Optimismは「Optimistic Rollup」であり、これは基本的に「親」ブロックチェーンのセキュリティを利用するブロックチェーンを説明するためのしゃれた表現です。
+具体的には、Optimistic Rollupsは独自のコンセンサスメカニズムを提供する代わりに、親チェーンのコンセンサスメカニズム（PoWやPoSなど）を利用します。OP Mainnetの場合、この親ブロックチェーンはEthereumです。
 
-![Ethereum and Optimism Forever Doodle.](/img/op-stack/protocol/ethereum-optimism-forever.png)
+![EthereumとOptimismの永遠のDoodle。](/img/op-stack/protocol/ethereum-optimism-forever.png)
 
-## Block storage
+## ブロックストレージ
 
-In Bedrock, L2 blocks are saved to the Ethereum blockchain using a non-contract address ([`0xff00..0010` on Ethereum](https://etherscan.io/address/0xff00000000000000000000000000000000000010)) to minimize the L1 gas expense.
-As these blocks are submitted as transaction calldata on Ethereum, there is no way to modify or censor them after the "transaction" is included in a block that has enough attestations.
-This is the way that OP Mainnet inherits the availability and integrity guarantees of Ethereum.
+Bedrockでは、L2ブロックはEthereumブロックチェーンにコントラクトアドレスではないアドレス（[Ethereum上の`0xff00..0010`](https://etherscan.io/address/0xff00000000000000000000000000000000000010)）を使用して保存され、L1のガスコストを最小限に抑えます。
+これらのブロックはEthereum上でトランザクションのcalldataとして送信されるため、「トランザクション」が十分な承認を持つブロックに含まれた後にそれらを変更したり検閲したりする方法はありません。
+これが、OP MainnetがEthereumの可用性と整合性の保証を継承する方法です。
 
-Blocks are written to L1 in [a compressed format](https://specs.optimism.io/protocol/derivation.html#batch-submission-wire-format) to reduce costs.
-This is important because writing to L1 is [the major cost of OP Mainnet transactions](/stack/transactions/fees).
+ブロックはコストを削減するために[L1に圧縮形式](https://specs.optimism.io/protocol/derivation.html#batch-submission-wire-format)で書き込まれます。
+これは、L1への書き込みが[OP Mainnetトランザクションの主要なコスト](/stack/transactions/fees)であるため重要です。
 
-## Block production
+## ブロック生成
 
-Optimism block production is primarily managed by a single party, called the "sequencer," which helps the network by providing the following services:
+Optimismのブロック生成は主に「sequencer」と呼ばれる単一のパーティによって管理されており、このネットワークに以下のサービスを提供します:
 
-*   Providing transaction confirmations and state updates.
-*   Constructing and executing L2 blocks.
-*   Submitting user transactions to L1.
+*   トランザクションの確認と状態の更新を提供する。
+*   L2ブロックを構築し、実行する。
+*   ユーザートランザクションをL1に送信する。
 
-In Bedrock, the sequencer does have a mempool, similar to L1 Ethereum, but the mempool is private to avoid opening opportunities for MEV.
-In OP Mainnet blocks are produced every two seconds, regardless of whether they are empty (no transactions), filled up to the block gas limit with transactions, or anything in between.
+Bedrockでは、L1 Ethereumと同様に、sequencerにはメモリプールが存在しますが、このメモリプールはMEVの機会を避けるために非公開です。
+OP Mainnetでは、ブロックは2秒ごとに生成され、トランザクションがない（空の）場合や、トランザクションでブロックガスリミットまで満たされている場合、またはその中間の状態であっても、常に生成されます。
 
-Transactions get to the sequencer in two ways:
+トランザクションは次の2つの方法でsequencerに到達します:
 
-1.  Transactions submitted on L1 (called *deposits*) are included in the chain in the appropriate L2 block.
-    Every L2 block is identified by the "epoch" (the L1 block to which it corresponds, which typically has happened a few minutes before the L2 block) and its serial number within that epoch.
-    The first block of the epoch includes all the deposits that happened in the L1 block to which it corresponds.
-    If the sequencer attempts to ignore a legitimate L1 transaction it ends up with a state that is inconsistent with the verifiers, same as if the sequencer tried to fake the state by other means.
-    This provides OP Mainnet with L1 Ethereum level censorship resistance.
-    You can read more about this mechanism [in the protocol specifications](https://specs.optimism.io/protocol/derivation.html#deriving-the-transaction-list).
+1.  L1に送信されたトランザクション（*deposits*と呼ばれます）は、対応するL2ブロックに適切に含まれます。
+    各L2ブロックは、「epoch」（それに対応するL1ブロック、通常はL2ブロックが発生する数分前に起こる）とそのepoch内のシリアル番号によって識別されます。
+    epochの最初のブロックには、それに対応するL1ブロックで発生したすべてのdepositsが含まれます。
+    sequencerが正当なL1トランザクションを無視しようとすると、他の手段で状態を偽装しようとした場合と同様に、検証者と矛盾する状態が生じます。
+    これにより、OP MainnetはL1 Ethereumレベルの検閲耐性を持ちます。
+    このメカニズムについての詳細は[プロトコル仕様](https://specs.optimism.io/protocol/derivation.html#deriving-the-transaction-list)をご覧ください。
 
-2.  Transactions submitted directly to the sequencer.
-    These transactions are a lot cheaper to submit, as they do not require the expense of a separate L1 transaction. However, they cannot be made censorship resistant since the sequencer is the only participant that knows about them.
+2.  直接sequencerに送信されたトランザクション。
+    これらのトランザクションは、別のL1トランザクションのコストを必要としないため、提出コストが大幅に安くなります。しかし、これらは検閲耐性を持つことはできません。sequencerがこれらのトランザクションを唯一知る参加者だからです。
 
-For the moment, [The Optimism Foundation](https://www.optimism.io/) runs the only block producer on OP Mainnet. Refer to [Protocol specs](overview) section for more information about how we plan to decentralize the Sequencer role in the future.
+現在のところ、[The Optimism Foundation](https://www.optimism.io/)がOP Mainnetで唯一のブロックプロデューサーを運営しています。将来的にSequencerの役割をどのように分散化するかについては[プロトコル仕様](overview)セクションを参照してください。
 
-## Block execution
+## ブロック実行
 
-The execution engine (implemented as the `op-geth` component) receive blocks using two mechanisms:
+実行エンジン（`op-geth`コンポーネントとして実装）は、次の2つのメカニズムを使用してブロックを受信します:
 
-1.  The execution engine can update itself using peer to peer network with other execution engines.
-    This operates the same way that the L1 execution clients synchronize the state across the network.
-    You can read more about it [in the specs](https://specs.optimism.io/protocol/exec-engine.html#happy-path-sync).
+1.  実行エンジンは、他の実行エンジンとのピアツーピアネットワークを使用して自らを更新できます。
+    これは、L1実行クライアントがネットワーク全体で状態を同期させるのと同じ方法で動作します。
+    詳細は[仕様](https://specs.optimism.io/protocol/exec-engine.html#happy-path-sync)で読むことができます。
 
-2.  The rollup node (implemented as the `op-node` component) derives the L2 blocks from L1.
-    This mechanism is slower, but censorship resistant.
-    You can read more about it [in the specs](https://specs.optimism.io/protocol/exec-engine.html#worst-case-sync).
+2.  Rollupノード（`op-node`コンポーネントとして実装）はL1からL2ブロックを派生させます。
+    このメカニズムは遅いですが、検閲耐性があります。
+    詳細は[仕様](https://specs.optimism.io/protocol/exec-engine.html#worst-case-sync)で読むことができます。
 
-## Bridging ETH or Tokens Between Layers
+## ETHやトークンのレイヤー間のブリッジ
 
-Optimism is designed so that users can send arbitrary messages between smart contracts on L2 (OP Mainnet, OP Sepolia, etc.) and the underlying L1 (Ethereum mainnet, Sepolia, etc.).
-This makes it possible to transfer ETH or tokens, including ERC20 tokens, between the two networks.
-The exact mechanism by which this communication occurs differs depending on the direction in which messages are being sent.
+Optimismは、L2（OP Mainnet、OP Sepoliaなど）と基盤となるL1（Ethereum mainnet、Sepoliaなど）上のスマートコントラクト間で任意のメッセージを送信できるように設計されています。
+これにより、ETHやERC20トークンを含むトークンを2つのネットワーク間で転送することが可能になります。
+この通信がどのように行われるかは、メッセージが送信される方向によって異なります。
 
-OP Mainnet uses this functionality in the Standard bridge to allow users to deposit tokens from Ethereum to OP Mainnet and also allow withdrawals of the same from OP Mainnet back to Ethereum.
-See the [developer documentation and examples](/builders/app-developers/bridging/standard-bridge) on details on the inner workings of the Standard bridge.
+OP Mainnetは、この機能をStandard bridgeで使用しており、ユーザーがEthereumからOP Mainnetにトークンを預け入れたり、OP MainnetからEthereumに同じトークンを引き出したりすることを可能にしています。
+Standard bridgeの内部動作に関する詳細については、[開発者ドキュメントと例](/builders/app-developers/bridging/standard-bridge)をご覧ください。
 
-### Moving from Ethereum to OP Mainnet
+### EthereumからOP Mainnetへ移動
 
-In Optimism terminology, transactions going from Ethereum (L1) to OP Mainnet (L2) are called *deposits*.
+Optimismの用語では、Ethereum（L1）からOP Mainnet（L2）へのトランザクションは*deposits*と呼ばれます。
 
-You use [`L1CrossDomainMessenger`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol) or [`L1StandardBridge`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/L1StandardBridge.sol).
-Deposit transactions become part of the canonical blockchain in the first L2 block of the "epoch" corresponding to the L1 block where the deposits were made.
-This L2 block will usually be created a few minutes after the corresponding L1 block.
-You can read more about this [in the specs](https://specs.optimism.io/protocol/deposits.html).
+[`L1CrossDomainMessenger`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/L1CrossDomainMessenger.sol)または[`L1StandardBridge`](https://github.com/ethereum-optimism/optimism/blob/v1.1.4/packages/contracts-bedrock/src/L1/L1StandardBridge.sol)を使用します。
+Depositトランザクションは、depositsが行われたL1ブロックに対応する「epoch」の最初のL2ブロックに含まれます。
+このL2ブロックは通常、対応するL1ブロックの数分後に作成されます。
+詳細については[仕様](https://specs.optimism.io/protocol/deposits.html)をご覧ください。
 
-### Moving from OP Mainnet to Ethereum
+### OP MainnetからEthereumへ移動
 
-Withdrawals (the term is used for any OP Mainnet to Ethereum message) have three stages:
+Withdrawals（この用語はOP MainnetからEthereumへのメッセージすべてに使用されます）は、3つの段階があります:
 
-1.  You initialize withdrawals with an L2 transaction.
+1.  L2トランザクションでwithdrawalsを初期化します。
 
-2.  Wait for the next output root to be submitted to L1 (you can see this on [the SDK](https://sdk.optimism.io)) and then submit the withdrawal proof using `proveWithdrawalTransaction`.
-    This new step enables offchain monitoring of the withdrawals, which makes it easier to identify incorrect withdrawals or output roots.
-    This protects OP Mainnet users against a whole class of potential bridge vulnerabilities.
+2.  次の出力ルートがL1に送信されるのを待ち（[SDK](https://sdk.optimism.io)で確認できます）、次に`proveWithdrawalTransaction`を使用してwithdrawal proofを提出します。
+    この新しいステップにより、withdrawalsのオフチェーンモニタリングが可能になり、誤ったwithdrawalsや出力ルートを特定しやすくなります。
+    これにより、OP Mainnetユーザーは一連のブリッジの脆弱性から保護されます。
 
-3.  After the fault challenge period ends (a week on mainnet, less than that on the test network), finalize the withdrawal.
+3.  フォールトチャレンジ期間が終了した後（メインネットでは1週間、テストネットではそれより短い）、withdrawalを確定します。
 
-[You can read the full withdrawal specifications here](https://specs.optimism.io/protocol/withdrawals.html)
+[withdrawalの完全な仕様はこちらで読むことができます](https://specs.optimism.io/protocol/withdrawals.html)
 
 ## Fault Proofs
 
-In an Optimistic Rollup, state commitments are published to L1 (Ethereum in the case of OP Mainnet) without any direct proof of the validity of these commitments.
-Instead, these commitments are considered pending for a period of time (called the "challenge window").
-If a proposed state commitment goes unchallenged for the duration of the challenge window (currently set to 7 days), then it is considered final.
-Once a commitment is considered final, smart contracts on Ethereum can safely accept withdrawal proofs about the state of OP Mainnet based on that commitment.
+Optimistic Rollupでは、状態コミットメントがL1（OP Mainnetの場合はEthereum）に直接的な有効性の証拠なしで公開されます。
+その代わりに、これらのコミットメントは一定期間（「チャレンジウィンドウ」と呼ばれます）ペンディングとして扱われます。
+提案された状態コミットメントがチャレンジウィンドウの期間（現在は7日間）中にチャレンジされなかった場合、それは最終的なものと見なされます。
+一旦コミットメントが最終的なものと見なされると、Ethereum上のスマートコントラクトは、そのコミットメントに基づいたOP Mainnetの状態に関するwithdrawal proofsを安全に受け入れることができます。
 
-When a state commitment is challenged, it can be invalidated through a "fault proof" ([formerly known as a "fraud proof"](https://specs.optimism.io/experimental/fault-proof/index.html)) process.
-If the commitment is successfully challenged, then it is removed from the `StateCommitmentChain` to eventually be replaced by another proposed commitment.
-It's important to note that a successful challenge does not roll back OP Mainnet itself, only the published commitments about the state of the chain.
-The ordering of transactions and the state of OP Mainnet is unchanged by a fault proof challenge.
+状態コミットメントがチャレンジされた場合、それは「fault proof」プロセスを通じて無効化される可能性があります（[以前は「fraud proof」として知られていました](https://specs.optimism.io/experimental/fault-proof/index.html)）。
+コミットメントが成功裏にチャレンジされると、それは`StateCommitmentChain`から削除され、最終的には別の提案されたコミットメントに置き換えられます。
+成功したチャレンジは、OP Mainnet自体をロールバックするのではなく、チェーンの状態に関する公開されたコミットメントのみをロールバックすることに注意が必要です。
+トランザクションの順序やOP Mainnetの状態は、fault proofのチャレンジによって変更されません。
 
-The fault proof process is currently undergoing major redevelopment as a side-effect of the November 11th, 2021 [EVM Equivalence](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306) update.
+fault proofプロセスは、2021年11月11日の[EVM Equivalence](https://web.archive.org/web/20231127160757/https://medium.com/ethereum-optimism/introducing-evm-equivalence-5c2021deb306)アップデートの副作用として現在大幅な再開発が進行中です。
 
-## Next Steps
+## 次のステップ
 
-*   If you want to learn more about rollup protocol, check out the guides on [deposit flow](deposit-flow), [withdrawal flow](withdrawal-flow), or [transaction flow](transaction-flow).
-*   To learn about operating your own L2 rollup, see the guide on [starting a self-hosted chain](/builders/chain-operators/self-hosted) or go directly to the tutorial on [creating your own L2 rollup](/builders/chain-operators/tutorials/create-l2-rollup).
+*   Rollupプロトコルについてさらに学びたい場合は、[depositフロー](deposit-flow)、[withdrawalフロー](withdrawal-flow)、または[トランザクションフロー](transaction-flow)に関するガイドを参照してください。
+*   独自のL2 Rollupを運営する方法については、[セルフホスト型チェーンの開始](https://builders/chain-operators/self-hosted)に関するガイドを参照するか、[独自のL2 Rollupを作成する](https://builders/chain-operators/tutorials/create-l2-rollup)チュートリアルに直接進んでください。
