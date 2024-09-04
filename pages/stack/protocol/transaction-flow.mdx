@@ -66,6 +66,8 @@ import { Callout } from 'nextra/components'
 
   トランザクションが確定されると、それが「起こった」と信頼できます。
   トランザクション後の状態はフォルトチャレンジの対象となりますが、トランザクション自体は確定し、変更不可能です。
+
+  TODO: stateを書き込むの目的は具体的に何か。fault challengeが成功した際、どうなるのか。Op-batcherの書き込むトランザクションは必ず正しいのかどうか。
 </Callout>
 
 L1に書き込まれるチャンネルを構築するコードは、[`channel_out.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-node/rollup/derive/channel_out.go)と[`channel_builder.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-node/rollup/derive/channel_out.go)にあります。
