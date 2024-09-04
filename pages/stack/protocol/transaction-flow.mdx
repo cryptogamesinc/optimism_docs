@@ -1,122 +1,122 @@
 ---
-title: Transaction Flow
-lang: en-US
-description: Learn the transaction flow process for rollup transactions.
+title: トランザクションフロー
+lang: ja-JP
+description: Rollupトランザクションのフローを学びましょう。
 ---
 
 import { Callout } from 'nextra/components'
 
-# Transaction Flow
+# トランザクションフロー
 
-This guide explains the transaction flow process for rollup transactions. The process for a rollup transaction has two requirements.
+このガイドは、Rollupトランザクションのフローについて説明します。Rollupトランザクションには2つの要件があります。
 
-*   The transaction needs to be written to L1 (Ethereum).
-    This is typically performed by `op-batcher`, but any user can send an L1 transaction to submit an L2 transaction, in which case `op-batcher` is bypassed.
+*   トランザクションはL1（Ethereum）に書き込む必要があります。
+    これは通常、`op-batcher`によって実行されますが、任意のユーザーがL1トランザクションを送信してL2トランザクションを提出することもでき、その場合は`op-batcher`がバイパスされます。
 
-*   The transaction needs to be executed to modify the state (by `op-geth`).
-    Afterwards, `op-proposer` writes a [commitment](https://en.wikipedia.org/wiki/Commitment_scheme) to the post-transaction state to L1.
-    Note that `op-proposer` does not need to write a commitment after each transaction to L1, it is OK to commit to the state after a block of transactions.
+*   トランザクションは実行され、状態を変更する必要があります（`op-geth`によって）。
+    その後、`op-proposer`は、トランザクション後の状態への[コミットメント](https://en.wikipedia.org/wiki/Commitment_scheme)をL1に書き込みます。
+    ただし、`op-proposer`はトランザクションごとにL1にコミットメントを書き込む必要はなく、トランザクションのブロック後に状態をコミットすることが許容されます。
 
-![Overall process.](/img/op-stack/protocol/transaction-flow.svg)
+![全体のプロセス.](/img/op-stack/protocol/transaction-flow.svg)
 
-## Writing the transaction to L1
+## トランザクションをL1に書き込む
 
-[`op-batcher`](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-batcher) has two main jobs:
+[`op-batcher`](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-batcher)には、主に2つの役割があります：
 
-*   Compress transactions into batches.
-*   Post those batches to L1 to ensure availability and integrity.
+*   トランザクションをバッチに圧縮すること。
+*   そのバッチをL1に投稿して、可用性と整合性を確保すること。
 
-### Compression
+### 圧縮
 
-The batcher aggregates [sequencer batches](https://specs.optimism.io/glossary.html#sequencer-batch) into [channels](https://specs.optimism.io/glossary.html#channel).
-This allows for more data per compression frame, and therefore a better compression ratio.
-You can read more about this process [in the specs](https://specs.optimism.io/protocol/derivation.html#batch-submission).
+バッチャーは[シーケンサーバッチ](https://specs.optimism.io/glossary.html#sequencer-batch)を[チャンネル](https://specs.optimism.io/glossary.html#channel)に集約します。
+これにより、圧縮フレームあたりのデータ量が増え、より良い圧縮率が得られます。
+このプロセスの詳細は[仕様書](https://specs.optimism.io/protocol/derivation.html#batch-submission)で読むことができます。
 
-When a channel is full or times out it is compressed and written.
+チャンネルが満杯になるかタイムアウトすると、圧縮されて書き込まれます。
 
-The maximum time that a channel can be open, from the first transaction to the last, is specified in units of L1 block time (so a value of 5 means 5\*12=60 seconds).
-You can specify it either as an environment variable (`OP_BATCHER_MAX_CHANNEL_DURATION`) or a command line parameters (`--max-channel-duration`).
-Alternatively, you can set it to zero (the default) to avoid posting smaller, less cost efficient, transactions.
+チャンネルが最初のトランザクションから最後のトランザクションまで開いている最大時間は、L1ブロック時間の単位で指定されます（したがって、値が5の場合、5\*12=60秒となります）。
+環境変数（`OP_BATCHER_MAX_CHANNEL_DURATION`）またはコマンドラインパラメータ（`--max-channel-duration`）で指定できます。
+あるいは、ゼロ（デフォルト）に設定して、コスト効率の低い小さなトランザクションの投稿を回避することも可能です。
 
-A channel is full when the anticipated compressed size is the target L1 transaction size.
-This is controlled by two parameters:
+予想される圧縮サイズが目標L1トランザクションサイズに達した場合、チャンネルは満杯になります。
+これは2つのパラメータで制御されます：
 
-1.  The target L1 transaction size, which you can specify in bytes on the command line (`--target-l1-tx-size-bytes`) or as an environment variable (`OP_BATCHER_TARGET_L1_TX_SIZE_BYTES`)
+1.  目標L1トランザクションサイズは、バイト単位でコマンドライン（`--target-l1-tx-size-bytes`）または環境変数（`OP_BATCHER_TARGET_L1_TX_SIZE_BYTES`）で指定できます。
 
-2.  The expected compression ratio, which you can specify as a decimal value, again either on the command line (`--approx-compr-ratio`) or as an environment variable (`OP_BATCHER_APPROX_COMPR_RATIO`).
+2.  予想される圧縮率は、小数値としてコマンドライン（`--approx-compr-ratio`）または環境変数（`OP_BATCHER_APPROX_COMPR_RATIO`）で指定できます。
 
-You can see the code that implements this process in [`channel_manager.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-batcher/batcher/channel_manager.go) and [`channel_builder.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-batcher/batcher/channel_builder.go).
+このプロセスを実装しているコードは、[`channel_manager.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-batcher/batcher/channel_manager.go)と[`channel_builder.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-batcher/batcher/channel_builder.go)にあります。
 
-### Posting to L1
+### L1への投稿
 
-When a channel is full it is posted, either as a single transaction or as multiple transactions (depending on data size) to L1.
+チャンネルが満杯になると、L1に単一のトランザクションまたは複数のトランザクション（データサイズに応じて）として投稿されます。
 
-Processed L2 transactions exist in one of three states:
+処理されたL2トランザクションは次の3つの状態のいずれかに存在します：
 
-*   **unsafe** transactions are already processed, but not written to L1 yet.
-    A batcher fault might cause these transactions to be dropped.
+*   **unsafe**トランザクションはすでに処理されていますが、まだL1に書き込まれていません。
+    バッチャーの故障により、これらのトランザクションが失われる可能性があります。
 
-*   **safe** transactions are already processed and written to L1.
-    However, they might be dropped due to a reorganization at the L1 level.
+*   **safe**トランザクションはすでに処理され、L1に書き込まれています。
+    しかし、L1レベルでの再編成によって失われる可能性があります。
 
-*   **finalized** transactions are written to L1 in an L1 block that is old enough to be extremely unlikely to be re-organized.
+*   **finalized**トランザクションはL1に書き込まれ、再編成が非常に起こりにくい古いL1ブロックに存在します。
 
 <Callout type="info">
-  When are transactions irrevocable?
+  トランザクションはいつ取り消せなくなりますか？
 
-  Once a transaction is finalized, you can rely that it has "happened".
-  While the state after the transaction is subject to fault challenges, the transaction itself is fixed and immutable.
+  トランザクションが確定されると、それが「起こった」と信頼できます。
+  トランザクション後の状態はフォルトチャレンジの対象となりますが、トランザクション自体は確定し、変更不可能です。
 </Callout>
 
-You can see the code that builds the channels to be written to L1 in [`channel_out.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-node/rollup/derive/channel_out.go) and [`channel_builder.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-node/rollup/derive/channel_out.go).
-The transactions themselves are sent in [`op-batcher`'s main loop](https://github.com/ethereum-optimism/optimism/blob/915036aaa7eba7ee2ce290be90f78bb35df8d066/op-batcher/batcher/driver.go#L284-L299), which calls [`publishStateToL1`](https://github.com/ethereum-optimism/optimism/blob/915036aaa7eba7ee2ce290be90f78bb35df8d066/op-batcher/batcher/driver.go#L303-L344)
+L1に書き込まれるチャンネルを構築するコードは、[`channel_out.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-node/rollup/derive/channel_out.go)と[`channel_builder.go`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/op-node/rollup/derive/channel_out.go)にあります。
+トランザクション自体は、[`op-batcher`のメインループ](https://github.com/ethereum-optimism/optimism/blob/915036aaa7eba7ee2ce290be90f78bb35df8d066/op-batcher/batcher/driver.go#L284-L299)で送信され、[`publishStateToL1`](https://github.com/ethereum-optimism/optimism/blob/915036aaa7eba7ee2ce290be90f78bb35df8d066/op-batcher/batcher/driver.go#L303-L344)が呼び出されます。
 
-#### Determining the status of a transaction
+#### トランザクションのステータスを確認する
 
-This is the procedure to see a transaction's status.
-The directions here are for [Foundry](https://book.getfoundry.sh/), but the concept is the same regardless of the method you use.
+これは、トランザクションのステータスを確認する手順です。
+ここでの手順は[Foundry](https://book.getfoundry.sh/)用ですが、使用する方法にかかわらずコンセプトは同じです。
 
-1.  Get the number of the L2 block in which the transaction is recorded.
+1.  トランザクションが記録されたL2ブロックの番号を取得します。
 
-    ```sh
-    export ETH_RPC_URL=<URL to Optimism network>
+    \```sh
+    export ETH_RPC_URL=<OptimismネットワークへのURL>
     cast tx <transaction hash> blockNumber
-    ```
+    \```
 
-2.  Get the number of the latest finalized block.
-    If the result is greater than the block number of the transaction, or equal, the transaction is finalized.
+2.  最新の確定ブロックの番号を取得します。
+    結果がトランザクションのブロック番号よりも大きいか同じ場合、トランザクションは確定されます。
 
-    ```sh
+    \```sh
     cast block finalized --field number
-    ```
+    \```
 
-3.  Get the number of the latest safe block.
-    If the result is greater than the block number of the transaction, or equal, the transaction is safe.
+3.  最新の安全なブロックの番号を取得します。
+    結果がトランザクションのブロック番号よりも大きいか同じ場合、トランザクションは安全です。
 
-    ```sh
+    \```sh
     cast block safe --field number
-    ```
+    \```
 
-4.  If the transaction isn't finalized or safe, it's unsafe.
+4.  トランザクションが確定または安全でない場合、それはunsafeです。
 
-## State processing
+## 状態の処理
 
-State processing can be divided into two steps:
+状態の処理は2つのステップに分けることができます：
 
-1.  Applying the transaction to the old state to produce the new state, which is performed by [`op-geth`](https://github.com/ethereum-optimism/op-geth).
+1.  トランザクションを古い状態に適用して新しい状態を生成すること。これは[`op-geth`](https://github.com/ethereum-optimism/op-geth)によって実行されます。
 
-2.  Proposing the new [Merkle root](https://en.wikipedia.org/wiki/Merkle_tree) of the state.
-    Merkle roots are used because the actual state is long and would cost too much to write to L1.
-    This step is performed by `op-proposer`.
+2.  状態の新しい[Merkle root](https://en.wikipedia.org/wiki/Merkle_tree)を提案します。
+    Merkle rootは、実際の状態が長く、L1に書き込むコストが高すぎるため使用されます。
+    このステップは`op-proposer`によって実行されます。
 
-### State changes
+### 状態の変更
 
-The state is stored and modified by [`op-geth`](https://github.com/ethereum-optimism/op-geth).
-It is a [slightly modified](https://op-geth.optimism.io/) version of the standard [geth](https://geth.ethereum.org/).
+状態は[`op-geth`](https://github.com/ethereum-optimism/op-geth)によって保存および変更されます。
+これは標準の[geth](https://geth.ethereum.org/)の[わずかに修正された](https://op-geth.optimism.io/)バージョンです。
 
-### State root proposals
+### 状態rootの提案
 
-The state root proposals are posted by [`op-proposer`](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-proposer) to [`L2OutputOracle`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/packages/contracts-bedrock/contracts/L1/L2OutputOracle.sol) on L1.
+状態rootの提案は[`op-proposer`](https://github.com/ethereum-optimism/optimism/tree/v1.1.4/op-proposer)によって[`L2OutputOracle`](https://github.com/ethereum-optimism/optimism/blob/233ede59d16cb01bdd8e7ff662a153a4c3178bdd/packages/contracts-bedrock/contracts/L1/L2OutputOracle.sol)にL1で投稿されます。
 
-Output proposals are *not* immediately valid.
-They can only be considered authoritative once the fault challenge period (7 days on the production network, less on test networks) has passed.
+出力提案は*すぐには有効にはなりません*。
+フォルトチャレンジ期間（本番ネットワークでは7日間、テストネットではそれ以下）が経過した後にのみ、権威的と見なされます。
