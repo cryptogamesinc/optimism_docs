@@ -267,11 +267,9 @@ ELFバイナリを読み込み、ロードし、パッチを適用してCannon�
 
 (初期ヒープ位置とは、プログラムが実行時に動的にメモリを割り当てるために使用するメモリ領域の開始アドレスのことです。ヒープは、プログラムが実行中に必要に応じてメモリを確保（アロケート）したり解放（デアロケート）したりするために使用されます。)
 
-While loading the ELF file into Cannon, [`metadata.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/metadata.go)
-is used to parse all the symbols stored in the ELF file. Understanding which ELF symbols exist and at which regions of memory
-they are located is important for other functionality, such as understanding if the current `PC` is running within a specific function.
 ELFファイルをCannonにロードする際に、[`metadata.go`](https://github.com/ethereum-optimism/optimism/blob/develop/cannon/mipsevm/metadata.go)が使用され、
-ELFファイルに格納されているすべてのシンボルを解析します。どのELFシンボルが存在し、それらがメモリのどの領域に配置されているかを理解することは、現在の`PC`が特定の関数内で実行されているかどうかを理解するなど、他の機能にとって重要です。
+ELFファイルに格納されているすべてのシンボルを解析します。どのELFシンボルが存在し、それらがメモリのどの領域に配置されているかを理解することは、
+現在の`PC`が特定の関数内で実行されているかどうかを理解するなど、他の機能にとって重要です。
 
 
 
