@@ -273,15 +273,28 @@ ELFファイルに格納されているすべてのシンボルを解析しま�
 
 
 
-Another step that occurs while loading the ELF file is patching the binary of any incompatible functions. This step is crucial, as a key design decision
-important**, as a key design decision in both the onchain and offchain `mipsevm` implementations is that neither implementation
-has access to a kernel. This is primarily due to the limitations within the EVM itself, and since the offchain Cannon
-implementation must match functionality exactly with its onchain counterpart, kernel access is also not available within Cannon. This means that the VMs
-cannot replicate behavior that would otherwise be performed by a kernel 1:1, which primarily impacts system calls (syscalls).
-So features like concurrency, memory management, I/O, etc. are either partially implemented or unimplemented. For the
-unimplemented functionality, any function within the ELF file that would require this functionality is patched out.
-Patching the binary of these functions involves identifying problematic functions, searching for their corresponding symbols
-within the ELF file, and effectively stubbing out the function by returning immediately, and adding a `nop` to the delay slot.
+ELFファイルをロードする際のもう一つのステップは、互換性のない関数のバイナリをパッチすることです。
+このステップは非常に重要です。オンチェーンおよびオフチェーンの`mipsevm`実装における重要な設計決定の一つは、
+どちらの実装もカーネルにアクセスできないことです。
+これは主にEVM自体の制約によるものであり、オフチェーンのCannon実装がオンチェーンの実装と機能を
+完全に一致させる必要があるため、Cannon内でもカーネルアクセスは利用できません。
+これにより、VMはカーネルが行うような動作を1:1で再現することができず、
+主にシステムコール（syscalls）に影響を与えます。
+そのため、並行処理、メモリ管理、I/Oなどの機能は部分的に実装されているか、未実装です。
+未実装の機能については、この機能を必要とするELFファイル内の関数はすべてパッチされます。
+これらの関数のバイナリをパッチするには、問題のある関数を特定し、ELFファイル内の対応するシンボルを検索し、
+関数を即座に返すようにスタブ化し、ディレイスロットに`nop`を追加します。
+
+(
+   ポイント 
+1. **カーネルアクセスの制限**:
+   - オンチェーンおよびオフチェーンの`mipsevm`実装では、カーネルにアクセスできません。これはEVMの制約によるものであり、オフチェーンのCannon実装もオンチェーンの実装と機能を完全に一致させる必要があるためです。
+2. **システムコールの影響**:
+   - カーネルアクセスがないため、システムコール（syscalls）に依存する機能（並行処理、メモリ管理、I/Oなど）は部分的に実装されているか、未実装です。
+3. **パッチの方法**:
+   - 未実装の機能を必要とするELFファイル内の関数はパッチされます。具体的には、問題のある関数を特定し、ELFファイル内の対応するシンボルを検索し、関数を即座に返すようにスタブ化し、ディレイスロットに`nop`を追加します。
+
+)
 
 ### Instruction Stepping
 
