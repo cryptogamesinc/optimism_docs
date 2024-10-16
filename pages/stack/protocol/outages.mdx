@@ -1,179 +1,148 @@
 ---
-title: Sequencer Outages
-lang: en-US
-description: Learn what happens if the Sequencer goes down and how you can be prepared.
+title: Sequencerの障害
+lang: ja-JP
+description: Sequencerがダウンした場合に何が起こるか、そしてどのように準備できるかを学びます。
 ---
 
-# Sequencer Outages
+# Sequencerの障害
 
-All OP Stack chains have a Sequencer that can receive, order, and publish L2 transactions to L1.
-Like any software systems, a Sequencer could potentially become unavailable for any number of different reasons.
-It's important to be aware of the implications of a Sequencer outage and how you can be prepared for it.
+すべてのOP Stackチェーンには、L2トランザクションを受信、順序付け、およびL1に公開できるSequencerがあります。ソフトウェアシステムである以上、Sequencerはさまざまな理由で利用できなくなる可能性があります。Sequencerの障害の影響と、そのための準備方法を理解することが重要です。
 
-Sequencer outages can broadly be categorized into two different types:
+Sequencerの障害は大きく2つのタイプに分類できます：
 
-1.  **Sequencer Downtime Outages** occur when the Sequencer is entirely unable to receive and/or process L2 transactions from users. Outages of this type will appear to users as a complete inability to submit transactions to the Sequencer.
-1.  **Transaction Submission Outages** occur when the Sequencer is still able to receive and process L2 transactions from users but is unable to publish these transactions to L1. Outages of this type generally do not impact users unless they remain unresolved for an extended period of time.
+1.  **Sequencerダウンタイムの障害**は、SequencerがユーザーからのL2トランザクションを完全に受信および/または処理できない場合に発生します。このタイプの障害は、ユーザーにはSequencerにトランザクションを送信できない完全な障害として現れます。
+2.  **トランザクション送信の障害**は、SequencerがまだユーザーからのL2トランザクションを受信および処理できるが、これらのトランザクションをL1に公開できない場合に発生します。このタイプの障害は、長期間未解決でない限り、通常ユーザーには影響しません。
 
-Both outage types can be circumvented by submitting transactions directly to the [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209) contract on L1 with certain important caveats.
-Keep reading to learn more about these potential outages and how to handle them.
+両方の障害タイプは、特定の重要な注意点を除いて、L1上の[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209)コントラクトに直接トランザクションを送信することで回避できます。これらの潜在的な障害とその対処方法について、詳しく読み進めてください。
 
-## Sequencer Downtime Outages
+## Sequencerダウンタイムの障害
 
-### Description
+### 説明
 
-Sequencer downtime outages occur when the Sequencer is unable to receive and/or process L2 transactions from users.
-Outages of this type may be caused by any number of different issues including bugs in client software, cloud outages, or other similar errors.
-Exact causes of Sequencer downtime outages can be dependent on the specific infrastructure used to run the Sequencer for any given OP Stack chain.
+Sequencerダウンタイムの障害は、SequencerがユーザーからのL2トランザクションを受信および/または処理できない場合に発生します。このタイプの障害は、クライアントソフトウェアのバグ、クラウドの障害、その他の類似のエラーなど、さまざまな問題によって引き起こされる可能性があります。Sequencerダウンタイムの障害の正確な原因は、特定のOP StackチェーンのSequencerを実行するために使用されるインフラストラクチャによって異なる場合があります。
 
-### Impact
+### 影響
 
-Sequencer downtime outages can have a significant impact on the user experience.
-During an outage of this type, users will be unable to submit transactions directly to the Sequencer.
-Users may observe that the network appears to be "stuck" at a particular block height.
+Sequencerダウンタイムの障害は、ユーザーエクスペリエンスに大きな影響を与える可能性があります。このタイプの障害の間、ユーザーはSequencerに直接トランザクションを送信できなくなります。ユーザーは、ネットワークが特定のブロック高で「停止」しているように見えるかもしれません。
 
-### Mitigation
+### 対策
 
-Users can always bypass the Sequencer by sending L2 transactions directly to the [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209) contract on L1.
-Refer to the [Bypassing the Sequencer](#bypassing-the-sequencer) section for more information about this functionality.
+ユーザーは常にSequencerをバイパスして、L1上の[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209)コントラクトに直接L2トランザクションを送信することができます。この機能の詳細については、[Sequencerのバイパス](#sequencerのバイパス)セクションを参照してください。
 
-## Transaction Submission Outages
+## トランザクション送信の障害
 
-### Description
+### 説明
 
-Transaction submission outages occur when the Sequencer is still able to receive and process L2 transactions from users but is unable to publish these transactions to L1.
-Outages of this type may be caused by any number of different issues including unexpected L1 network conditions, bugs in transaction submission software, or other similar errors.
+トランザクション送信の障害は、SequencerがまだユーザーからのL2トランザクションを受信および処理できるが、これらのトランザクションをL1に公開できない場合に発生します。このタイプの障害は、予期しないL1ネットワークの状況、トランザクション送信ソフトウェアのバグ、その他の類似のエラーなど、さまざまな問題によって引き起こされる可能性があります。
 
-### Impact
+### 影響
 
-Transaction submission outages generally do not have a significant impact on the user experience unless they remain unresolved for an extended period of time.
-During an outage of this type, users will be able to submit transactions directly to the Sequencer but the blocks including these transactions will not be published to L1.
-Users may observe that the "safe" and "finalized" block heights of the L2 chain appear to remain stuck while the "unsafe" block height continues to increase.
+トランザクション送信の障害は、長期間未解決でない限り、一般的にユーザーエクスペリエンスに大きな影響を与えません。このタイプの障害の間、ユーザーはSequencerに直接トランザクションを送信できますが、これらのトランザクションを含むブロックはL1に公開されません。ユーザーは、L2チェーンの「セーフ」および「ファイナライズド」ブロック高が停止しているように見え、一方で「アンセーフ」ブロック高は増加し続けることに気付くかもしれません。
 
-Transaction submission outages can cause a more significant impact if they remain unresolved.
-Crucially, L2 transactions sent directly to the Sequencer must be published within a certain amount of time after they are included in an L2 block by the Sequencer.
-If this time limit is exceeded, the L2 chain must be reorganized to include these transactions in a later block.
-This can appear to users as a large change in the expected state of the L2 chain.
+トランザクション送信の障害が未解決のままの場合、より重大な影響を及ぼす可能性があります。重要なことに、Sequencerに直接送信されたL2トランザクションは、SequencerによってL2ブロックに含まれてから一定の時間内に公開されなければなりません。この時間制限を超えると、これらのトランザクションを後のブロックに含めるためにL2チェーンを再編成する必要があります。これはユーザーには、L2チェーンの期待される状態が大きく変化したように見える可能性があります。
 
-### Mitigation
+### 対策
 
-Users can always bypass the Sequencer by sending L2 transactions directly to the [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209) contract on L1.
-Refer to the [Bypassing the Sequencer](#bypassing-the-sequencer) section for more information about this functionality.
+ユーザーは常にSequencerをバイパスして、L1上の[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209)コントラクトに直接L2トランザクションを送信することができます。この機能の詳細については、[Sequencerのバイパス](#sequencerのバイパス)セクションを参照してください。
 
-## Bypassing the Sequencer
+## Sequencerのバイパス
 
-A core security goal of OP Stack chains is that the Sequencer should not be able to prevent users from submitting transactions to the L2 chain.
-Users of OP Stack chains can always bypass the sequencer and include transactions in the L2 chain by sending their L2 transactions directly to the [`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209) contract on L1.
+OP Stackチェーンのコアなセキュリティ目標は、SequencerがユーザーのL2チェーンへのトランザクション送信を妨げることができないようにすることです。OP Stackチェーンのユーザーは常にSequencerをバイパスして、L1上の[`OptimismPortal`](https://github.com/ethereum-optimism/optimism/blob/111f3f3a3a2881899662e53e0f1b2f845b188a38/packages/contracts-bedrock/src/L1/OptimismPortal.sol#L209)コントラクトに直接L2トランザクションを送信することで、L2チェーンにトランザクションを含めることができます。
 
-### About the OptimismPortal
+### OptimismPortalについて
 
-The `OptimismPortal` contract is an L1 smart contract that can be used by both smart contracts and EOAs to create L2 transactions without the direct involvement of the Sequencer.
-Many users already interact with this contract indirectly when they bridge ETH or other tokens between L1 and L2 via the Standard Bridge system available on all OP Stack chains.
+`OptimismPortal`コントラクトは、Sequencerの直接的な関与なしに、スマートコントラクトやEOAがL2トランザクションを作成するために使用できるL1のスマートコントラクトです。多くのユーザーは、すでにすべてのOP Stackチェーンで利用可能なStandard Bridgeシステムを介してL1とL2の間でETHや他のトークンをブリッジするときに、このコントラクトと間接的にやり取りしています。
 
-The `OptimismPortal` contract is currently a unique contract for each OP Stack chain.
-Refer to the contract addresses page for your OP Stack chain to find the address of the `OptimismPortal` contract.
-L2 transactions can be triggered on L1 by calling the `depositTransaction` function on the `OptimismPortal` contract.
+`OptimismPortal`コントラクトは現在、各OP Stackチェーンごとにユニークなコントラクトです。お使いのOP Stackチェーンのコントラクトアドレスページを参照して、`OptimismPortal`コントラクトのアドレスを見つけてください。L2トランザクションは、`OptimismPortal`コントラクトの`depositTransaction`関数を呼び出すことでL1上でトリガーされます。
 
-### Capabilities
+### 機能
 
-Users can send any type of L2 transaction to the `OptimismPortal` contract including contract creations and transactions that carry ETH value.
-As a security measure, transactions sent via the `OptimismPortal` are indistinguishable from transactions sent via the Sequencer from the perspective of smart contracts on L2.
+ユーザーは、コントラクトの作成やETHの価値を運ぶトランザクションを含む、あらゆるタイプのL2トランザクションを`OptimismPortal`コントラクトに送信できます。セキュリティ対策として、`OptimismPortal`を介して送信されたトランザクションは、L2上のスマートコントラクトの観点からは、Sequencerを介して送信されたトランザクションと区別できません。
 
-### Address Aliasing
+### アドレスエイリアシング
 
-Transactions triggered via the `OptimismPortal` contract will appear to have been sent by the L1 address that triggered the transaction **unless** the transaction was sent by a smart contract.
-L2 transactions sent by smart contracts via the `OptimismPortal` contract will appear to have been sent by an "aliased" version of the smart contract's address.
-Refer to the [address aliasing](/chain/differences#address-aliasing) explainer for more information about address aliasing.
+`OptimismPortal`コントラクトを介してトリガーされたトランザクションは、トランザクションをトリガーしたL1アドレスから送信されたものとして表示されます。ただし、そのトランザクションがスマートコントラクトによって送信された場合は除きます。スマートコントラクトによって`OptimismPortal`コントラクトを介して送信されたL2トランザクションは、スマートコントラクトの「エイリアス化」されたアドレスから送信されたものとして表示されます。アドレスエイリアシングの詳細については、[アドレスエイリアシング](/chain/differences#address-aliasing)の解説を参照してください。
 
-### Inclusion Rules
+### 包含ルール
 
-Transactions sent to the `OptimismPortal` contract are processed according to a set of rules designed to limit the impact of a failed Sequencer.
-It's important to understand these rules in detail to properly mitigate the effects of an outage.
+`OptimismPortal`コントラクトに送信されたトランザクションは、失敗したSequencerの影響を制限するように設計された一連のルールに従って処理されます。障害の影響を適切に軽減するためには、これらのルールを詳細に理解することが重要です。
 
-For all transactions sent to the `OptimismPortal`:
+`OptimismPortal`に送信されたすべてのトランザクションについて：
 
-1.  Transactions sent within a specific L1 block are processed together.
-2.  Transactions are given a timestamp no more than [`max_sequencer_drift`](https://specs.optimism.io/protocol/derivation.html#overview) in the future.
-3.  Transactions are processed in the order they are received.
-4.  Transactions are processed within the [`sequencer_window`](https://specs.optimism.io/glossary.html#sequencing-window).
+1.  トランザクションは、特定のL1ブロック内で送信されたものが一緒に処理されます。
+2.  トランザクションには、[`max_sequencer_drift`](https://specs.optimism.io/protocol/derivation.html#overview)を超えない将来のタイムスタンプが与えられます。
+3.  トランザクションは、受信された順序で処理されます。
+4.  トランザクションは、[`sequencer_window`](https://specs.optimism.io/glossary.html#sequencing-window)内で処理されます。
 
-In practice, this means that transactions sent to the `OptimismPortal` contract will always be processed in the order they are received and within a maximum delay of the `sequencer_window` (set to 24 hours by default but may differ from chain to chain).
-If the Sequencer is unavailable or transactions are not published to L1 within this `sequencer_window`, OP Stack chains will automatically reorganize themselves to guarantee that these transactions are included in the L2 chain.
+実際には、`OptimismPortal`コントラクトに送信されたトランザクションは、受信された順序で常に処理され、`sequencer_window`の最大遅延内（デフォルトでは24時間に設定されていますが、チェーンによって異なる場合があります）で処理されます。Sequencerが利用できないか、トランザクションがこの`sequencer_window`内にL1に公開されない場合、OP StackチェーンはこれらのトランザクションがL2チェーンに含まれることを保証するために自動的に再編成されます。
 
-Refer to the [L2 Chain Derivation Specification](https://specs.optimism.io/protocol/derivation.html) for a much more detailed explanation of how transactions sent to the `OptimismPortal` contract are processed.
+`OptimismPortal`コントラクトに送信されたトランザクションがどのように処理されるかについて、より詳細な説明は[L2チェーンの導出仕様](https://specs.optimism.io/protocol/derivation.html)を参照してください。
 
-### Inclusion Scenarios
+### 包含シナリオ
 
-It can be helpful to understand how transactions sent to the `OptimismPortal` contract are processed in different scenarios.
-The following scenarios make different assumptions about the state of the Sequencer and the L2 chain to illustrate how transactions sent to the `OptimismPortal` contract are processed.
+`OptimismPortal`コントラクトに送信されたトランザクションがさまざまなシナリオでどのように処理されるかを理解することは有益です。以下のシナリオは、`OptimismPortal`コントラクトに送信されたトランザクションがどのように処理されるかを説明するために、SequencerとL2チェーンの状態に関する異なる仮定をしています。
 
-#### Total Sequencer Outage
+#### 完全なSequencerの障害
 
-In this scenario we'll assume that the Sequencer is completely unavailable and unable to process any transactions.
-Users must send transactions directly to the `OptimismPortal` contract to have them included in the L2 chain.
-We'll also assume that the `sequencer_window` has been set to 24 hours.
-Here, two users are sending transactions to the `OptimismPortal` contract.
+このシナリオでは、Sequencerが完全に利用できず、トランザクションを処理できないと仮定します。ユーザーは、`OptimismPortal`コントラクトに直接トランザクションを送信して、L2チェーンに含める必要があります。また、`sequencer_window`が24時間に設定されていると仮定します。ここでは、2人のユーザーが`OptimismPortal`コントラクトにトランザクションを送信しています。
 
-Observe how the transactions sent by both users are included in the L2 chain automatically after the `sequencer_window` has elapsed.
-The transactions are included in the L2 chain in the order they were received by the `OptimismPortal` contract.
+両方のユーザーが送信したトランザクションが、`sequencer_window`が経過した後に自動的にL2チェーンに含まれることに注目してください。トランザクションは、`OptimismPortal`コントラクトで受信された順序でL2チェーンに含まれます。
 
 ```mermaid
 sequenceDiagram
     participant S as Sequencer
-    participant U1 as User 1
-    participant U2 as User 2
-    participant OP as OptimismPortal Contract
-    participant L2 as Layer 2
+    participant U1 as ユーザー1
+    participant U2 as ユーザー2
+    participant OP as OptimismPortalコントラクト
+    participant L2 as レイヤー2
 
-    Note over S: Sequencer goes offline
-    U1->>OP: User 1 sends transaction 1 to OptimismPortal
-    U2->>OP: User 2 sends transaction 2 to OptimismPortal
-    Note over U1: User 1 waits 24 hours
-    Note over U2: User 2 waits 24 hours
-    OP->>L2: Transaction 1 included in L2 automatically
-    OP->>L2: Transaction 2 included in L2 automatically
-```
-#### Partial Sequencer Outage
-
-In this scenario we'll assume that the Sequencer is down for some period of time but comes back online before the `sequencer_window` has elapsed.
-A user sends a transaction to the `OptimismPortal` during the downtime and but the Sequencer comes back online and includes the transaction in an L2 block before the full `sequencer_window` ends.
-
-```mermaid  
-sequenceDiagram
-    participant S as Sequencer
-    participant U as User
-    participant OP as OptimismPortal Contract
-    participant L2 as Layer 2
-
-    Note over S: Sequencer goes offline
-    U->>OP: User sends transaction to OptimismPortal
-    Note over U: User waits 1 hour
-    Note over S: Sequencer comes back online after 1 hour
-    S->>L2: Transaction included by Sequencer
+    Note over S: Sequencerがオフラインになる
+    U1->>OP: ユーザー1がトランザクション1をOptimismPortalに送信
+    U2->>OP: ユーザー2がトランザクション2をOptimismPortalに送信
+    Note over U1: ユーザー1が24時間待つ
+    Note over U2: ユーザー2が24時間待つ
+    OP->>L2: トランザクション1が自動的にL2に含まれる
+    OP->>L2: トランザクション2が自動的にL2に含まれる
 ```
 
-#### Partial Outage Ordering
+#### 部分的なSequencerの障害
 
-Here we'll again assume that the Sequencer is down for some period of time but comes back online before the `sequencer_window` has elapsed.
-In this scenario, we'll observe the ability that the Sequencer has to include additional transactions in the L2 chain in between transactions sent to the `OptimismPortal` contract.
-
-Here, even though the first user sends their transaction to the `OptimismPortal` contract before the second user sends their transaction to the Sequencer, the Sequencer is able to include the second user's transaction before the first user's transaction is included.
-**Sequencers will typically choose to include transactions sent to the `OptimismPortal` contract before any other transactions but this is not guaranteed.**
+このシナリオでは、Sequencerが一時的にダウンしているが、`sequencer_window`が経過する前に再稼働するものとします。ユーザーがダウンタイム中に`OptimismPortal`にトランザクションを送信し、Sequencerが再稼働して、完全な`sequencer_window`が終了する前にトランザクションをL2ブロックに含めます。
 
 ```mermaid
 sequenceDiagram
     participant S as Sequencer
-    participant U1 as User 1
-    participant U2 as User 2
-    participant OP as OptimismPortal Contract
-    participant L2 as Layer 2
+    participant U as ユーザー
+    participant OP as OptimismPortalコントラクト
+    participant L2 as レイヤー2
 
-    Note over S: Sequencer goes offline
-    U1->>OP: User 1 sends transaction 1 to OptimismPortal
-    Note over U1: User waits 1 hour
-    Note over S: Sequencer comes back online after 1 hour
-    
-    U2->>S: User 2 sends transaction 2 to Sequencer
-    S->>L2: Transaction 2 included by Sequencer
-    S->>L2: Transaction 1 included by Sequencer
+    Note over S: Sequencerがオフラインになる
+    U->>OP: ユーザーがトランザクションをOptimismPortalに送信
+    Note over U: ユーザーが1時間待つ
+    Note over S: Sequencerが1時間後に再稼働
+    S->>L2: Sequencerによってトランザクションが含まれる
+```
+
+#### 部分的な障害の順序付け
+
+ここでも、Sequencerが一時的にダウンしているが、`sequencer_window`が経過する前に再稼働するものとします。このシナリオでは、Sequencerが`OptimismPortal`コントラクトに送信されたトランザクションの間に追加のトランザクションをL2チェーンに含める能力を観察します。
+
+ここでは、最初のユーザーが`OptimismPortal`コントラクトにトランザクションを送信した後に、2番目のユーザーがSequencerにトランザクションを送信したにもかかわらず、Sequencerは2番目のユーザーのトランザクションを最初のユーザーのトランザクションより先に含めることができます。**Sequencerは通常、`OptimismPortal`コントラクトに送信されたトランザクションを他のトランザクションよりも先に含めることを選択しますが、これは保証されていません。**
+
+```mermaid
+sequenceDiagram
+    participant S as Sequencer
+    participant U1 as ユーザー1
+    participant U2 as ユーザー2
+    participant OP as OptimismPortalコントラクト
+    participant L2 as レイヤー2
+
+    Note over S: Sequencerがオフラインになる
+    U1->>OP: ユーザー1がトランザクション1をOptimismPortalに送信
+    Note over U1: ユーザー1が1時間待つ
+    Note over S: Sequencerが1時間後に再稼働
+
+    U2->>S: ユーザー2がトランザクション2をSequencerに送信
+    S->>L2: Sequencerによってトランザクション2が含まれる
+    S->>L2: Sequencerによってトランザクション1が含まれる
 ```
